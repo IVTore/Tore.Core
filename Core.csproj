@@ -11,6 +11,12 @@ Stl: A versatile string associated object list class.
 Com: A Http Client for keeping things neat, tidy and simple.</Description>
     <PackageTags>Tore Core Sys Stl Com Utilities Http Client</PackageTags>
     <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <SignAssembly>false</SignAssembly>
+    <ApplicationIcon />
+    <Win32Resource />
   </PropertyGroup>
 
   <ItemGroup>
