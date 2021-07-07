@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+    <PackageId>Tore.Core</PackageId>
+    <Authors>İhsan Volkan Töre</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>2021 İhsan Volkan Töre</Copyright>
+    <Description>Sys : A static library of many utility functions.
+Stl: A versatile string associated object list class.
+Com: A Http Client for keeping things neat, tidy and simple.</Description>
+    <PackageTags>Tore Core Sys Stl Com Utilities Http Client</PackageTags>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+</Project>
