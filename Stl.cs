@@ -7,7 +7,7 @@
 
 Author              : IVT.  (İhsan Volkan Töre)
 Version             : 202003101300. 
-License				: MIT.
+Licenses            : MIT.
 
 History             :
 202101261231: IVT   : - Removed unnecessary mapped enc/dec.
@@ -49,10 +49,10 @@ public class StlIgnore:  System.Attribute { }
     TASKS:                                                          <br/>
             A string associated object list class with tricks.      <para/>
     USAGE:                                                          <br/>
-            Many key associated object containers need:             <br/>
+            Stl provides:                                           <br/>
             1) Numerically indexed access to keys and objects       <br/>
             2) Ordering.                                            <br/>
-                                                                    <br/>
+            3) Translation forward and backward to various formats. <br/>
                                                                     <br/>
             * Keys can not be null empty or whitespace.             <br/>
             * Lists are public in this class intentionally.         <br/>

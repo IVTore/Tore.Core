@@ -7,7 +7,7 @@
 
 Author              : IVT.  (İhsan Volkan Töre)
 Version             : 202003201700 
-License				: MIT.
+License             : MIT.
 
 History             :
 202003101700: IVT   : Complete rewrite. Now in Tore.Core namespace.

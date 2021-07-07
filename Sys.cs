@@ -7,7 +7,7 @@
 
 Author              : IVT.  (İhsan Volkan Töre)
 Version             : 202006131333
-License				: MIT.
+License             : MIT.
 
 History             :
 202003101700: IVT   : Revision.
