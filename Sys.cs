@@ -43,11 +43,20 @@ public static class     Sys {
 /*————————————————————————————————————————————————————————————————————————————
   Handy constants.
 ————————————————————————————————————————————————————————————————————————————*/
-/**<summary>Constant for carriage return character 0x0D (\r) </summary>*/
+/**———————————————————————————————————————————————————————————————————————————
+  CONST: CR                                                         <summary>
+  USE  : Constant string for carriage return character 0x0D (\r)    </summary> 
+————————————————————————————————————————————————————————————————————————————*/
 public const string CR      = "\r";
-/**<summary>Constant for line feed character 0x0A (\n) </summary>*/
+/**———————————————————————————————————————————————————————————————————————————
+  CONST: LF                                                         <summary>
+  USE  : Constant string for line feed character 0x0A (\n)          </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public const string LF      = "\n";
-/**<summary>Constant for carriage return line feed sequence </summary>*/
+/**———————————————————————————————————————————————————————————————————————————
+  CONST: CRLF                                                       <summary>
+  USE  : Constant string for carriage return line feed sequence.   </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public const string CRLF    = CR+LF;
 
 /**———————————————————————————————————————————————————————————————————————————
@@ -229,10 +238,7 @@ byte[] key;
             not ASCII only.                                     <br/>
         *   The C# keywords are intentionally not checked.      <br/>
         *   @ as first character is not supported.              <br/>
-        *   Optimized for speed.                                <br/>
-        *   Added two methods :                                 <br/>
-                bool identifierBegin(char c),                   <br/>
-                bool identifierInner(char c).                   </summary>
+        *   Optimized for speed.                                </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public static bool          identifier(string s) {
 int i,
@@ -257,6 +263,17 @@ int i,
 // Char.IsLetter() is called.
 // identifierBegin does not consider @ as valid.
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: identifierBegin [static]                                <summary>
+  TASK: Checks if a character can be at the beginning of an 
+        identifier.                                             <para/>
+  ARGS: c   : char    : identifier begin candidate character.   <para/>
+  RETV:     : boolean : true if valid else false.               <para/>
+  INFO:                                                         <br/>
+        *   This accepts unicode identifier letters.            <br/>
+        *   @ as beginning character is not supported.          <br/>
+        *   Optimized for speed.                                </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public static bool identifierBegin (char c) {
     return (c >= 'a' && c <= 'z') 
         || (c >= 'A' && c <= 'Z') 
@@ -264,12 +281,21 @@ public static bool identifierBegin (char c) {
         ||  Char.IsLetter(c);
 }
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: identifierInner [static]                                <summary>
+  TASK: Checks if a character can be inside of an identifier.   <para/>                                             <para/>
+  ARGS: c   : char    : inner identifier candidate character.   <para/>
+  RETV:     : boolean : true if valid else false.               <para/>
+  INFO:                                                         <br/>
+        *   This accepts unicode identifier letters and digits. <br/>
+        *   Optimized for speed.                                </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public static bool identifierInner (char c) {
     return (c >= 'a' && c <= 'z') 
         || (c >= 'A' && c <= 'Z') 
         || (c >= '0' && c <= '9')
         ||  c == '_' 
-        ||  Char.IsLetter(c);
+        ||  Char.IsLetter(c); 
 }
 
 /**———————————————————————————————————————————————————————————————————————————
@@ -290,7 +316,7 @@ public static bool          snoWhite(string s){
   ARGS: s   : string    : Source string to strip multi whitespaces. <para/>
   RETV:     : string    : String stripped of multi white spaces.    <para/>
   INFO: White space characters other than space will be converted to space.
-        Modified from solution of : Felipe Machado, thank you.      </summary>
+        Modified from solution of   Felipe Machado, thank you.      </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public static string        whiteSpacesToSpace(string str){
 int     len     = str.Length;
@@ -344,11 +370,16 @@ int     dstIx  = 0;
     ——————————————————————————
     A Practical Exception Subsystem.
 ————————————————————————————————————————————————————————————————————————————*/
-/*————————————————————————————————————————————————————————————————————————————
-  Exception Interceptor Function Pointer Type and variable.
+/**———————————————————————————————————————————————————————————————————————————
+  TYPE: ExcInt [delegate]                                           <summary>
+  TASK: Exception Interceptor delegate Type                         </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public  delegate    void    ExcInt(Exception e);        // Type definition.
-public  static      ExcInt  excInt  = null;             // Function pointer.
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: excInt                                                      <summary>
+  USE: Exception Interceptor delegate property.                     </summary>
+————————————————————————————————————————————————————————————————————————————*/
+public  static      ExcInt  excInt {get; set;} = null;
 
 /**———————————————————————————————————————————————————————————————————————————
   FUNC: exc [static]                                                <summary>
@@ -409,6 +440,12 @@ MethodBase      met;
     return null; 
 }
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: excDbg [static]                                             <summary>
+  TASK: Outputs exception info via dbg() method                     <para/>
+  ARGS: ed  : Stl       : Exception data in Stl form.               <para/>
+  INFO: The ed Stl can be found in exception.Data["dta"].           </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public static void      excDbg(Stl ed) {
 List<string>    dia,
                 inl;
@@ -460,11 +497,16 @@ public static void          chk(object arg,
 
 private const string dbgLine =  "—————————————————————————————————" +
                                 "—————————————————————————————————";
-/*————————————————————————————————————————————————————————————————————————————
-  Logging Interceptor Function Pointer Type and variable.
+/**———————————————————————————————————————————————————————————————————————————
+  TYPE: LogInt [delegate]                                           <summary>
+  TASK: Logging Interceptor delegate Type for dbg() outputs.        </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public  delegate    void    LogInt(string s);           // Type definition.
-public  static      LogInt  logInt = null;              // Function pointer.
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: logInt                                                      <summary>
+  USE : Logging Interceptor delegate property for dbg() outputs.    </summary>
+————————————————————————————————————————————————————————————————————————————*/
+public  static      LogInt  logInt {get; set;} = null;              // Function pointer.
 
 /**———————————————————————————————————————————————————————————————————————————
   FUNC: dbg [static]                                                <summary>
@@ -560,11 +602,11 @@ List<T> l;
   ARGS: akv : object[]  : Arguments (may be key - values).          <para/>
   RETV:     : Stl       : Arguments as Stl.                         <para/>
   INFO:                                                             <br/>
-        If  akv lenkth = 0 null is returned.                        <br/>
+        If  akv length = 0 null is returned.                        <br/>
         If  akv length = 1                                          <br/>
-            if akv[0] is an Stl, it is returned.                    <br/>
-            otherwise akv[0] is assumed to be a DTO.
-            It is converted to an Stl and returned.                 <br/>
+          __ if akv[0] is an Stl, it is returned.                    <br/>
+          __ else akv[0] is assumed to be a data transfer object.    <br/>
+          __ It is converted to an Stl and returned.                 <br/>
         Otherwise Stl constructor with object[] is called.
         For more info refer to Stl.                                 </summary>
 ————————————————————————————————————————————————————————————————————————————*/
@@ -1216,7 +1258,16 @@ private static string   prepCryptoKey(  string  key, string  strip){
             for attributes with a name.                             </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public class        NameMetadata:  System.Attribute {
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: name: string;                                               <summary>
+  GET : Returns the string kept in the attribute.                   </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public string       name { get; }
+/**——————————————————————————————————————————————————————————————————————————
+  CTOR: NameMetaData                                            <summary>
+  TASK: Constructs a NameMetaData attribute.                    <para/>
+  ARGS: aName : string : Name to keep in the attribute.          </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public              NameMetadata(string aName){
     name = aName;
 }
@@ -1230,7 +1281,11 @@ public              NameMetadata(string aName){
             for attributes with a name list.                        </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public class        NameListMetadata:  System.Attribute {
-
+/**——————————————————————————————————————————————————————————————————————————
+  CTOR: NameMetaData                                            <summary>
+  TASK: Constructs a NameMetaData attribute.                    <para/>
+  ARGS: names : string[] : Names to keep in the attribute.      </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public              NameListMetadata(params string[] names){
     nameList = new List<string>();
     if (names != null){ 
@@ -1238,7 +1293,10 @@ public              NameListMetadata(params string[] names){
             Sys.addUnique(nameList, n);
     }
 }
-
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: nameList: List of string;                                   <summary>
+  GET : Returns the strings kept in the attribute.                   </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public List<string> nameList { get; }
 
 }   // End NameListMetadata Attribute class.

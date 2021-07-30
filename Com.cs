@@ -45,7 +45,7 @@ namespace Tore.Core {
                 req.Content,                                        <br/>
                 req.Content.Headers.Accept,                         <br/>
                 req.Content.Headers.ContentType.MediaType           <br/>
-            properties, And Respective content, accept, mediaType of 
+            properties, And Respective accept, mediaType of 
             Com instance properties must be <b>empty</b>.           <para/>
             Please read the comments on the code at least once for 
             using this class efficiently.                           </summary>
@@ -57,10 +57,7 @@ public class  Com {
   WARN:
     Microsoft recommends usage of a single HttpClient for all requests.
     HttpClient is thread safe and manages all requests and responses to
-    the socket level. So beware.
-    It is private here because of many web articles and examples abusing 
-    it, like setting default headers etc. 
-    No copy paste and cargo cult programming allowed...
+    the socket level. 
 ————————————————————————————————————————————————————————————————————————————*/
 private static HttpClient   client      {get; set;} = new HttpClient();
 
@@ -124,21 +121,21 @@ public string   mediaType   {get; set;} // Req. content MIME.
   PROP: content  .                                                  <summary>
   GET : Returns content to set during request.                      <br/>
   SET : Sets content to set during request.                         <para/>
-  INFO: Must be left null when direct manipulation required.        </summary>
+  INFO: Ignored when req.content is directly assigned (non null).   </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public object   content     {get; set;} // Req. content.
 /**———————————————————————————————————————————————————————————————————————————
   PROP: isForm.                                                     <summary>
   GET : Returns if content must be form url encoded.                <br/>
   SET : Sets if content must be form url encoded.                   <para/>
-  INFO: Irrelevant when content is directly manipulated.            </summary>
+  INFO: Irrelevant when content is directly assigned.               </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public bool     isForm      {get; set;} 
 /**———————————————————————————————————————————————————————————————————————————
   PROP: queryList.                                                  <summary>
   GET : Returns a clone of query list.                              </summary>
 ————————————————————————————————————————————————————————————————————————————*/
-public Stl      queryList    => qList == null ? null: new Stl().clone(qList);
+public Stl      queryList    => qList == null ? null: qList.clone();
 
 private Stl     qList      {get; set;} // info for query.
 
@@ -356,7 +353,7 @@ public async Task<Com>      sendAsync(){
 
 /**———————————————————————————————————————————————————————————————————————————
   FUNC: checkResult.                                                <summary>
-  TASK: Raises exception if request not successfull.                <para/>
+  TASK: Raises exception if request is not successfull.             <para/>
   RETV:     : Com : this object.                                    </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public void                     checkResult(){
@@ -378,7 +375,7 @@ public void                     checkResult(){
 ————————————————————————————————————————————————————————————————————————————*/
 public T                        resObjByJson<T>(){
 T   obj;
-var ser = (typeof(T) == typeof(Stl)) ? Stl.stlJsonSrlzSet : null;
+var ser = (typeof(T) == typeof(Stl)) ? Stl.stlJsonSettings : null;
 
     checkResult();
     try { 
@@ -465,7 +462,7 @@ int             i,
   INFO: 
         Algorithm :
         Call contentSetup
-
+        Build query if exists, and add it to url.
         If  accept is defined
             adds it to request headers.
         If  mediaType is defined
@@ -473,10 +470,11 @@ int             i,
 
   WARN: This routine is called by sendReqAsync().
         IT WORKS AT EVERY REQUEST.
-        If accept, mediaType (content type) or content is
+        If accept, mediaType (content type) is
         very special, they should be assigned via req property and
-        corresponding properties (accept or mediaType or content)
-        should be left empty.       
+        corresponding properties (accept or mediaType)
+        should be left empty.
+        If req.content is not null instance content will be ignored.
 ————————————————————————————————————————————————————————————————————————————*/
 private void                requestSetup(){
     contentSetup();

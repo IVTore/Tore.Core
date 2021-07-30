@@ -46,9 +46,8 @@ public class StlIgnore:  System.Attribute { }
 
 /**——————————————————————————————————————————————————————————————————————————— 
     CLASS:  Stl                                                     <summary>
-    TASKS:                                                          <br/>
-            A string associated object list class with tricks.      <para/>
-    USAGE:                                                          <br/>
+    USAGE:  A string associated object list class with tricks.      <br/>
+                                                                    <br/>
             Stl provides:                                           <br/>
             1) Numerically indexed access to keys and objects       <br/>
             2) Ordering.                                            <br/>
@@ -70,17 +69,32 @@ public class StlIgnore:  System.Attribute { }
 public class Stl    :   IEnumerable,
                         IEnumerable<Kvp>,
                         IDso {
-
+/**———————————————————————————————————————————————————————————————————————————
+  VAR : kl: List of string;                                         <summary>
+  USE : Keeps the list of keys.                                     <para/>
+  INFO: Public by design. 
+        Never add or remove items directly for the sake of coherence.
+        Use add(), addPair, del(), delPair()                        </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public  List <string>   kl;         // Keys     list.
+/**———————————————————————————————————————————————————————————————————————————
+  VAR : ol: List of object;                                         <summary>
+  USE : Keeps the list of values (objects).                         <para/>
+  INFO: Public by design. 
+        Never add or remove items directly for the sake of coherence.
+        Use add(), addPair, delObj(), delPair()                     </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public  List <object>   ol;         // Objects  list.
 private bool            un,         // Keys should be unique        if true.
                         id,         // Keys should be identifier    if true.
                         wr;         // Overwrite Object with same key.
 
-public static   JsonConverter[]         stlJsonConvArr {get; }= 
-                    new JsonConverter[]{new NestedStlConverter()};
-public static   JsonSerializerSettings  stlJsonSrlzSet {get; } = 
-                    new JsonSerializerSettings(){Converters = stlJsonConvArr};
+/**<summary>Used for json conversion while Stl's are nested.</summary>*/
+public static   JsonConverter[]         stlJsonConverter {get; }= 
+                new JsonConverter[]{new NestedStlConverter()};
+/**<summary>Used for setting json conversion for nested Stl's.</summary>*/
+public static   JsonSerializerSettings  stlJsonSettings {get; } = 
+                new JsonSerializerSettings(){Converters = stlJsonConverter};
             
 /**——————————————————————————————————————————————————————————————————————————
   CTOR: Stl                                                     <summary>
@@ -132,6 +146,14 @@ public          Stl(){
         since it copies the properties of original Stl.             </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public          Stl(object o){
+Stl c;
+
+    if (o is Stl){
+        c = (Stl)o;
+        initialize(c.un, c.id, c.wr);
+        append(c);
+        return;
+    }
     initialize();
     if (o is string){
         byJson((string)o, false);
@@ -139,10 +161,6 @@ public          Stl(object o){
     }
     if (o is Type){
         byStatic((Type)o, false);
-        return;
-    }
-    if (o is Stl){
-        clone((Stl)o);
         return;
     }
     byObj(o, false);
@@ -177,9 +195,9 @@ int i,
 }
 
 
-/*———————————————————————————————————————————————————————————————————————————
-  DTOR: ~Stl
-  TASK: Destroys a string associated object list.
+/**——————————————————————————————————————————————————————————————————————————
+  DTOR: ~Stl                                                        <summary>
+  TASK: Destroys a string associated object list.                   </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 ~Stl(){
 
@@ -221,27 +239,32 @@ public  void    clear() {
 
 /**———————————————————————————————————————————————————————————————————————————
   FUNC: clone                                                       <summary>
-  TASK: Clones a Stl into this Stl.                                 </summary>
+  TASK: Clones this Stl into a new Stl.                             </summary>
 ————————————————————————————————————————————————————————————————————————————*/
-public  Stl    clone(Stl src) {    
-    clear();
-    un = src.un;
-    id = src.id;
-    wr = src.wr;
-    append(src);
-    return this;
+public  Stl    clone() {    
+Stl c = new Stl(un, id, wr);
+    c.append(this);
+    return c;
 }
+
 
 /**———————————————————————————————————————————————————————————————————————————
   FUNC: append                                                      <summary>
   TASK: Shallow transfer of all entries.                            </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public  void    append(Stl src) {
-int i;
+int             i,
+                l = count;
+List<string>    sk;
+List<object>    so;
     if (src == null)
         return;
-    for(i = 0; i < src.count; i++)
-        add(src.kl[i], src.ol[i]);
+    sk = src.kl;
+    so = src.ol;
+    for (i = 0; i < l; i++){
+         kl.Add(sk[i]);
+         ol.Add(so[i]);
+    }
 }
 
 /**———————————————————————————————————————————————————————————————————————————
@@ -288,7 +311,7 @@ int i;
   ARGS:                                                             <br/>
         aKey: String : Key to add.                                  <br/>
         aObj: Object : Object to add.          :DEF: null.          <br/>
-        pUni: Bool   : Unique pair (addPair).  :DEF: false.         <para/>
+        pUni: Bool   : Unique pair (addPair).  :DEF: true.          <para/>
   RETV:     : int    : Index of pair.                               <para/>
   INFO: By default it adds unique pairs.                            </summary>
 ————————————————————————————————————————————————————————————————————————————*/  
@@ -387,7 +410,7 @@ public  int     idxObj(object aObj, int fromIndex = 0) {
 ————————————————————————————————————————————————————————————————————————————*/
 public int      idxPair(string  aKey,
                         object  aObj = null, 
-                        int     fromIndex=0) {
+                        int     fromIndex = 0) {
 int j;
 
     if (String.IsNullOrWhiteSpace(aKey))
@@ -568,7 +591,7 @@ public Stl      byJson(string json, bool init = true){
         id = true;
         wr = true;
     }
-    JsonConvert.PopulateObject(json, this, stlJsonSrlzSet);
+    JsonConvert.PopulateObject(json, this, stlJsonSettings);
     return this;
 }
 
@@ -810,33 +833,86 @@ List<Kvs>   r;
     —————————————————————————————————————————
     Recommended use: When Stl is with unique keys and overwrite is true.
 ————————————————————————————————————————————————————————————————————————————*/
-
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: Add                                                         <summary>
+  TASK: Adds a key-value pair to Stl.                               <para/>
+  ARGS:                                                             <br/>
+        key  : string : Key to add.                                 <br/>
+        value: object : Object to add.          :DEF: null.         <para/>
+  INFO: IDictionary interface. Better use add().                    </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public void Add(string key, object value)   => add(key, value);
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: Remove                                                      <summary>
+  TASK: Deletes first occurence of a key and 
+        associated object from the list.                            <para/>
+  ARGS: key     : String : Key.                                     <para/>
+  RETV          : bool   : true if key found and pair deleted.      <para/>
+  INFO: IDictionary interface. Better use del().                    </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public bool Remove(string key)              => del(key);
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: Remove                                                      <summary>
+  TASK: Deletes first occurence of a key-value pair.                <para/>
+  ARGS: item: KeyValuePair of string,object: Pair to remove.        <para/>
+  RETV:     : bool   : true if pair found and deleted.              <para/>
+  INFO: IDictionary interface. Look delPair().                      </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public bool Remove(Kvp item)                => delPair(item.Key, item.Value);
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: Add                                                         <summary>
+  TASK: Adds a key-value pair to Stl.                               <br/>
+  ARGS: KeyValuePair of string,object: item.                        <br/>
+  INFO: IDictionary interface. Look add(), addPair().               </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public void Add(Kvp item)                   => add(item.Key, item.Value);
-
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: Clear                                                       <summary>
+  TASK: IDictionary interface. Better use clear().                  </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public void Clear()                         => clear();
-
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: ContainsKey                                                 <summary>
+  TASK: IDictionary interface. Better use has().                    </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public bool ContainsKey(string key)         => has(key);
 
+/**———————————————————————————————————————————————————————————————————————————
+  FUNC: Contains                                                    <summary>
+  TASK: IDictionary interface. Better use hasPair().                </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public bool Contains(Kvp item)              => hasPair(item.Key, item.Value);
-
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: Count                                                       <summary>
+  GET : IDictionary interface. Better use count.                    </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public int  Count                           => count;
 
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: IsReadOnly                                                  <summary>
+  GET : IDictionary interface. Always false.                        </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public bool IsReadOnly                      => false;
-
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: Keys                                                        <summary>
+  GET : Gets a shallow copy of Keys list.                           <br/>
+  INFO: IDictionary interface.                                      </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public ICollection<string>  Keys            => copyToList<string>(kl);
-
+/**———————————————————————————————————————————————————————————————————————————
+  PROP: Values                                                      <summary>
+  GET : Gets a shallow copy of values (objects) list.               <br/>
+  INFO: IDictionary interface.                                      </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public ICollection<object>  Values          => copyToList<object>(ol);
-
+/**<inheritdoc/>*/
 public IEnumerator<Kvp>     GetEnumerator() => new StlEnumeratorKVP(this);
-
+/**<inheritdoc/>*/
 IEnumerator     IEnumerable.GetEnumerator() => kl.GetEnumerator();
-
+/**<inheritdoc/>*/
 public bool     TryGetValue(string key, out object value) {
 int     i;
 bool    b;
@@ -846,7 +922,7 @@ bool    b;
     value = b ? ol[i] : null;
     return(b); 
 }
-
+/**<inheritdoc/>*/
 public void     CopyTo(Kvp[] array, int arrayIndex) {
 int i,
     j = 0,
@@ -856,7 +932,7 @@ int i,
     for(i = arrayIndex; i < c; i++) 
         array[j] = new Kvp(kl[i], ol[i]);
 }
-
+/**<inheritdoc/>*/
 public object   this[string key] {
     get => obj(key, 0); 
     set {
@@ -875,32 +951,40 @@ public object   this[string key] {
 
 }// end class Stl
 
-
+/**———————————————————————————————————————————————————————————————————————————
+  CLASS : StlEnumeratorKVP.                                         <summary>
+  USAGE : Stl Enumeration Support for IDictionary interface.        </summary>
+————————————————————————————————————————————————————————————————————————————*/
 public class        StlEnumeratorKVP: IEnumerator<Kvp> {
 
 private Stl         lst;
 private int         idx;
+/**<inheritdoc/>*/
 public  Kvp         Current => new Kvp(lst.kl[idx], lst.ol[idx]);
 
 object              IEnumerator.Current => Current;
-
+/**<summary> Constructor for enumerator class. </summary>*/
 public              StlEnumeratorKVP(Stl stl) {
     lst = stl;
     idx = -1;
 }
 
+/**<inheritdoc/>*/
 public void             Reset(){
     idx = -1;   
 }
 
+/**<inheritdoc/>*/
 public void             Dispose(){ 
     Dispose(true);
 }
-   
+
+/**<inheritdoc/>*/
 protected virtual void  Dispose(bool disposing){
      
 }
 
+/**<inheritdoc/>*/
 public bool             MoveNext() {
     if ((idx + 1) == lst.count)
         return false;
@@ -909,24 +993,24 @@ public bool             MoveNext() {
 }
 }   // end class StlEnumeratorKVP.
 
-/*————————————————————————————————————————————————————————————————————————————
-  CLASS :   NestedStlConverter.
-  USAGE :   Used in jsonDeserializer, for supporting nested Stl.
+/**———————————————————————————————————————————————————————————————————————————
+  CLASS :   NestedStlConverter.                                     <summary>
+  USAGE :   In jsonDeserializer, for supporting nested Stl.         <br/>
   
-    This replaces all untyped sub-list elements of a Stl which can be 
-    IDictionary<string,object> lists with Stl. 
+    This replaces all untyped sub-list elements that can be
+    IDictionary string,object lists with Stl.                      </summary>
 ————————————————————————————————————————————————————————————————————————————*/
 public class        NestedStlConverter : 
                     CustomCreationConverter<IDso>{
-
+/**<inheritdoc/>*/
 public override IDso    Create(Type objectType){
     return new Stl();
 }
-
+/**<inheritdoc/>*/
 public override bool    CanConvert( Type objectType){
     return objectType == typeof(object) || base.CanConvert(objectType);
 }
-
+/**<inheritdoc/>*/
 public override object  ReadJson(   JsonReader      reader, 
                                     Type            objectType, 
                                     object          existingValue, 
