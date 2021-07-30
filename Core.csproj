@@ -14,11 +14,12 @@ Com: A Http Client for keeping things neat, tidy and simple.
     <PackageTags>Tore Core Sys Stl Com Utilities Http Client</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
-    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageReleaseNotes>Added intellisense information, optimized Stl append, corrected Stl clone.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
     <ApplicationIcon />
     <Win32Resource />
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
