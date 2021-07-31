@@ -1,9 +1,9 @@
 # Tore.Core
 Core utilities library for C# By İ. Volkan Töre.
 
-Language : C#.
+Language: C#. (.Net 5)
 
-Nuget package:[Tore.Core](https://www.nuget.org/packages/Tore.Core/)
+Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
 Dependancies: [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
 
