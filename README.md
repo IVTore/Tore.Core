@@ -1,7 +1,12 @@
 # Tore.Core
 Core utilities library for C# By İ. Volkan Töre.
 
-Nuget: https://www.nuget.org/packages/Tore.Core/
+Language : C#.
+
+Nuget package:[Tore.Core](https://www.nuget.org/packages/Tore.Core/)
+
+Dependancies: [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
+
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
@@ -62,5 +67,6 @@ Tricky assignments must be done via
    - req.Content.Headers.Accept,                         
    - req.Content.Headers.ContentType.MediaType properties, 
 When req.content is non null, content property of instance is ignored. 
-Respective accept, mediaType of Com instance properties must be <b>empty</b>.           
+Respective accept, mediaType of Com instance properties must be empty.  
+
 Please read the comments on the code at least once for using this class efficiently.                           
