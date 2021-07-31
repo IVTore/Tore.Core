@@ -1,6 +1,8 @@
 # Tore.Core
 Core utilities library for C# By İ. Volkan Töre.
 
+Nuget: https://www.nuget.org/packages/Tore.Core/
+
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
   - Output by dbg().
