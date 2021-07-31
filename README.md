@@ -1,18 +1,32 @@
 # Tore.Core
-Core utilities library for c#.
+Core utilities library for C# By İ. Volkan Töre.
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
-Exceptions / Strings / Simple encryption / Reflection / Type juggling / Attributes / Simple File Load Save / Simple Encrypted File Load Save/ Time, Date, and many others.                                       
+  - Output by dbg().
+  - Exceptions by exc().
+  - Strings.
+  - Simple encryption.
+  - Reflection.
+  - Type juggling.
+  - Attributes. 
+  - Simple File Load Save. 
+  - Simple Encrypted File Load Save.
+  - Time, Date.
+  
+and many others.
+
 The best way of using them is by adding:               
-using static Tore.Core.Sys;                            
+```C#
+using static Tore.Core.Sys;
+```                            
 to the source file.    
 
 ## Stl.cs :
 Defines the class Stl which is a string associated object list (key - value) class with tricks.     
                                                        
 Stl provides:                                          
-1) Numerically indexed access to keys and objects      
+1) Numerically indexed access to keys and objects.      
 2) Ordering.                                           
 3) Translation forward and backward to various formats.
                                                        
@@ -27,6 +41,7 @@ Stl provides:
    - List KeyValuePair string,string      [Alias: Kvs].     
  
 Has Enumerator and Nested conversion support.           
+Note : Stl is neither suitable nor built for millions of entries.
 
 ## Com.cs :
 Defines the class Com which manages Http client requests and responses.
@@ -44,6 +59,6 @@ Tricky assignments must be done via
    - req.Content,                                        
    - req.Content.Headers.Accept,                         
    - req.Content.Headers.ContentType.MediaType properties, 
-When req.content is non null, Com content property is ignored. 
+When req.content is non null, content property of instance is ignored. 
 Respective accept, mediaType of Com instance properties must be <b>empty</b>.           
 Please read the comments on the code at least once for using this class efficiently.                           
