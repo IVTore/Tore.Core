@@ -36,7 +36,8 @@ Stl provides:
 1) Numerically indexed access to keys and objects.      
 2) Ordering.                                           
 3) Translation forward and backward to various formats.
-                                                       
+4) Duplicate key support.
+
 * Keys can not be null empty or whitespace.            
 * Lists are public in this class intentionally.        
 * Stl also acts as a bridge for,
