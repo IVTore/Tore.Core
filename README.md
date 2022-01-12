@@ -5,7 +5,7 @@ Language: C#. (.Net 5)
 
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
-Dependancies: [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
+Dependencies: [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
 
 
 ## Sys.cs :
