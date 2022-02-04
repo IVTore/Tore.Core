@@ -14,7 +14,6 @@ Tore.Core v6.0.0+ for net 6.0 .<br/>
 &emsp; net 6.0<br/>
 &emsp; Newtonsoft.Json (6.0.1) <br/>
 
-
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
   - Output by dbg().

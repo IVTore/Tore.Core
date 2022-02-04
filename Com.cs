@@ -422,7 +422,7 @@ namespace Tore.Core {
             int i,
                 l;
 
-            if (qList == null)
+            if (qList == null) 
                 return "";
             l = qList.count;
             if (l == 0)
