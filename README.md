@@ -6,13 +6,13 @@ Language: C#.
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
 Dependencies: <br/>
-Tore.Core for net 5.0 .<br/>
+Tore.Core 5.0.0 is for net 5.0 .<br/>
 &emsp; net 5.0<br/>
-&emsp; Newtonsoft.Json (5.0.10)<br/>
+&emsp; Newtonsoft.Json<br/>
 <br/>
-Tore.Core v6.0.0+ for net 6.0 .<br/>
+Tore.Core v6.0.0+ is for net 6.0 .<br/>
 &emsp; net 6.0<br/>
-&emsp; Newtonsoft.Json (6.0.1) <br/>
+&emsp; Newtonsoft.Json <br/>
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
