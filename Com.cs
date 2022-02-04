@@ -461,7 +461,7 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         private void requestSetup() {
             contentSetup();
-            if (qList != null)
+            if ((qList != null) && (qList.count > 0))
                 url += "?" + buildQuery();
             if (!snoWhite(accept))
                 req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));

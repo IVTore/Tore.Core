@@ -1,11 +1,18 @@
 # Tore.Core
 Core utilities library for C# By İ. Volkan Töre.
 
-Language: C#. (.Net 5)
+Language: C#.
 
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
-Dependancies: [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json/)
+Dependencies: <br/>
+Tore.Core for net 5.0 .<br/>
+&emsp; net 5.0<br/>
+&emsp; Newtonsoft.Json (5.0.10)<br/>
+<br/>
+Tore.Core v6.0.0+ for net 6.0 .<br/>
+&emsp; net 6.0<br/>
+&emsp; Newtonsoft.Json (6.0.1) <br/>
 
 
 ## Sys.cs :
@@ -65,10 +72,10 @@ Then use INSTANCE send() and sendAsync() routines.
   
 IMPORTANT:                                              
 Instance content, accept and mediaType properties are transferred to request just before sending it.          
-Tricky assignments must be done via                     
-   - req.Content,                                        
-   - req.Content.Headers.Accept,                         
-   - req.Content.Headers.ContentType.MediaType properties, 
+Tricky assignments must be done via;
+   - req.Content,
+   - req.Content.Headers.Accept,
+   - req.Content.Headers.ContentType.MediaType properties,
   
 When req.content is non null, content property of instance is ignored.
   

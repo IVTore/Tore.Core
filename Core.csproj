@@ -14,12 +14,15 @@ Com: A Http Client for keeping things neat, tidy and simple.
     <PackageTags>Tore Core Sys Stl Com Utilities Http Client</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
-    <PackageReleaseNotes>Added intellisense information, optimized Stl append, corrected Stl clone.</PackageReleaseNotes>
+    <PackageReleaseNotes>* Corrected a minor bug in Com buildQuery method. 
+This is the last version for Net 5.0.
+Tore.Core 6.0.0 is for Net 6.0.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>1.0.1</Version>
+    <Version>5.0.0</Version>
+    <PackageProjectUrl>https://github.com/IVTore/Tore.Core</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
