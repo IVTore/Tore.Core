@@ -5,13 +5,14 @@ Language: C#.
 
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
-Warning: <br/>
+<b>WARNING</b>: <br/>
 Tore.Core v7.0.0+ has undergone radical changes.<br/>
 It is not compatible to previous versions! <br/>
+<br/>
 
-Deprecated Versions are available on Nuget as : <br/>
-    - Deprecated Tore.Core v5.0.0  for net5.0 .
-    - Deprecated Tore.Core v6.0.0+ for net6.0 .
+Deprecated Versions are available on Nuget as :
+  - Deprecated Tore.Core v5.0.0  for net5.0 .
+  - Deprecated Tore.Core v6.0.0+ for net6.0 .
 
 
 Dependencies: <br/>
@@ -21,7 +22,7 @@ Newtonsoft.Json 13+
 
 
 ## Sys.cs :
-Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
+Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:
   - Output by dbg().
   - Exceptions by exc().
   - Reflection.
