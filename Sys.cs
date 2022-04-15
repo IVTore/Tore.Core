@@ -28,11 +28,17 @@ namespace Tore.Core {
 
     /**———————————————————————————————————————————————————————————————————————————
         CLASS:  Sys [Static]                                            <summary>
-        USAGE:  Contains a library of static utility methods treated as 
+        USAGE:                                                          <br/>
+                Contains a library of static utility methods treated as <br/>
                 global functions which is used for managing:            <para/>
-                Exceptions / Strings / Simple encryption / Reflection   <br/>
-                Type juggling / Attributes / Simple File Load Save      <br/>
-                Simple Encrypted File Load Save/ Time, Date,
+                Exceptions                                              <br/>
+                Reflection                                              <br/>
+                Type juggling                                           <br/>
+                Attributes                                              <br/>
+                Simple File Load Save                                   <br/>
+                Time,                                                   <br/>
+                Date,                                                   <br/>
+                
                 and many others.                                        <para/>
                 The best way of using them is by adding:                <br/>
                 using static Tore.Core.Sys;                             <br/>
@@ -66,18 +72,18 @@ namespace Tore.Core {
         public static bool isDebug {
             get {
                 bool d = false;
-#if DEBUG
+        #if DEBUG
                 d = true;
-#endif
+        #endif
                 return d;
             }
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          PROP: isDocker [static] : bool.                                   <summary>
+          PROP: isInContainer [static] : bool.                              <summary>
           TASK: GET: Returns if program is running in a container.          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static bool isDocker {
+        public static bool isInContainer {
             get {
                 return 
                     Environment
@@ -113,7 +119,7 @@ namespace Tore.Core {
           ARGS: hex : string    : Hex string.                               <para/>
           RETV:     : byte[]    : Byte array.                               <para/>
           INFO:                                                             <br/>
-                *   Hex digit letters should be capital.                    <br/>
+                *   Hex digit letters should be <b> CAPITAL </b>.           <br/>
                 *   Throws exception if hex string is invalid.              <br/>
                 *   'A'- 0xA => 65 - 10 = 55.                               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
@@ -172,198 +178,6 @@ namespace Tore.Core {
             return s.ToString();
         }
 
-        /**————————————————————————————————————————————————————————————————————————————
-          FUNC: cryptByteArrays [static]                                <summary>
-          TASK:                                                         <br/>
-                XOR's two byte arrays, returns XOR'ed byte array.       <para/>
-          ARGS:                                                         <br/>
-                encDec  : byte[]    : Byte array to encrypt or decrypt. <br/>   
-                xorKey  : byte[]    : Byte array used as key.           <para/>
-          RETV:         : byte[]    : Result.                           <br/>
-          INFO: xorKey is wrapped over encDec if xorKey is shorter.     <para/>
-          WARN: Throws exception if byte arrays are null or             <br/>
-                xorKey length = 0.                                      </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static byte[] cryptByteArrays(byte[] encDec, byte[] xorKey) {
-            int idx,
-                eln,
-                kln;
-            byte[] res;
-
-            chk(encDec, "encDec");
-            chk(xorKey, "xorKey");
-            eln = encDec.Length;
-            kln = xorKey.Length;
-            if (kln == 0)
-                exc("E_INV_ARG", "xorKey.Length = 0");
-            res = new byte[eln];
-            for(idx = 0; idx < eln; idx++)
-                res[idx] = (byte)(encDec[idx] ^ xorKey[idx % kln]);
-            return res;
-        }
-
-        /**————————————————————————————————————————————————————————————————————————————
-          FUNC: cryptStrings [static]                                       <summary>
-          TASK:                                                             <br/>
-                Encodes UTF8 strings to byte arrays, XOR's them,            <br/>
-                returns XOR'ed byte array.                                  <br/>
-                xorKey is wrapped over encDec if xorKey is shorter.         <para/>
-          ARGS:                                                             <br/>
-                encDec  : string    : String to encrypt or decrypt.         <br/>   
-                xorKey  : string    : String used as key.                   <para/>
-          RETV:         : byte[]    : XOR'ed result as byte array.          <para/>
-          INFO: xorKey is wrapped over encDec if xorKey is shorter.         <para/>
-          WARN: Throws exception if strings are null or empty               </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static byte[] cryptStrings(string encDec, string xorKey) {
-            byte[] enc;
-            byte[] key;
-
-            chk(encDec, "encDec");
-            chk(xorKey, "xorKey");
-            enc = Encoding.UTF8.GetBytes(encDec);
-            key = Encoding.UTF8.GetBytes(xorKey);
-            return cryptByteArrays(enc, key);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: identifier [static]                                     <summary>
-          TASK:                                                         <br/>
-                Checks if an identifier name has a valid syntax.        <para/>
-          ARGS:                                                         <br/>
-                s   : string    : identifier candidate string.          <para/>
-          RETV:     : boolean   : true if valid else false.             <para/>
-          INFO:                                                         <br/>
-                *   This checks for unicode identifiers for runtime,    <br/>
-                    not ASCII only.                                     <br/>
-                *   The C# keywords are intentionally not checked.      <br/>
-                *   @ as first character is not supported.              <br/>
-                *   Optimized for speed.                                </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static bool identifier(string s) {
-            int i,
-            l;
-
-            if (s == null)
-                return false;
-            l = s.Length;
-            if (l == 0)
-                return false;
-            if (!identifierBegin(s[0]))
-                return false;
-            for(i = 1; i < l; i++) {
-                if (!identifierInner(s[i]))
-                    return false;
-            }
-            return true;
-        }
-
-        // In the methods below, Char.IsLetter() costs a lot.
-        // So the highly probable characters are checked before
-        // Char.IsLetter() is called.
-        // identifierBegin does not consider @ as valid.
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: identifierBegin [static]                                <summary>
-          TASK: Checks if a character can be at the beginning of an 
-                identifier.                                             <para/>
-          ARGS: c   : char    : identifier begin candidate character.   <para/>
-          RETV:     : boolean : true if valid else false.               <para/>
-          INFO:                                                         <br/>
-                *   This accepts unicode identifier letters.            <br/>
-                *   @ as beginning character is not supported.          <br/>
-                *   Optimized for speed.                                </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static bool identifierBegin(char c) {
-            return (c >= 'a' && c <= 'z')
-                || (c >= 'A' && c <= 'Z')
-                || c == '_'
-                || Char.IsLetter(c);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: identifierInner [static]                                <summary>
-          TASK: Checks if a character can be inside of an identifier.   <para/>
-          ARGS: c   : char    : inner identifier candidate character.   <para/>
-          RETV:     : boolean : true if valid else false.               <para/>
-          INFO:                                                         <br/>
-                *   This accepts unicode identifier letters and digits. <br/>
-                *   Optimized for speed.                                </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static bool identifierInner(char c) {
-            return  (c >= 'a' && c <= 'z') ||
-                    (c >= 'A' && c <= 'Z') ||
-                    (c >= '0' && c <= '9') ||
-                    c == '_' ||
-                    Char.IsLetter(c);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-            FUNC:   snoWhite [static]                              <summary>
-            TASK:   Shorthand for String.IsNullOrWhiteSpace.       <para/>
-            ARGS:   s   : string    : Source string to check.      <para/>
-            RETV:       : bool      : True if string is null       
-                                      or made of whitespaces.      </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static bool snoWhite(string s) {
-            return string.IsNullOrWhiteSpace(s);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: whiteSpacesToSpace [static]                                 <summary>
-          TASK: Converts all single or consequtive whitespaces 
-                to single space in str.                                     <para/>
-          ARGS: s   : string    : Source string to strip multi whitespaces. <para/>
-          RETV:     : string    : String stripped of multi white spaces.    <para/>
-          INFO: White space characters other than space will be converted to space.
-                Modified from solution of   Felipe Machado, thank you.      </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static string whiteSpacesToSpace(string str) {
-            int len = str.Length;
-            char[] src = str.ToCharArray();
-            int dstIx = 0;
-            bool inWsp = false;
-
-            if (str == null)
-                exc("E_INV_ARG", "str");
-            for(int i = 0; i < len; i++) {
-                var ch = src[i];
-                if (char.IsWhiteSpace(ch)) {
-                    if (!inWsp) {
-                        src[dstIx++] = ' ';
-                        inWsp = true;
-                    }
-                    continue;
-                }
-                inWsp = false;
-                src[dstIx++] = ch;
-            }
-            return new string(src, 0, dstIx);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: rmWhiteSpaces [static]                                      <summary>
-          TASK: removes all whitespaces from str.                           <para/>
-          ARGS: s   : string    : Source string to strip whitespaces.       <para/>
-          RETV:     : string    : String stripped of white spaces.          </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static string rmWhiteSpaces(string str) {
-            int len;
-            char[] src;
-            int dstIx = 0;
-
-            if (str == null)
-                exc("E_INV_ARG", "str");
-            len = str.Length;
-            src = str.ToCharArray();
-            for(int i = 0; i < len; i++) {
-                var ch = src[i];
-                if (char.IsWhiteSpace(ch))
-                    continue;
-                src[dstIx++] = ch;
-            }
-            return new string(src, 0, dstIx);
-        }
         /*————————————————————————————————————————————————————————————————————————————
             ——————————————————————————
             |   Exception Subsystem  |
@@ -374,7 +188,7 @@ namespace Tore.Core {
           TYPE: ExcInt [delegate]                                           <summary>
           TASK: Exception Interceptor delegate Type                         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public delegate void ExcInt(Exception e);        // Type definition.
+        public delegate void ExcInt(Exception e, Stl dta);        // Type definition.
         /**———————————————————————————————————————————————————————————————————————————
           PROP: excInt                                                      <summary>
           USE: Exception Interceptor delegate property.                     </summary>
@@ -414,26 +228,28 @@ namespace Tore.Core {
                 Exception e = null) {
 
             Exception cex;
-            Stl lst;
+            Stl dta;
             MethodBase met;
 
-            cex = e ?? new Exception(tag);              // If no exception make one.
+            cex = e ?? new ToreCoreException(tag);      // If no exception make one.
             if (cex.Data.Contains("dta"))               // If exception already processed
                 return null;                            // return.
-            lst = new Stl(){                            // Collect data.
+            dta = new Stl(){                            // Collect data.
                 {"exc", cex.GetType().FullName},
                 {"msg", cex.Message},
                 {"tag", tag},
                 {"inf", inf}
             };
             met = new StackTrace(2)?.GetFrame(0)?.GetMethod();
-            if (met?.Name == "chk")
-                met = new StackTrace(3)?.GetFrame(0)?.GetMethod();
-            if ((met != null) && (met.DeclaringType != null))
-                lst.add("loc", $"{met.DeclaringType.Name}.{met.Name}");
-            cex.Data.Add("dta", (object)lst);
-            excDbg(lst);
-            excInt?.Invoke(cex);                        // if assigned, invoke.
+            if (met != null) { 
+                if (met.Name.Equals("chk") || met.Name.StartsWith("<"))
+                    met = new StackTrace(3)?.GetFrame(0)?.GetMethod();
+            }
+            if (met != null)
+                dta.add("loc", $"{met.DeclaringType?.Name}.{met.Name}");
+            excInt?.Invoke(cex, dta);                   // if assigned, invoke.
+            cex.Data.Add("dta", (object)dta);
+            excDbg(dta);
             if (e == null)                              // If we made the exception
                 throw cex;                              // throw it
             return null;
@@ -455,7 +271,7 @@ namespace Tore.Core {
             dia.Add("[EXC]: " + (string)ed.obj("exc"));
             dia.Add("[MSG]: " + (string)ed.obj("msg"));
             dia.Add("[TAG]: " + (string)ed.obj("tag"));
-            if (snoWhite(inf)) {
+            if (inf.isNullOrWhiteSpace()) {
                 dia.Add("[INF]: - .");
             } else {
                 inl = new List<string>(inf.Split('\n'));
@@ -470,6 +286,7 @@ namespace Tore.Core {
             dia.Add("_LINE_");
             dbg(dia);
         }
+
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: chk [static]                                            <summary>
           TASK:                                                         <br/>
@@ -531,7 +348,7 @@ namespace Tore.Core {
                 }
             }
             s = b.ToString();
-            if (isDocker)
+            if (isInContainer)
                 Console.Write(s);
             else
                 Debug.Write(s);
@@ -612,8 +429,8 @@ namespace Tore.Core {
             if (akv.Length == 0)
                 return null;
             if (akv.Length == 1) {
-                if (akv[0] is Stl)
-                    return (Stl)akv[0];
+                if (akv[0] is Stl lst)
+                    return lst;
                 return new Stl(akv[0]);
             }
             return new Stl(akv);
@@ -701,7 +518,13 @@ namespace Tore.Core {
             Attribute a;
 
             a = attr(typeof(T), memInfo);
-            return (a is NameMetadata) ? ((NameMetadata)a).name : null;
+            return (a is NameMetadata nmd) ? nmd.name : null;
+        }
+
+        private static Type fetchType(object src, string name) {
+            if (src == null)
+                exc("E_TYPE_SRC_NULL", name);
+            return (src is Type t) ? t : src.GetType();
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -718,12 +541,8 @@ namespace Tore.Core {
         public static PropertyInfo instanceProp(object propSrc,
                                                 string propNam,
                                                 bool inherit = true) {
-            Type t;
-
-            chk(propSrc, "propSrc");
-            chk(propNam, "propNam");
-            t = (propSrc is Type) ? (Type)propSrc : propSrc.GetType();
-            return t.GetProperty(
+            chk(propNam, nameof(propNam));
+            return fetchType(propSrc, nameof(propSrc)).GetProperty(
                     propNam,
                     BindingFlags.Public |
                     BindingFlags.Instance |
@@ -745,12 +564,8 @@ namespace Tore.Core {
         public static PropertyInfo staticProp(object propSrc,
                                                 string propNam,
                                                 bool inherit = true) {
-            Type t;
-
-            chk(propSrc, "propSrc");
-            chk(propNam, "propNam");
-            t = (propSrc is Type) ? (Type)propSrc : propSrc.GetType();
-            return t.GetProperty(
+            chk(propNam, nameof(propNam));
+            return fetchType(propSrc, nameof(propSrc)).GetProperty(
                     propNam,
                     BindingFlags.Public |
                     BindingFlags.Static |
@@ -770,14 +585,10 @@ namespace Tore.Core {
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static FieldInfo staticField(object fldSrc,
-                                                string fldNam,
-                                                bool inherit = true) {
-            Type t;
-
-            chk(fldSrc, "fldSrc");
-            chk(fldNam, "fldNam");
-            t = (fldSrc is Type) ? (Type)fldSrc : fldSrc.GetType();
-            return t.GetField(
+                                            string fldNam,
+                                            bool inherit = true) {
+            chk(fldNam, nameof(fldNam));
+            return fetchType(fldSrc, nameof(fldSrc)).GetField(
                 fldNam,
                 BindingFlags.Public |
                 BindingFlags.Static |
@@ -797,14 +608,10 @@ namespace Tore.Core {
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static MethodInfo instanceMethod(object metSrc,
-                                                    string metNam,
-                                                    bool inherit = true) {
-            Type t;
-
-            chk(metSrc, "metSrc");
-            chk(metNam, "metNam");
-            t = (metSrc is Type) ? (Type)metSrc : metSrc.GetType();
-            return t.GetMethod(
+                                                string metNam,
+                                                bool inherit = true) {
+            chk(metNam, nameof(metNam));
+            return fetchType(metSrc, nameof(metSrc)).GetMethod(
                 metNam,
                 BindingFlags.Public |
                 BindingFlags.Instance |
@@ -824,14 +631,10 @@ namespace Tore.Core {
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static MethodInfo staticMethod(object metSrc,
-                                                    string metNam,
-                                                    bool inherit = true) {
-            Type t;
-
-            chk(metSrc, "metSrc");
-            chk(metNam, "metNam");
-            t = (metSrc is Type) ? (Type)metSrc : metSrc.GetType();
-            return t.GetMethod(
+                                              string metNam,
+                                              bool inherit = true) {
+            chk(metNam, nameof(metNam));
+            return fetchType(metSrc, nameof(metSrc)).GetMethod(
                 metNam,
                 BindingFlags.Public |
                 BindingFlags.Static |
@@ -853,9 +656,9 @@ namespace Tore.Core {
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static T instanceDelegate<T>(object metSrc,
-                                                string metNam,
-                                                bool inherit = true)
-                                                where T : Delegate {
+                                            string metNam,
+                                            bool inherit = true)
+                                            where T : Delegate {
             return instanceMethod(metSrc, metNam, inherit)?
                     .CreateDelegate<T>();
         }
@@ -873,10 +676,8 @@ namespace Tore.Core {
           RETV:         : T             : If method exists, the delegate,
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static T staticDelegate<T>(object metSrc,
-                                                string metNam,
-                                                bool inherit = true)
-                                                where T : Delegate {
+        public static T staticDelegate<T>(object metSrc, string metNam, bool inherit = true)
+                                          where T : Delegate {
             return staticMethod(metSrc, metNam, inherit)?
                     .CreateDelegate<T>();
         }
@@ -890,11 +691,7 @@ namespace Tore.Core {
           RETV:         : object            : Object constructed.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static object makeObject(object template, params object[] args) {
-            Type t;
-
-            chk(template, "template");
-            t = (template is Type) ? (Type)template : template.GetType();
-            return Activator.CreateInstance(t, args);
+            return Activator.CreateInstance(fetchType(template, nameof(template)), args);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -947,13 +744,10 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public static void setStatProp(string propNam, object tar, object val) {
             PropertyInfo inf;
-            string tnm;
 
             inf = staticProp(tar, propNam, true);
-            if (inf == null) {
-                tnm = (tar is Type) ? ((Type)tar).Name : tar.GetType().Name;
-                exc("E_INV_PROP", tnm + "." + propNam);
-            }
+            if (inf == null) 
+                exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
             inf.SetValue(null, setType(val, inf.PropertyType));
         }
 
@@ -968,19 +762,16 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public static object setInstPropType(string propNam, object tar, object val) {
             PropertyInfo inf;
-            string tnm;
-
+ 
             inf = instanceProp(tar, propNam, true);
-            if (inf == null) {
-                tnm = (tar is Type) ? ((Type)tar).Name : tar.GetType().Name;
-                exc("E_INV_PROP", tnm + "." + propNam);
-            }
+            if (inf == null)
+                exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
             return setType(val, inf.PropertyType);
         }
 
         // Used in setType...
         private static readonly Type NULLABLE = typeof(Nullable<>);
-
+        
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: setType [static]                                            <summary>
           TASK: Checks type of a value and if required, tries to change it. <para/>
@@ -995,21 +786,21 @@ namespace Tore.Core {
           WARN: Throws E_TYPE_CONV on failure.                              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static object setType(object val,
-                                        Type typ,
-                                        bool ignoreMissing = false) {
+                                     Type typ,
+                                     bool ignoreMissing = false) {
 
             bool n = ((val == null) || (val is DBNull));
             Type v = n ? null : val.GetType();
-
+            
             if ((typ.IsGenericType)
             && (typ.GetGenericTypeDefinition() == NULLABLE)) {
                 if (n)
                     return null;
                 typ = Nullable.GetUnderlyingType(typ);
             }
-            if (n) {                                     // If null,
-                val = (typ.IsValueType) ?              // If value
-                        makeObject(typ) :              // make a default,
+            if (n) {                                    // If null,
+                val = (typ.IsValueType) ?               // If value
+                        makeObject(typ) :               // make a default,
                         null;                           // else null.
                 return val;
             }
@@ -1018,14 +809,14 @@ namespace Tore.Core {
             if (typ.IsAssignableFrom(v))                // Is it?
                 return val;
             try {                                       // Try to convert.
-                if (val is JToken)                      // If coming from json, 
-                    return ((JToken)val).ToObject(typ); // call json converter.
-                if (typ == typeof(Guid)) {               // If guid,
-                    if (val is string)                  // string support only.
-                        return Guid.Parse((string)val);
+                if (val is JToken tok)                  // If coming from json, 
+                    return tok.ToObject(typ);           // call json converter.
+                if (typ == typeof(Guid)) {              // If guid,
+                    if (val is string str)              // string support only.
+                        return Guid.Parse(str);
                 }
-                if (val is Stl)                         // If Stl.
-                    return ((Stl)val).toObj(typ, ignoreMissing);
+                if (val is Stl lst)                     // If Stl.
+                    return lst.toObj(typ, ignoreMissing);
                 return Convert.ChangeType(val, typ);    // Otherwise...
             } catch(Exception e) {
                 exc("E_TYPE_CONV",
@@ -1071,14 +862,14 @@ namespace Tore.Core {
 
             chk(baseAsm, "baseAsm");
             chk(baseType, "baseType");
-            foreach(var asm in aArr) {                   // Scan assemblies:
+            foreach(var asm in aArr) {                  // Scan assemblies:
                 refs = asm.GetReferencedAssemblies();   // Get referenced.
                 if (!refs.Contains(baseAsm))            // If this is not referenced,
                     continue;                           // ignore.
                 tArr = asm.GetTypes();                  // Get types in assembly.
                 if (tArr == null)                       // If no types in it,
                     continue;                           // ignore.
-                foreach(var typ in tArr) {               // Scan types:
+                foreach(var typ in tArr) {              // Scan types:
                     if (typ.IsSubclassOf(baseType))     // If baseType descendant,
                         tLst.Add(typ);                  // Add to list.
                 }
@@ -1160,85 +951,6 @@ namespace Tore.Core {
             }
         }
 
-        /*————————————————————————————————————————————————————————————————————————————
-            —————————————————————————————————————————
-            |   Crypto json File routines           |
-            —————————————————————————————————————————
-        ————————————————————————————————————————————————————————————————————————————*/
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: loadCryptoJsonFile [static].                                <summary>
-          TASK: Reads and decrypts an encrypted Utf8 json file into a Stl.  <para/>
-          ARGS:                                                             <br/>
-                fileSpec    : string : filename with path.                  <br/>
-                encKey      : string : Encrypt  key builder.                <br/>
-                xorKey      : string : Xor      key builder.                <br/>
-                strip       : string : Any string to strip from keys.       <para/>
-          RETV:             : Stl    : Decrypted file as Stl.               <para/>
-          INFO: Encrypted files are marked with string "TORECJF:1:".        </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static Stl loadCryptoJsonFile(string fileSpec, string encKey,
-                string xorKey, string strip = "-") {
-            byte[] key;
-            byte[] dec;
-            string buf;
-
-            chk(fileSpec, "fileSpec");
-            chk(encKey, "encKey");
-            chk(xorKey, "xorKey");
-            buf = loadUtf8File(fileSpec);
-            if (!buf.StartsWith("TORECJF:1:"))
-                exc("E_INV_ENC", fileSpec);
-            dec = hexStrToByteArr(buf.Substring(10));
-            encKey = prepCryptoKey(encKey, strip);
-            xorKey = prepCryptoKey(xorKey, strip);
-            key = cryptStrings(encKey, xorKey);
-            dec = cryptByteArrays(dec, key);
-            buf = Encoding.UTF8.GetString(dec);
-            return new Stl(buf);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: saveCryptoJsonFile [static].                                <summary>
-          TASK: Encrypts and writes an Stl to an Utf8 json file.             <para/>
-          ARGS:                                                             <br/>
-                fileSpec    : string : filename with path.                  <br/>
-                encKey      : string : Encrypt  key builder.                <br/>
-                xorKey      : string : Xor      key builder.                <br/>
-                strip       : string : Any string to strip from keys.       <para/>
-          INFO: Encrypted files are marked with string "TORECJF:1:".        </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static void saveCryptoJsonFile(string fileSpec, Stl src,
-                string encKey, string xorKey, string strip = "-") {
-            byte[] key;
-            byte[] enc;
-            string buf;
-
-            chk(fileSpec, "fileSpec");
-            chk(src, "src");
-            chk(encKey, "encKey");
-            chk(xorKey, "xorKey");
-            buf = src.toJson();
-            encKey = prepCryptoKey(encKey, strip);
-            xorKey = prepCryptoKey(xorKey, strip);
-            key = cryptStrings(encKey, xorKey);
-            enc = Encoding.UTF8.GetBytes(buf);
-            enc = cryptByteArrays(enc, key);
-            buf = byteArrToHexStr(enc);
-            saveUtf8File(fileSpec, "TORECJF:1:" + buf);
-        }
-
-        /*————————————————————————————————————————————————————————————————————————————
-            FUNC:   prepCryptoKey [static].
-            TASK:   Prepares a crypto key string. 
-                    Used in LoadCryptoJsonFile and SaveCryptoJsonFile.
-            ARGS:   key         : string : Key builder.
-                    strip       : string : Any string to strip from key.
-                    exInf       : string : For exception info.
-        ————————————————————————————————————————————————————————————————————————————*/
-        private static string prepCryptoKey(string key, string strip) {
-            return (snoWhite(strip)) ? key : key.Replace(strip, "");
-        }
-
     }   // End static class Sys.
 
 
@@ -1291,5 +1003,19 @@ namespace Tore.Core {
         public List<string> nameList { get; }
 
     }   // End NameListMetadata Attribute class.
+
+    /**———————————————————————————————————————————————————————————————————————————
+                                                                        <summary>
+      CLASS :   ToreCoreException.                                      <para/>
+      USAGE :   Tore.Core Exception class to distinguish.               </summary>
+    ————————————————————————————————————————————————————————————————————————————*/
+    public class ToreCoreException: Exception {
+        /**<inheritdoc/>*/
+        public ToreCoreException():base() { }
+        /**<inheritdoc/>*/
+        public ToreCoreException(string message): base(message) { }
+        /**<inheritdoc/>*/
+        public ToreCoreException(string message, Exception inner): base(message, inner) { }
+    }
 
 }   // End namespace.

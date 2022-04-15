@@ -1,35 +1,38 @@
 # Tore.Core
-Core utilities library for C# By İ. Volkan Töre.
+Core utilities and extensions library for C# By İ. Volkan Töre.
 
 Language: C#.
 
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
+Warning: <br/>
+Tore.Core v7.0.0+ has undergone radical changes.<br/>
+It is not compatible to previous versions! <br/>
+
+Deprecated Versions are available as : <br/>
+    - Deprecated Tore.Core v5.0.0  for net5.0 .
+    - Deprecated Tore.Core v6.0.0+ for net6.0 .
+
+
 Dependencies: <br/>
-Tore.Core 5.0.0 is for net 5.0 .<br/>
-&emsp; net 5.0<br/>
-&emsp; Newtonsoft.Json<br/>
-<br/>
-Tore.Core v6.0.0+ is for net 6.0 .<br/>
-&emsp; net 6.0<br/>
-&emsp; Newtonsoft.Json <br/>
+net6.0
+Newtonsoft.Json 13+
+
+
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:           
   - Output by dbg().
   - Exceptions by exc().
-  - Strings.
-  - Simple encryption.
   - Reflection.
   - Type juggling.
   - Attributes. 
   - Simple File Load Save. 
-  - Simple Encrypted File Load Save.
   - Time, Date.
   
 and many others.
 
-The best way of using them is by adding:               
+The best way of using them is by adding: 
 ```C#
 using static Tore.Core.Sys;
 ```                            
@@ -50,7 +53,7 @@ Stl provides:
 
    - Json, 
    - Objects (public properties), 
-   - Static classes (static fields),
+   - Static classes (public static fields),
    - IDictionary string key, object value [Alias: IDso] and
    - List KeyValuePair string,string      [Alias: Kvs].     
  
@@ -61,13 +64,21 @@ Note : Stl is neither suitable nor built for millions of entries.
 Defines the class Com which manages Http client requests and responses.
 
 Com gathers sub components required for a proper request and its response into an instance.
-Since client requests and responses differ dramatically, Com objects give both standard and micro managed request types and response handling.                            
-For simple standard http requests use STATIC functions Com.send(...), Com.sendAsync(...), Com.Talk<T>(...) and Com.TalkAsync<T>(...) .
-Otherwise, create a Com object and manipulate the request via 
+Since client requests and responses differ dramatically, 
+Com objects give both standard and micro managed request types and response handling.                            
+For simple standard http requests use STATIC functions 
+
+    - Com.send(...),
+    - Com.sendAsync(...), 
+    - Com.Talk<T>(...) and 
+    - Com.TalkAsync<T>(...) .
+
+Otherwise, create a Com object and manipulate the request via
+
    - The Com instance properties, like: content, accept, mediaType.
    - The Com instance req, the HttpRequestMessage property, directly. 
 
-Then use INSTANCE send() and sendAsync() routines. 
+Then use INSTANCE send() or sendAsync() routines. 
   
 IMPORTANT:                                              
 Instance content, accept and mediaType properties are transferred to request just before sending it.          

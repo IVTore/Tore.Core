@@ -45,7 +45,8 @@ namespace Tore.Core {
 
     /**——————————————————————————————————————————————————————————————————————————— 
         CLASS:  Stl                                                     <summary>
-        USAGE:  A string associated object list class with tricks.      <br/>
+        USAGE:                                                          <br/>
+                A string associated object list class with tricks.      <br/>
                                                                         <br/>
                 Stl provides:                                           <br/>
                 1) Numerically indexed access to keys and objects       <br/>
@@ -55,11 +56,11 @@ namespace Tore.Core {
                                                                         <br/>
                 * Keys can not be null empty or whitespace.             <br/>
                 * Lists are public in this class intentionally.         <br/>
-                * Stl also acts as a bridge for, 
-                json, 
-                objects (public properties), 
-                static classes (static fields),
-                IDictionary string key, object value [Alias: IDso] and
+                * Stl also acts as a bridge for,                        <br/>
+                json,                                                   <br/>
+                objects (public properties),                            <br/>
+                static classes (static fields),                         <br/>
+                IDictionary string key, object value [Alias: IDso] and  <br/>
                 List KeyValuePair string,string      [Alias: Kvs].      <br/>
                 Has Enumerator and Nested converter support.            </summary>
     ————————————————————————————————————————————————————————————————————————————*/
@@ -68,21 +69,21 @@ namespace Tore.Core {
 
     public class Stl:IEnumerable, IEnumerable<Kvp>, IDso {
         /**———————————————————————————————————————————————————————————————————————————
-          VAR : kl: List of string;                                         <summary>
+          VAR : keyLst: List of string;                                     <summary>
           USE : Keeps the list of keys.                                     <para/>
           INFO: Public by design. 
                 Never add or remove items directly for the sake of coherence.
                 Use add(), addPair, del(), delPair()                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public List<string> kl;             // Keys list.
+        public List<string> keyLst;         // Keys list.
         /**———————————————————————————————————————————————————————————————————————————
-          VAR : ol: List of object;                                         <summary>
+          VAR : objLst: List of objects;                                    <summary>
           USE : Keeps the list of values (objects).                         <para/>
           INFO: Public by design. 
                 Never add or remove items directly for the sake of coherence.
                 Use add(), addPair, delObj(), delPair()                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public List<object> ol;             // Objects  list.
+        public List<object> objLst;         // Objects  list.
         private bool un,                    // Keys should be unique        if true.
                      id,                    // Keys should be identifier    if true.
                      wr;                    // Overwrite Object with same key.
@@ -98,18 +99,17 @@ namespace Tore.Core {
           CTOR: Stl                                                     <summary>
           TASK: Constructs a string associated object list.             <para/>
           ARGS:                                                         <br/>
-                aUnique     : bool: true if list keys should be unique.
+                unique     : bool: true if list keys should be unique.
                                     :DEF: true.                         <br/>
-                aIdentifier : bool: true if keys should be identifier.
+                identifier : bool: true if keys should be identifier.
                                     :DEF: true.                         <br/>
-                aOverwrite  : bool: true if object is overwritable
+                overwrite  : bool: true if object is overwritable
                                     with the same key.                  <br/>
                                     This works only if keys are unique.
                                     :DEF: true.                         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl(bool aUnique = true, bool aIdentifier = true,
-                bool aOverwrite = true) {
-            initialize(aUnique, aIdentifier, aOverwrite);
+        public Stl(bool unique = true, bool identifier = true, bool overwrite = true) {
+            init(unique, identifier, overwrite);
         }
 
         /**——————————————————————————————————————————————————————————————————————————
@@ -121,7 +121,7 @@ namespace Tore.Core {
                 Objects can be overwritten if added with same key.      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl() {
-            initialize(true, true, true);
+            init(true, true, true);
         }
 
         /**——————————————————————————————————————————————————————————————————————————
@@ -142,21 +142,18 @@ namespace Tore.Core {
                 since it copies the properties of original Stl.             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl(object o) {
-            Stl c;
-
-            if (o is Stl) {
-                c = (Stl)o;
-                initialize(c.un, c.id, c.wr);
-                append(c);
+            if (o is Stl lst) {
+                init(lst.un, lst.id, lst.wr);
+                append(lst);
                 return;
             }
-            initialize();
-            if (o is string) {
-                byJson((string)o, false);
+            init();
+            if (o is string str) {
+                byJson(str, false);
                 return;
             }
-            if (o is Type) {
-                byStatic((Type)o, false);
+            if (o is Type typ) {
+                byStatic(typ, false);
                 return;
             }
             byObj(o, false);
@@ -176,7 +173,7 @@ namespace Tore.Core {
             int i,
                 l;
 
-            initialize();
+            init();
             chk(akv, "akv");
             l = akv.Length;
             if (akv.Length == 0)
@@ -184,9 +181,10 @@ namespace Tore.Core {
             if (l % 2 != 0)
                 exc("E_ARG_COUNT", "akv");
             for(i = 0; i < l; i += 2) {
-                if (!(akv[i] is string))
+                if (akv[i] is not string str)
                     exc("E_INV_KEY", "akv[" + i.ToString() + "]");
-                add((string)akv[i], akv[i + 1]);
+                else
+                    add(str, akv[i + 1]);
             }
         }
 
@@ -196,24 +194,22 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         ~Stl() {
 
-            if (kl == null)
+            if (keyLst == null)
                 return;
             clear();
-            kl = null;
-            ol = null;
+            keyLst = null;
+            objLst = null;
         }
         /*————————————————————————————————————————————————————————————————————————————
-          FUNC: initialize [private]
+          FUNC: init [private]
           TASK: Initializes a new Stl. Helps constructors.
         ————————————————————————————————————————————————————————————————————————————*/
-        private void initialize(bool aUnique = true, bool aIdentifier = true,
-            bool aOverwrite = true) {
-
-            un = aUnique;
-            id = aIdentifier;
-            wr = aOverwrite;
-            kl = new List<string>();
-            ol = new List<object>();
+        private void init(bool unique = true, bool identifier = true, bool overwrite = true) {
+            un = unique;
+            id = identifier;
+            wr = overwrite;
+            keyLst = new List<string>();
+            objLst = new List<object>();
         }
 
         /*————————————————————————————————————————————————————————————————————————————
@@ -227,8 +223,8 @@ namespace Tore.Core {
           TASK: Shallow deletation of all entries (no element destruction). </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public void clear() {
-            kl.Clear();
-            ol.Clear();
+            keyLst.Clear();
+            objLst.Clear();
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -236,7 +232,7 @@ namespace Tore.Core {
           TASK: Clones this Stl into a new Stl.                             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl clone() {
-            Stl c = new Stl(un, id, wr);
+            Stl c = new (un, id, wr);
             c.append(this);
             return c;
         }
@@ -254,11 +250,11 @@ namespace Tore.Core {
             List<object> so;
             if (src == null)
                 return;
-            sk = src.kl;
-            so = src.ol;
+            sk = src.keyLst;
+            so = src.objLst;
             for(i = 0; i < l; i++) {
-                kl.Add(sk[i]);
-                ol.Add(so[i]);
+                keyLst.Add(sk[i]);
+                objLst.Add(so[i]);
             }
         }
 
@@ -275,28 +271,26 @@ namespace Tore.Core {
           RETV:     : int    : Index of pair.                               <para/>
           INFO: This is a working logical madness.                          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int add(string aKey, object aObj = null, bool pUni = false,
-                int aIdx = -1) {
-            
+        public int add(string aKey, object aObj = null, bool pUni = false, int aIdx = -1) {
             int i;
 
             if (String.IsNullOrWhiteSpace(aKey))
-                exc("E_INV_ARG", "aKey");
-            if (id && (!identifier(aKey)))                  // Check if Identifier.
+                exc("E_INV_ARG", nameof(aKey));
+            if (id && (!aKey.isIdentifier()))               // Check if Identifier.
                 exc("E_INV_IDENT", $"aKey = {aKey}");
             i = (pUni) ? idxPair(aKey, aObj) : idx(aKey);   // Search (look: pUni).
             if (pUni && (i > -1))                           // If we have this 
                 return (i);                                 // return index.
             if ((!un) || (i == -1)) {                       // If not unique or not found
-                if ((aIdx < 0) || (aIdx >= kl.Count))       // If insert to end
-                    aIdx = kl.Count;                        // set index to append.
-                kl.Insert(aIdx, aKey);                      // insert key to index
-                ol.Insert(aIdx, aObj);                      // insert object to index
+                if ((aIdx < 0) || (aIdx >= keyLst.Count))   // If insert to end
+                    aIdx = keyLst.Count;                    // set index to append.
+                keyLst.Insert(aIdx, aKey);                  // insert key to index
+                objLst.Insert(aIdx, aObj);                  // insert object to index
                 return (aIdx);                              // Return index.
             }
             if (!wr)                                        // If no overwrite
                 exc("E_STL_NO_OVR", aKey);                  // Error.
-            ol[i] = aObj;                                   // Overwrite object
+            objLst[i] = aObj;                                   // Overwrite object
             return i;
         }
 
@@ -320,10 +314,10 @@ namespace Tore.Core {
           ARGS: index   : int : pair index.                                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public void delIdx(int index) {
-            if ((index > -1) && (index < kl.Count)) {
-                ol[index] = null;
-                kl.RemoveAt(index);
-                ol.RemoveAt(index);
+            if ((index > -1) && (index < keyLst.Count)) {
+                objLst[index] = null;
+                keyLst.RemoveAt(index);
+                objLst.RemoveAt(index);
             }
         }
 
@@ -376,7 +370,7 @@ namespace Tore.Core {
         public int idx(string aKey, int fromIndex = 0) {
             if (String.IsNullOrWhiteSpace(aKey))
                 return -1;
-            return (kl.IndexOf(aKey, fromIndex));
+            return (keyLst.IndexOf(aKey, fromIndex));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -388,7 +382,7 @@ namespace Tore.Core {
           RETV:             : int    : The object index else -1.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public int idxObj(object aObj, int fromIndex = 0) {
-            return (ol.IndexOf(aObj, fromIndex));
+            return (objLst.IndexOf(aObj, fromIndex));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -408,10 +402,10 @@ namespace Tore.Core {
             if (String.IsNullOrWhiteSpace(aKey))
                 return -1;
             while(true) {
-                j = kl.IndexOf(aKey, fromIndex);    // Search key.  
+                j = keyLst.IndexOf(aKey, fromIndex);    // Search key.  
                 if (j == -1)                         // If key not found
                     return (-1);                     // return not found.
-                if (ol[j] == aObj)                   // If object at key matches
+                if (objLst[j] == aObj)                   // If object at key matches
                     return (j);                      // return index.
                 fromIndex = j + 1;                  // Change search start.
             }                                       // Loop
@@ -428,7 +422,7 @@ namespace Tore.Core {
         public bool has(string aKey, int fromIndex = 0) {
             if (String.IsNullOrWhiteSpace(aKey))
                 return false;
-            return (kl.IndexOf(aKey, fromIndex) > -1);
+            return (keyLst.IndexOf(aKey, fromIndex) > -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -440,7 +434,7 @@ namespace Tore.Core {
         RETV:               : bool   : true if found, else false.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public bool hasObj(object aObj, int fromIndex = 0) {
-            return (ol.IndexOf(aObj, fromIndex) > -1);
+            return (objLst.IndexOf(aObj, fromIndex) > -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -469,8 +463,8 @@ namespace Tore.Core {
             int i;
             if (String.IsNullOrWhiteSpace(aKey))
                 return null;
-            i = kl.IndexOf(aKey, fromIndex);
-            return (i < 0) ? null : ol[i];
+            i = keyLst.IndexOf(aKey, fromIndex);
+            return (i < 0) ? null : objLst[i];
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -510,7 +504,7 @@ namespace Tore.Core {
                     return default;
                 exc("E_STL_VAL", s + " undefined");
             }
-            v = setType<T>(ol[i]);
+            v = setType<T>(objLst[i]);
             if (!empty)
                 chk(v, s + " empty.", "E_STL_VAL");
             return (T)v;
@@ -527,14 +521,14 @@ namespace Tore.Core {
         public string key(object aObj, int fromIndex = 0) {
             int i = idxObj(aObj, fromIndex);
 
-            return ((i < 0) ? null : kl[i]);
+            return ((i < 0) ? null : keyLst[i]);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: count: int;                                             <summary>
           GET : Returns number of entries in list.                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int count => kl.Count;
+        public int count => keyLst.Count;
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: capacity: int;                                          <summary>
@@ -543,12 +537,12 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public int capacity {
             get {
-                return kl.Capacity;
+                return keyLst.Capacity;
             }
             set {
                 try {
-                    kl.Capacity = value;
-                    ol.Capacity = value;
+                    keyLst.Capacity = value;
+                    objLst.Capacity = value;
                 } catch(Exception e) {
                     exc("E_STL_CAP", "", e);
                 }
@@ -721,7 +715,7 @@ namespace Tore.Core {
                         continue;
                     exc("E_PROP_MISSING", t.Name + "." + p.Name);
                 }
-                v = ol[i];
+                v = objLst[i];
                 p.SetValue(o, setType(v, p.PropertyType, ignoreMissing));
             }
             return o;
@@ -788,12 +782,12 @@ namespace Tore.Core {
             d = new Dictionary<string, T>();
             l = count;
             for(i = 0; i < l; i++) {
-                if (ol[i] is T) {
-                    t = (T)ol[i];
+                if (objLst[i] is T obj) {
+                    t = obj;
                 } else {
-                    t = setType<T>(ol[i], ignoreMissing);
+                    t = setType<T>(objLst[i], ignoreMissing);
                 }
-                d.Add(kl[i], t);
+                d.Add(keyLst[i], t);
             }
             return d;
         }
@@ -815,7 +809,7 @@ namespace Tore.Core {
             c = count;
             r = new List<Kvs>();
             for(i = 0; i < c; i++)
-                r.Add(new Kvs(kl[i], ol[i].ToString()));
+                r.Add(new Kvs(keyLst[i], objLst[i].ToString()));
             return r;
         }
 
@@ -893,17 +887,17 @@ namespace Tore.Core {
           GET : Gets a shallow copy of Keys list.                           <br/>
           INFO: IDictionary interface.                                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public ICollection<string> Keys => copyToList<string>(kl);
+        public ICollection<string> Keys => copyToList<string>(keyLst);
         /**———————————————————————————————————————————————————————————————————————————
           PROP: Values                                                      <summary>
           GET : Gets a shallow copy of values (objects) list.               <br/>
           INFO: IDictionary interface.                                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public ICollection<object> Values => copyToList<object>(ol);
+        public ICollection<object> Values => copyToList<object>(objLst);
         /**<inheritdoc/>*/
         public IEnumerator<Kvp> GetEnumerator() => new StlEnumeratorKVP(this);
         /**<inheritdoc/>*/
-        IEnumerator IEnumerable.GetEnumerator() => kl.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => keyLst.GetEnumerator();
         /**<inheritdoc/>*/
         public bool TryGetValue(string key, out object value) {
             int i;
@@ -911,7 +905,7 @@ namespace Tore.Core {
 
             i = idx(key);
             b = (i > -1);
-            value = b ? ol[i] : null;
+            value = b ? objLst[i] : null;
             return (b);
         }
         /**<inheritdoc/>*/
@@ -922,7 +916,7 @@ namespace Tore.Core {
 
             c = count;
             for(i = arrayIndex; i < c; i++)
-                array[j] = new Kvp(kl[i], ol[i]);
+                array[j] = new Kvp(keyLst[i], objLst[i]);
         }
         /**<inheritdoc/>*/
         public object this[string key] {
@@ -937,7 +931,7 @@ namespace Tore.Core {
                 if (!wr) {
                     exc("E_STL_NO_OVR", key);
                 }
-                ol[i] = value;
+                objLst[i] = value;
             }
         }
 
@@ -952,7 +946,7 @@ namespace Tore.Core {
         private Stl lst;
         private int idx;
         /**<inheritdoc/>*/
-        public Kvp Current => new Kvp(lst.kl[idx], lst.ol[idx]);
+        public Kvp Current => new (lst.keyLst[idx], lst.objLst[idx]);
 
         object IEnumerator.Current => Current;
         /**<summary> Constructor for enumerator class. </summary>*/

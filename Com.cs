@@ -52,14 +52,28 @@ namespace Tore.Core {
     ————————————————————————————————————————————————————————————————————————————*/
     public class Com {
 
-        /*———————————————————————————————————————————————————————————————————————————— 
-          PROP: HttpClient : client [private]
-          WARN:
+        #region Private properties.
+        /**——————————————————————————————————————————————————————————————————————————— 
+          PROP: HttpClient : client [private]                               <summary>
+          WARN:                                                             <br/>
             Microsoft recommends usage of a single HttpClient for all requests.
             HttpClient is thread safe and manages all requests and responses to
-            the socket level. 
+            the socket level.                                               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         private static HttpClient client { get; set; } = new HttpClient();
+
+        /// <summary>
+        /// Storage for query.
+        /// </summary>
+        private Stl qList { get; set; }
+        #endregion
+
+        #region Public properties.
+        /*————————————————————————————————————————————————————————————————————————————
+            ———————————————————————
+            |  Public properties  |
+            ———————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: req.                                                    <summary>
@@ -67,18 +81,21 @@ namespace Tore.Core {
           INFO: For cases requiring direct manipulation.                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public HttpRequestMessage req { get; private set; }
+
         /**———————————————————————————————————————————————————————————————————————————
           PROP: res.                                                    <summary>
           GET : Returns HttpResponseMessage object.                     <para/>
           INFO: For cases requiring direct manipulation.                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public HttpResponseMessage res { get; private set; }
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: headers.                                                <summary>
           GET : Returns HttpRequestHeaders object.                      <br/>
           INFO: For cases requiring direct manipulation.                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public HttpRequestHeaders headers { get => req.Headers; }
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: method.                                                 <summary>
           GET : Returns current request method.                         <br/>
@@ -88,6 +105,7 @@ namespace Tore.Core {
             get => req.Method;
             set => req.Method = value;
         }
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: url                                                     <summary>
           GET : Returns request url as string.                          <br/>
@@ -97,12 +115,14 @@ namespace Tore.Core {
             get => req.RequestUri.ToString();
             set => req.RequestUri = new Uri(value);
         }
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: encoding.                                                   <summary>
           GET : Returns request encoding to set during request.             <br/>
           SET : Sets request encoding to set during request.                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Encoding encoding { get; set; }
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: accept.                                                     <summary>
           GET : Returns accept mime type to set during request.             <br/>
@@ -110,6 +130,7 @@ namespace Tore.Core {
           INFO: Must be left null when direct manipulation required.        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public string accept { get; set; } // Req. accept  MIME.
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: mediaType.                                                  <summary>
           GET : Returns content mime type to set during request.            <br/>
@@ -117,6 +138,7 @@ namespace Tore.Core {
           INFO: Must be left null when direct manipulation required.        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public string mediaType { get; set; } // Req. content MIME.
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: content  .                                                  <summary>
           GET : Returns content to set during request.                      <br/>
@@ -124,6 +146,7 @@ namespace Tore.Core {
           INFO: Ignored when req.content is directly assigned (non null).   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public object content { get; set; } // Req. content.
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: isForm.                                                     <summary>
           GET : Returns if content must be form url encoded.                <br/>
@@ -131,13 +154,12 @@ namespace Tore.Core {
           INFO: Irrelevant when content is directly assigned.               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public bool isForm { get; set; }
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: queryList.                                                  <summary>
           GET : Returns a clone of query list.                              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl queryList => qList == null ? null : qList.clone();
-
-        private Stl qList { get; set; } // info for query.
+        public Stl queryList => qList?.clone();
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: resString.                                              <summary>
@@ -157,26 +179,28 @@ namespace Tore.Core {
           GET : Returns response as byte[].                             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public byte[] resByteArray {          // Response as byte array.
-            get => (res == null) ?
-                        null :
-                        res.Content
-                            .ReadAsByteArrayAsync()
-                            .ConfigureAwait(false)
-                            .GetAwaiter()
-                            .GetResult();
+            get => res?.Content
+                        .ReadAsByteArrayAsync()
+                        .ConfigureAwait(false)
+                        .GetAwaiter()
+                        .GetResult();
         }
+        #endregion
 
+        #region Static utility methods.
         /*————————————————————————————————————————————————————————————————————————————
             ——————————————————————————————
             |   Static utility methods   |
             ——————————————————————————————
         ————————————————————————————————————————————————————————————————————————————*/
+
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: send [static]                                               <summary>
-          TASK: Static method to prepare and send a request, blocking 
+          TASK:                                                             <br/>
+                Static method to prepare and send a request, blocking       <br/>
                 until a response or an exception.[Synchronous].             <br/>
-                This is a convenience routine for standard requests which
-                does not need header manipulations etc.                     <para/>
+                This routine is for standard requests which does not        <br/>
+                need header manipulations etc.                              <para/>
           ARGS:                                                             <br/>
             url       : string     : Target url.                            <br/>
             content   : object     : Object holding the content.            <br/>
@@ -186,8 +210,10 @@ namespace Tore.Core {
             encoding  : Encoding   : Encoding.    :DEF: null -> UTF8.       <br/>
             bool      : isForm     : If true content will be FormUrlEncoded.
                                                   :DEF: false.              <para/>
-          RETV:       : Com        : Com object with response.              <para/>
-          WARN: Rethrows all exceptions coming from HttpClient sendAsync.   </summary>
+          RETV:                                                             <br/>
+                      : Com        : Com object with response.              <para/>
+          WARN:                                                             <br/>
+                Rethrows all exceptions coming from HttpClient sendAsync.   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static Com send(string url, object content, Stl query = null,
                 HttpMethod method = null, string mediaType = "application/json",
@@ -199,9 +225,11 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: sendAsync [static]                                          <summary>
-          TASK: Static method to prepare and send a request without blocking 
-                [Asynchronous].                                             <br/>
-                Does not need header manipulations etc.                     <para/>
+          TASK:                                                             <br/>
+                Static method to prepare and send a request,                <br/>
+                without blocking [Asynchronous].                            <br/>
+                This routine is for standard requests which does not        <br/>
+                need header manipulations etc.                              <para/>
           ARGS:                                                             <br/>
             url       : string     : Target url.                            <br/>
             content   : object     : Object holding the content.            <br/>
@@ -211,8 +239,10 @@ namespace Tore.Core {
             encoding  : Encoding   : Encoding.    :DEF: null -> UTF8.       <br/>
             bool      : isForm     : If true content will be FormUrlEncoded.
                                                   :DEF: false.              <para/>
-          RETV:       : Com        : Com object with response.              <para/>
-          WARN: Rethrows all exceptions coming from HttpClient sendAsync.   </summary>
+          RETV:                                                             <br/>
+                      : Com        : Com object with response.              <para/>
+          WARN:                                                             <br/>
+                Rethrows all exceptions coming from HttpClient sendAsync.   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static async Task<Com> sendAsync(string url, object content, Stl query = null,
                 HttpMethod method = null, string mediaType = "application/json",
@@ -223,42 +253,50 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: talk [static]                                           <summary>
-          TASK: POST content as an Utf-8 json request                       <br/>
+          FUNC: talk [static]                                               <summary>
+          TASK:                                                             <br/>
+                Http <b> POST </b> content as an Utf-8 json request         <br/>
                 and return response as an instance of T [Synchronous].      <br/>
-                This is a convenience routine for standard requests which 
+                This routine is for standard requests which                 <br/>
                 does not need header manipulations etc.                     <para/>
           ARGS:                                                             <br/>
+            T           : Type      : Type of expected response object.     <br/>
             url         : string    : Target url.                           <br/>
-            content     : object    : Object holding the content.           <br/>
+            content     : object    : Request content object.               <br/>
             query       : Stl       : Query list.       :DEF: null          <para/>
-          RETV:         : T         : Json decoded response object.         <para/>
-          WARN: Rethrows all exceptions coming from HttpClient sendAsync.   <br/>
+          RETV:                                                             <br/>
+                        : T         : Json decoded response object.         <para/>
+          WARN:                                                             <br/>
+                Rethrows all exceptions coming from HttpClient sendAsync.   <br/>
                 Throws E_INV_ARG  if url or content is null.                <br/>
                 Throws E_COM_FAIL if not successful.                        <br/>
                 Throws E_COM_INV_OBJ if response object invalid             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static T talk<T>(string url, object content, Stl query = null) {
-            string jsn;
+            string json;
 
             chk(url, "url");
             chk(content, "content");
-            jsn = JsonConvert.SerializeObject(content, Formatting.Indented);
-            return Com.send(url, jsn, query).resObjByJson<T>();
+            json = JsonConvert.SerializeObject(content, Formatting.Indented);
+            return Com.send(url, json, query).resObjByJson<T>();
         }
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: talkAsync [static]                                          <summary>
-          TASK: POST content as an Utf-8 json request                       <br/>
+          TASK:                                                             <br/>
+                Http <b> POST </b> content as an Utf-8 json request         <br/>
                 and return response as an instance of T [Asynchronous].     <br/>
-                This is a convenience routine for standard requests which 
+                This routine is for standard requests which                 <br/>
                 does not need header manipulations etc.                     <para/>
           ARGS:                                                             <br/>
+            T           : Type      : Type of expected response object.     <br/>
             url         : string    : Target url.                           <br/>
-            content     : object    : Object holding the content.           <br/>
+            content     : object    : Request content object.               <br/>
             query       : Stl       : Query list.       :DEF: null          <para/>
-          RETV:         : T         : Json decoded response object.         <para/>
-          WARN: Rethrows all exceptions coming from HttpClient sendAsync.   <br/>
+          RETV:                                                             <br/>
+                        : T         : Json decoded response object.         <para/>
+          WARN:                                                             <br/>
+                Rethrows all exceptions coming from HttpClient sendAsync.   <br/>
                 Throws E_INV_ARG  if url or content is null.                <br/>
                 Throws E_COM_FAIL if not successful.                        <br/>
                 Throws E_COM_INV_OBJ if response object invalid             </summary>
@@ -279,7 +317,7 @@ namespace Tore.Core {
                 HttpMethod method = null, string mediaType = "application/json",
                 Encoding encoding = null, bool isForm = false) {
 
-            Com c = new Com() {
+            Com c = new () {
                 url = url,
                 content = content,
                 mediaType = mediaType,
@@ -291,7 +329,9 @@ namespace Tore.Core {
                 c.addQuery(query);
             return c;
         }
+        #endregion
 
+        #region Instance methods.
         /*————————————————————————————————————————————————————————————————————————————
             ————————————————————————
             |   Instance methods   |
@@ -300,7 +340,8 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           CTOR: Com.                                                    <summary>
-          TASK: Constructs a Com object.                                <para/>
+          TASK:                                                         <br/>
+                Constructs a Com object.                                <para/>
           INFO:                                                         <br/>
                 Sets req to a new HttpRequestMessage.                   <br/>
                 Sets method to POST.                                    <br/>
@@ -350,10 +391,14 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: resObjByJson                                                <summary>
-          TASK: Checks and deserializes response json into Type T.          <para/>
-          ARGS: T   : Type : Type of response expected.                     <para/>
-          RETV:     : T    : Response object.                               <para/>
-          WARN: Throws E_COM_FAIL if request was not successful.            <br/>
+          TASK:                                                             <br/>
+                Checks and deserializes response json into Type T.          <para/>
+          ARGS:                                                             <br/>
+                T   : Type : Type of response expected.                     <para/>
+          RETV:                                                             <br/>
+                    : T    : Response object.                               <para/>
+          WARN:                                                             <br/>
+                Throws E_COM_FAIL if request was not successful.            <br/>
                 Throws E_COM_INV_OBJ if response object invalid             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public T resObjByJson<T>() {
@@ -375,11 +420,13 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: addQuery                                                    <summary>
-          TASK: Collects key value pairs to prepare a request uri query 
+          TASK:                                                             <br/>
+                Collects key value pairs to prepare a request uri query     <br/>
                 information. Key duplication allowed.                       <para/>
           ARGS:                                                             <br/>
                 query : Stl : List containing keys and values.              <para/>
-          WARN: Throws all exceptions coming from Stl.                      </summary>
+          WARN:                                                             <br/>
+                Throws all exceptions coming from Stl.                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public void addQuery(Stl query) {
             if (qList == null)
@@ -389,12 +436,14 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: addQuery                                                    <summary>
-          TASK: Collects key value pairs to prepare a request uri query 
+          TASK:                                                             <br/>
+                Collects key value pairs to prepare a request uri query     <br/>
                 information. Key duplication allowed.                       <para/>
           ARGS:                                                             <br/>
                 key     : string : A query key.                             <br/>
                 value   : string : A value corresponding to the key.        <para/>
-          WARN: Throws all exceptions coming from Stl.                      </summary>
+          WARN:                                                             <br/>
+                Throws all exceptions coming from Stl.                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public void addQuery(string key, string value) {
             if (qList == null)
@@ -414,8 +463,11 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: buildQuery                                                  <summary>
-          TASK: Converts the key value pairs in query list to a get query.  <para/>
-          INFO: qList is a Stl, addQuery methods can be used to populate it.</summary>
+          TASK:                                                             <br/>
+                Converts the key value pairs in query list to a get query.  <para/>
+          INFO:                                                             <br/>
+                Query list is a Stl.                                        <br/>
+                To populate it addQuery methods can be used.                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public string buildQuery() {
             StringBuilder b;
@@ -433,12 +485,14 @@ namespace Tore.Core {
                     b.Append('&');
                 b.AppendFormat(
                     "{0}={1}",
-                    Uri.EscapeDataString(qList.kl[i]),
-                    Uri.EscapeDataString((string)qList.ol[i]));
+                    Uri.EscapeDataString(qList.keyLst[i]),
+                    Uri.EscapeDataString((string)qList.objLst[i]));
             }
             return b.ToString();
         }
+        #endregion
 
+        #region Private methods.
         /*———————————————————————————————————————————————————————————————————————————
           FUNC: requestSetup [private]
           TASK: Sets up a request right before sending.
@@ -463,9 +517,9 @@ namespace Tore.Core {
             contentSetup();
             if ((qList != null) && (qList.count > 0))
                 url += "?" + buildQuery();
-            if (!snoWhite(accept))
+            if (!accept.isNullOrWhiteSpace())
                 req.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(accept));
-            if (!snoWhite(mediaType))
+            if (!mediaType.isNullOrWhiteSpace())
                 req.Content.Headers.ContentType.MediaType = mediaType;
         }
 
@@ -502,7 +556,7 @@ namespace Tore.Core {
                 leave the Com object content property empty.
         ————————————————————————————————————————————————————————————————————————————*/
         private void contentSetup() {
-            Stl stl = null;
+            Stl stl;
 
             if (req.Content != null)
                 return;
@@ -510,15 +564,15 @@ namespace Tore.Core {
                 req.Content = new StringContent("");
                 return;
             }
-            if (content is byte[]) {
-                req.Content = new ByteArrayContent((byte[])content);
+            if (content is byte[] bytArr) {
+                req.Content = new ByteArrayContent(bytArr);
                 return;
             }
-            if (content is string) {
-                req.Content = new StringContent((string)content, encoding, mediaType);
+            if (content is string str) {
+                req.Content = new StringContent(str, encoding, mediaType);
                 return;
             }
-            stl = (content is Stl) ? (Stl)content : new Stl(content);
+            stl = (content is Stl lst) ? lst : new Stl(content);
             if (isForm) {
                 req.Content = new FormUrlEncodedContent(stl.toLstKvpStr());
                 return;
@@ -550,6 +604,6 @@ namespace Tore.Core {
                 throw;
             }
         }
-
-    }   //  End class Com.
-}   //  End namespace.
+        #endregion
+    }
+}
