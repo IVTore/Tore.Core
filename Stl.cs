@@ -11,8 +11,8 @@ Licenses            : MIT.
 
 History             :
 202101261231: IVT   : - Removed unnecessary mapped enc/dec.
-202003101300: IVT   : + toLstKvpStr() + mapped enc/dec.
-202002011604: IVT   : toObj behaviour changed. Added toObj<T>.
+202003101300: IVT   : + ToListOfKeyValuePairsOfString() + mapped enc/dec.
+202002011604: IVT   : ToObj behaviour changed. Added ToObj<T>.
 201909051400: IVT   : First Draft.
 ————————————————————————————————————————————————————————————————————————————*/
 using System;
@@ -29,19 +29,21 @@ using Kvs = System.Collections.Generic.KeyValuePair<string, string>;
 using IDso = System.Collections.Generic.IDictionary<string, object>;
 
 namespace Tore.Core {
-
     /**———————————————————————————————————————————————————————————————————————————
                                                                         <summary>
       CLASS :   StlIgnore [property attribute].                         <para/>
-      USAGE :   This attribute excludes  property from 
-                toObj and byObj operations of Stl objects.              </summary>
+      USAGE :                                                           <br/>
+                This attribute excludes                                 <br/>
+                <b> Instance properties </b> from ToObj and ByObj,      <br/>
+                <b> Static fields </b> from ToStatic and ByStatic,      <br/>
+                operations of Stl.                                      </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     [System.AttributeUsage(
-            System.AttributeTargets.Property,
-            AllowMultiple = false
-    )]
-
-    public class StlIgnore:System.Attribute { }
+        System.AttributeTargets.Property|
+        System.AttributeTargets.Field, 
+        AllowMultiple = false)]
+    
+    public class StlIgnore: System.Attribute { }
 
     /**——————————————————————————————————————————————————————————————————————————— 
         CLASS:  Stl                                                     <summary>
@@ -52,15 +54,15 @@ namespace Tore.Core {
                 1) Numerically indexed access to keys and objects       <br/>
                 2) Ordering.                                            <br/>
                 3) Translation forward and backward to various formats. <br/>
-                4) Duplicate key support.                               <br/>
+                4) Duplicate Key support.                               <br/>
                                                                         <br/>
                 * Keys can not be null empty or whitespace.             <br/>
                 * Lists are public in this class intentionally.         <br/>
                 * Stl also acts as a bridge for,                        <br/>
                 json,                                                   <br/>
-                objects (public properties),                            <br/>
-                static classes (static fields),                         <br/>
-                IDictionary string key, object value [Alias: IDso] and  <br/>
+                objects <b> (public properties with get and set) </b>,  <br/>
+                static classes <b> (public static fields) </b>,         <br/>
+                IDictionary string Key, object value [Alias: IDso] and  <br/>
                 List KeyValuePair string,string      [Alias: Kvs].      <br/>
                 Has Enumerator and Nested converter support.            </summary>
     ————————————————————————————————————————————————————————————————————————————*/
@@ -68,123 +70,172 @@ namespace Tore.Core {
     [JsonConverter(typeof(NestedStlConverter))]     // For web api conversions.
 
     public class Stl:IEnumerable, IEnumerable<Kvp>, IDso {
-        /**———————————————————————————————————————————————————————————————————————————
-          VAR : keyLst: List of string;                                     <summary>
-          USE : Keeps the list of keys.                                     <para/>
-          INFO: Public by design. 
-                Never add or remove items directly for the sake of coherence.
-                Use add(), addPair, del(), delPair()                        </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public List<string> keyLst;         // Keys list.
-        /**———————————————————————————————————————————————————————————————————————————
-          VAR : objLst: List of objects;                                    <summary>
-          USE : Keeps the list of values (objects).                         <para/>
-          INFO: Public by design. 
-                Never add or remove items directly for the sake of coherence.
-                Use add(), addPair, delObj(), delPair()                     </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public List<object> objLst;         // Objects  list.
+
         private bool un,                    // Keys should be unique        if true.
                      id,                    // Keys should be identifier    if true.
-                     wr;                    // Overwrite Object with same key.
+                     wr;                    // Overwrite Object with same Key.
+
+        /**———————————————————————————————————————————————————————————————————————————
+          VAR : keyLst: List of string;                                     <summary>
+          USE :                                                             <br/>
+                Keeps the list of keys.                                     <para/>
+          INFO:                                                             <br/>
+                Public by design.                                           <br/>
+                Never Add or remove items directly.                         <br/>
+                Use Add(), AddPair, Delete(), DeletePair()                  </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public List<string> keyLst;
+
+        /**———————————————————————————————————————————————————————————————————————————
+          VAR : objLst: List of objects;                                    <summary>
+          USE :                                                             <br/>
+                Keeps the list of values (objects).                         <para/>
+          INFO:                                                             <br/>
+                Public by design.                                           <br/>
+                Never Add or remove items directly.                         <br/>
+                Use Add(), AddPair, delObj(), DeletePair()                  </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public List<object> objLst;         // Objects  list.
 
         /**<summary>Used for json conversion while Stl's are nested.</summary>*/
         public static JsonConverter[] stlJsonConverter { get; } =
                         new JsonConverter[] { new NestedStlConverter() };
+
         /**<summary>Used for setting json conversion for nested Stl's.</summary>*/
         public static JsonSerializerSettings stlJsonSettings { get; } =
                         new JsonSerializerSettings() { Converters = stlJsonConverter };
 
+
+        #region Constructor and initializer methods.
+        /*————————————————————————————————————————————————————————————————————————————
+            ————————————————————————————————————————
+            | Constructor and initializer methods. |
+            ————————————————————————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: ByArgs [static]                                             <summary>
+          TASK:                                                             <br/>
+                Converts an object array to Stl appropriately.              <para/>
+          ARGS:                                                             <br/>
+                args    : object[]  : Arguments (may be Key - values).      <para/>
+          RETV:                                                             <br/>
+                        : Stl       : Arguments as Stl.                     <para/>
+          INFO:                                                             <br/>
+                If args length = 0 null is returned.                        <br/>
+                If args length = 1 then if args[0] is                       <br/>
+                   * either an Stl, and it is returned.                     <br/>
+                   * or an object, then converted to an Stl and returned.   <br/>
+                Otherwise Stl constructor with object[] is called.          <br/>
+                For more info refer to Stl.                                 </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static Stl ByArgs(object[] args) {
+            if (args.Length == 0)
+                return null;
+            if (args.Length == 1) {
+                if (args[0] is Stl stl)
+                    return stl;
+                return new Stl(args[0]);
+            }
+            return new Stl(args);
+        }
+
         /**——————————————————————————————————————————————————————————————————————————
           CTOR: Stl                                                     <summary>
-          TASK: Constructs a string associated object list.             <para/>
+          TASK:                                                         <br/>
+                Constructs a string associated object list.             <para/>
           ARGS:                                                         <br/>
                 unique     : bool: true if list keys should be unique.
                                     :DEF: true.                         <br/>
                 identifier : bool: true if keys should be identifier.
                                     :DEF: true.                         <br/>
                 overwrite  : bool: true if object is overwritable
-                                    with the same key.                  <br/>
+                                    with the same Key.                  <br/>
                                     This works only if keys are unique.
                                     :DEF: true.                         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl(bool unique = true, bool identifier = true, bool overwrite = true) {
-            init(unique, identifier, overwrite);
+            Init(unique, identifier, overwrite);
         }
 
         /**——————————————————————————————————————————————————————————————————————————
           CTOR: Stl                                                     <summary>
-          TASK: Constructs a string associated object list.             <para/>
+          TASK:                                                         <br/>
+                Constructs a string associated object list.             <para/>
           INFO:                                                         <br/>
                 Parameterless version:                                  <br/>
                 Keys must be always unique identifiers.                 <br/>
-                Objects can be overwritten if added with same key.      </summary>
+                Objects can be overwritten if added with same Key.      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl() {
-            init(true, true, true);
+            Init(true, true, true);
         }
 
         /**——————————————————————————————————————————————————————————————————————————
           CTOR: Stl                                                         <summary>
-          TASK: Constructs a string associated object list.                 <para/>
-          ARGS: o   : object :                                              <br/>
+          TASK:                                                             <br/>
+                Constructs a string associated object list.                 <para/>
+          ARGS:                                                             <br/>
+                o   : object :                                              <br/>
                 *   If string, it is assumed to be json and Stl is
                     loaded via json conversion.                             <br/>
                 *   If Type, the <b>public static fields</b> of the type 
                     will be used to load the Stl.                           <br/>
                 *   If Stl, it will be cloned [look info].                  <br/>
-                *   If any other object the <b>public properties</b> of 
+                *   If any other object the <b>public properties</b> of
                     object will be used to load the Stl.                    <para/>
           INFO:                                                             <br/>
                 Keys must be always unique identifiers.                     <br/>
-                Objects can be overwritten if added with same key.          <br/>
-                These may be different for Stl cloning case                 <br/>
-                since it copies the properties of original Stl.             </summary>
+                Objects can be overwritten if added with same Key.          <br/>
+                These may be different for Stl cloning case
+                since it copies the properties of the original Stl.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl(object o) {
             if (o is Stl lst) {
-                init(lst.un, lst.id, lst.wr);
-                append(lst);
+                Init(lst.un, lst.id, lst.wr);
+                Append(lst);
                 return;
             }
-            init();
+            Init();
             if (o is string str) {
-                byJson(str, false);
+                ByJson(str, false);
                 return;
             }
             if (o is Type typ) {
-                byStatic(typ, false);
+                ByStatic(typ, false);
                 return;
             }
-            byObj(o, false);
+            ByObj(o, false);
         }
 
         /**——————————————————————————————————————————————————————————————————————————
           CTOR: Stl                                                     <summary>
-          TASK: Constructs a string associated object list.             <para/>
-          ARGS: akv : object[]  : array: key, value, key, value, ...    <para/>
+          TASK:                                                         <br/>
+                Constructs a string associated object list.             <para/>
+          ARGS:                                                         <br/>
+                arrKeyVal : object[]  : array: key, val, key, val, ...  <para/>
           INFO:                                                         <br/>
                 Keys must be always unique identifiers.                 <br/>
-                Objects can be overwritten if added with same key.      <br/>
-                akv is not a key value array, it is a linear array 
-                of keys and values following each other.                </summary>
+                Objects can be overwritten if added with same Key.      <br/>
+                arrKeyVal is not a Key value array, it is a linear      <br/>
+                array of keys and values following each other.          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl(params object[] akv) {
+        public Stl(params object[] arrKeyVal) {
             int i,
                 l;
 
-            init();
-            chk(akv, "akv");
-            l = akv.Length;
-            if (akv.Length == 0)
-                exc("E_INV_ARG", "akv");
+            Init();
+            Chk(arrKeyVal, "akv");
+            l = arrKeyVal.Length;
+            if (arrKeyVal.Length == 0)
+                Exc("E_INV_ARG", "akv");
             if (l % 2 != 0)
-                exc("E_ARG_COUNT", "akv");
+                Exc("E_ARG_COUNT", "akv");
             for(i = 0; i < l; i += 2) {
-                if (akv[i] is not string str)
-                    exc("E_INV_KEY", "akv[" + i.ToString() + "]");
+                if (arrKeyVal[i] is not string str)
+                    Exc("E_INV_KEY", "akv[" + i.ToString() + "]");
                 else
-                    add(str, akv[i + 1]);
+                    Add(str, arrKeyVal[i + 1]);
             }
         }
 
@@ -193,25 +244,27 @@ namespace Tore.Core {
           TASK: Destroys a string associated object list.                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         ~Stl() {
-
             if (keyLst == null)
                 return;
-            clear();
+            Clear();
             keyLst = null;
             objLst = null;
         }
+
         /*————————————————————————————————————————————————————————————————————————————
-          FUNC: init [private]
+          FUNC: Init [private]
           TASK: Initializes a new Stl. Helps constructors.
         ————————————————————————————————————————————————————————————————————————————*/
-        private void init(bool unique = true, bool identifier = true, bool overwrite = true) {
+        private void Init(bool unique = true, bool identifier = true, bool overwrite = true) {
             un = unique;
             id = identifier;
             wr = overwrite;
             keyLst = new List<string>();
             objLst = new List<object>();
         }
+        #endregion
 
+        #region Manipulator methods.
         /*————————————————————————————————————————————————————————————————————————————
             ————————————————————————
             | Manipulator methods  |
@@ -219,101 +272,107 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: clear                                                       <summary>
-          TASK: Shallow deletation of all entries (no element destruction). </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public void clear() {
+           FUNC: Clear                                                       <summary>
+           TASK:                                                             <br/>
+                 Shallow deletation of all entries (no element destruction). <br/>
+                 Also part of IDictionary interface.                         </summary>
+         ————————————————————————————————————————————————————————————————————————————*/
+        public void Clear() {
             keyLst.Clear();
             objLst.Clear();
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: clone                                                       <summary>
+          FUNC: Clone                                                       <summary>
           TASK: Clones this Stl into a new Stl.                             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl clone() {
-            Stl c = new (un, id, wr);
-            c.append(this);
-            return c;
+        public Stl Clone() {
+            Stl clone = new (un, id, wr);
+            clone.Append(this);
+            return clone;
         }
 
-
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: append                                                      <summary>
+          FUNC: Append                                                      <summary>
           TASK: Shallow transfer of all entries.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public void append(Stl src) {
+        public void Append(Stl src) {
             int i,
-                l = count;
+                l = Count;
+            List<string> sKey;
+            List<object> sObj;
 
-            List<string> sk;
-            List<object> so;
             if (src == null)
                 return;
-            sk = src.keyLst;
-            so = src.objLst;
-            for(i = 0; i < l; i++) {
-                keyLst.Add(sk[i]);
-                objLst.Add(so[i]);
-            }
+            sKey = src.keyLst;
+            sObj = src.objLst;
+            for(i = 0; i < l; i++)
+                Add(sKey[i], sObj[i], -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: add                                                         <summary>
-          TASK: Adds a key and associated object to the list.               <para/>
+          FUNC: Add                                                         <summary>
+          TASK:                                                             <br/>
+                Adds a Key and associated object to the list.               <para/>
           ARGS:                                                             <br/>
-                aKey: String : Key to add.                                  <br/>
-                aObj: Object : Object to add.          :DEF: null.          <br/>
-                pUni: Bool   : Unique pair (addPair).  :DEF: false.         <br/>
-                aIdx: int    : Insert index, 
-                               if aIdx out of bounds, inserts to end (push).
-                               Otherwise inserts to aIdx. :DEF: -1 (push).  <para/>
-          RETV:     : int    : Index of pair.                               <para/>
-          INFO: This is a working logical madness.                          </summary>
+                aKey        : String : Key to Add.                          <br/>
+                aObj        : Object : Object to Add. :DEF: null.           <br/>
+                aIdx        : int    : Insert index,                        <br/>
+                            * if aIdx out of bounds, inserts to end (push). <br/>
+                            * Otherwise inserts to aIdx. :DEF: -1 (push).   <br/>
+                uniquePair  : Bool   : Unique pair (AddPair).  :DEF: false. <para/>
+          RETV:                                                             <br/>
+                            : int    : Index of pair.                       <para/>
+          INFO:                                                             <br/>
+                This is a working logical madness.                          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int add(string aKey, object aObj = null, bool pUni = false, int aIdx = -1) {
+        public int Add(string aKey, object aObj = null, int aIdx = -1, bool uniquePair = false) {
             int i;
 
-            if (String.IsNullOrWhiteSpace(aKey))
-                exc("E_INV_ARG", nameof(aKey));
-            if (id && (!aKey.isIdentifier()))               // Check if Identifier.
-                exc("E_INV_IDENT", $"aKey = {aKey}");
-            i = (pUni) ? idxPair(aKey, aObj) : idx(aKey);   // Search (look: pUni).
-            if (pUni && (i > -1))                           // If we have this 
+            if (aKey.IsNullOrWhiteSpace())
+                Exc("E_INV_ARG", nameof(aKey));
+            if (id && (!aKey.IsIdentifier()))               // Check if Identifier.
+                Exc("E_INV_IDENT", $"aKey = {aKey}");
+            i = (uniquePair) ? 
+                    IndexPair(aKey, aObj) : Index(aKey);    // Search (look: uniquePair).
+            if (uniquePair && (i > -1))                     // If we have this 
                 return (i);                                 // return index.
             if ((!un) || (i == -1)) {                       // If not unique or not found
                 if ((aIdx < 0) || (aIdx >= keyLst.Count))   // If insert to end
-                    aIdx = keyLst.Count;                    // set index to append.
-                keyLst.Insert(aIdx, aKey);                  // insert key to index
+                    aIdx = keyLst.Count;                    // set index to Append.
+                keyLst.Insert(aIdx, aKey);                  // insert Key to index
                 objLst.Insert(aIdx, aObj);                  // insert object to index
                 return (aIdx);                              // Return index.
             }
             if (!wr)                                        // If no overwrite
-                exc("E_STL_NO_OVR", aKey);                  // Error.
-            objLst[i] = aObj;                                   // Overwrite object
+                Exc("E_STL_NO_OVR", aKey);                  // Error.
+            objLst[i] = aObj;                               // Overwrite object
             return i;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: addPair                                                     <summary>
-          TASK: Adds a key and associated object pair to the list.          <para/>
+          FUNC: AddPair                                                     <summary>
+          TASK:                                                             <br/>
+                Adds a Key and associated object pair to the list.          <para/>
           ARGS:                                                             <br/>
-                aKey: String : Key to add.                                  <br/>
-                aObj: Object : Object to add.          :DEF: null.          <br/>
-                pUni: Bool   : Unique pair (addPair).  :DEF: true.          <para/>
-          RETV:     : int    : Index of pair.                               <para/>
-          INFO: By default it adds unique pairs.                            </summary>
+                aKey        : String : Key to Add.                          <br/>
+                aObj        : Object : Object to Add.          :DEF: null.  <br/>
+                uniquePair  : Bool   : Unique pair (AddPair).  :DEF: true.  <para/>
+          RETV:                                                             <br/>
+                : int    : Index of pair.                                   <para/>
+          INFO:                                                             <br/>
+                By default it adds unique pairs.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int addPair(string aKey, object aObj = null, bool pUni = true) {
-            return add(aKey, aObj, pUni);
+        public int AddPair(string aKey, object aObj = null, bool uniquePair = true) {
+            return Add(aKey, aObj, -1, uniquePair);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: delIdx                                                      <summary>
+          FUNC: DeleteIndex                                                 <summary>
           TASK: Deletes pair at the index.                                  <para/>
           ARGS: index   : int : pair index.                                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public void delIdx(int index) {
+        public void DeleteIndex(int index) {
             if ((index > -1) && (index < keyLst.Count)) {
                 objLst[index] = null;
                 keyLst.RemoveAt(index);
@@ -322,233 +381,222 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: del                                                         <summary>
-          TASK: Deletes first occurence of a key and 
-                associated object from the list.                            <para/>
-          ARGS: aKey    : String : Key.                                     <para/>
-          RETV          : bool   : true if key found and pair deleted.      </summary>
+          FUNC: Delete                                                      <summary>
+          TASK:                                                             <br/>
+                Deletes first occurence of a Key and associated object.     <para/>
+          ARGS:                                                             <br/>
+                aKey    : String : Key.                                     <para/>
+          RETV:                                                             <br/>
+                        : bool   : true if Key found and pair deleted.      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool del(string aKey) {
-            int i = idx(aKey);
+        public bool Delete(string aKey) {
+            int i = Index(aKey);
 
             if (i > -1)
-                delIdx(i);
+                DeleteIndex(i);
             return (i > -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: delPair                                                     <summary>
-          TASK: Deletes first occurence of a key, object pair.              <para/>
+          FUNC: DeletePair                                                  <summary>
+          TASK:                                                             <br/>
+                Deletes first occurence of a Key, object pair.              <para/>
           ARGS:                                                             <br/>
                 aKey: String : Key.                                         <br/>
                 aObj: Object : Object.                                      <para/>
-          RETV:     : bool   : true if key found and pair deleted.          <para/>
-          INFO: Key and object must match for erasure.                      </summary>
-          ————————————————————————————————————————————————————————————————————————————*/
-        public bool delPair(string aKey, object aObj) {
-            int i = idxPair(aKey, aObj);
+          RETV:                                                             <br/>
+                    : bool   : true if Key found and pair deleted.          <para/>
+          INFO:                                                             <br/>
+                Key and object must match for erasure.                      </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public bool DeletePair(string aKey, object aObj) {
+            int i = IndexPair(aKey, aObj);
 
             if (i > -1)
-                delIdx(i);
+                DeleteIndex(i);
             return (i > -1);
         }
+        #endregion
 
-
+        #region Search methods.
         /*————————————————————————————————————————————————————————————————————————————
             ————————————————————————
-            |   Search methods     |
+            |   Search methods.    |
             ————————————————————————
         ————————————————————————————————————————————————————————————————————————————*/
+
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: idx                                                         <summary>
-          TASK: Finds first occurence of a key from the beginning index.    <para/>
+          FUNC: Index                                                       <summary>
+          TASK:                                                             <br/>
+                Finds first occurence of a Key from the beginning index.    <para/>
           ARGS:                                                             <br/>
                 aKey        : String : Key to search for.                   <br/>
                 fromIndex   : int    : Index to start the search.:DEF: 0.   <para/>
-          RETV:             : int    : The key index else -1.               </summary>
+          RETV:                                                             <br/>
+                            : int    : The Key index else -1.               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int idx(string aKey, int fromIndex = 0) {
+        public int Index(string aKey, int fromIndex = 0) {
             if (String.IsNullOrWhiteSpace(aKey))
                 return -1;
             return (keyLst.IndexOf(aKey, fromIndex));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: idxObj                                                      <summary>
-          TASK: Finds first occurence of an object from the beginning index.<para/>
+          FUNC: IndexObj                                                    <summary>
+          TASK:                                                             <br/>
+                Finds first occurence of an object from the index.          <para/>
           ARGS:                                                             <br/>
                 aObj        : Object : Object to search for. :DEF: "".      <br/>
                 fromIndex   : int    : Index to start the search. :DEF: 0.  <para/>
-          RETV:             : int    : The object index else -1.            </summary>
+          RETV:                                                             <br/>
+                            : int    : The object index else -1.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int idxObj(object aObj, int fromIndex = 0) {
+        public int IndexObj(object aObj, int fromIndex = 0) {
             return (objLst.IndexOf(aObj, fromIndex));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: idxPair                                                     <summary>
-          TASK: Finds first occurence of a key, object pair 
-                from the start index.                                       <para/>
+          FUNC: IndexPair                                                   <summary>
+          TASK:                                                             <br/>
+                Finds first occurence of a Key, object pair from the index. <para/>
           ARGS:                                                             <br/>
                 aKey        : String : Key of pair to search for.           <br/>
                 aObj        : Object : Object of pair to search for.        <br/>
                 fromIndex   : int    : Index to start the search. :DEF: 0.  <para/>
-          RETV:             : int    : The index found, else -1.            </summary>
+          RETV:                                                             <br/>
+                            : int    : The index found, else -1.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int idxPair(string aKey, object aObj = null, int fromIndex = 0) {
-
+        public int IndexPair(string aKey, object aObj = null, int fromIndex = 0) {
             int j;
 
-            if (String.IsNullOrWhiteSpace(aKey))
+            if (aKey.IsNullOrWhiteSpace())
                 return -1;
             while(true) {
-                j = keyLst.IndexOf(aKey, fromIndex);    // Search key.  
-                if (j == -1)                         // If key not found
-                    return (-1);                     // return not found.
-                if (objLst[j] == aObj)                   // If object at key matches
-                    return (j);                      // return index.
-                fromIndex = j + 1;                  // Change search start.
-            }                                       // Loop
+                j = keyLst.IndexOf(aKey, fromIndex);    // Search Key.  
+                if (j == -1)                            // If Key not found
+                    return (-1);                        // return not found.
+                if (objLst[j] == aObj)                  // If object at Key matches
+                    return (j);                         // return index.
+                fromIndex = j + 1;                      // Change search start.
+            }                                           // Loop
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: has                                                         <summary>
-          TASK: Looks if a key exists from the beginning index.             <para/>
+          FUNC: Has                                                         <summary>
+          TASK:                                                             <br/>
+                Looks if a Key exists from the beginning index.             <para/>
           ARGS:                                                             <br/>
                 aKey        : String : Key to search for.                   <br/>
                 fromIndex   : int    : Index to start the search. :DEF: 0.  <para/>
-          RETV:             : bool   : true if found, else false.           </summary>
+          RETV:                                                             <br/>
+                            : bool   : true if found, else false.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool has(string aKey, int fromIndex = 0) {
-            if (String.IsNullOrWhiteSpace(aKey))
+        public bool Has(string aKey, int fromIndex = 0) {
+            if (aKey.IsNullOrWhiteSpace())
                 return false;
             return (keyLst.IndexOf(aKey, fromIndex) > -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: hasObj                                                      <summary>
-          TASK: Looks if an object exists from the beginning index.         <para/>
+          FUNC: HasObj                                                      <summary>
+          TASK:                                                             <br/>
+                Looks if an object exists from the beginning index.         <para/>
           ARGS:                                                             <br/>
-                aObj        : Object : Object to search for.                  <br/>
+                aObj        : Object : Object to search for.                <br/>
                 fromIndex   : int    : Index to start the search. :DEF: 0.  <para/>
-        RETV:               : bool   : true if found, else false.           </summary>
+          RETV:                                                             <br/>
+                            : bool   : true if found, else false.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool hasObj(object aObj, int fromIndex = 0) {
+        public bool HasObj(object aObj, int fromIndex = 0) {
             return (objLst.IndexOf(aObj, fromIndex) > -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: hasPair                                                     <summary>
-          TASK: Looks if a key object pair exists from the beginning index. <para/>
+          TASK:                                                             <br/>
+                Looks if a Key object pair exists from the beginning index. <para/>
           ARGS:                                                             <br/>
                 aKey        : String : Key of pair to search for.           <br/>
                 aObj        : Object : Object of pair to search for.        <br/>
                 fromIndex   : int    : Index to start the search. :DEF: 0.  <para/>
-        RETV:               : bool   : true if found, else false.           </summary>
+          RETV:                                                             <br/>
+                            : bool   : true if found, else false.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public bool hasPair(string aKey, object aObj, int fromIndex = 0) {
-            return (idxPair(aKey, aObj, fromIndex) > -1);
+            return (IndexPair(aKey, aObj, fromIndex) > -1);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: obj                                                         <summary>
-          TASK: Returns first object with the key given from the
+          FUNC: Obj                                                         <summary>
+          TASK: Returns first object with the Key given from the
                 search index.                                               <para/>
           ARGS:                                                             <br/>
                 aKey      : String : Key to search for.                     <br/>
                 fromIndex : int    : Index to start the search. :DEF: 0.    <para/>
-          RETV:           : object : If key found returns object else null. </summary>
+          RETV:                                                             <br/>
+                          : object : If Key found returns object else null. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public object obj(string aKey, int fromIndex = 0) {
+        public object Obj(string aKey, int fromIndex = 0) {
             int i;
-            if (String.IsNullOrWhiteSpace(aKey))
+
+            if (aKey.IsNullOrWhiteSpace())
                 return null;
             i = keyLst.IndexOf(aKey, fromIndex);
             return (i < 0) ? null : objLst[i];
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: val.                                                        <summary>
-          TASK: Checks and gets a value corresponding to a key from Stl.    <para/>
-          ARGS:                                                             <br/>
-                T     : Type   : Value type.                                <br/>
-                key   : string : Key of value.                              <br/>
-                empty : bool   : Null or empty allowed.    :DEF: false.     <br/>
-                name  : string : Name of Stl.              :DEF: "".        <para/>
-          RETV:       : T      : Value or default(T).                       <para/>
-          INFO:                                                             <br/>
-                Algorithm:                                                  <br/>
-                If  key empty                           raises exception.   <br/>
-                If  key does not exist in stl                               <br/>
-                    if empty is true (allowed)          returns default.    <br/>
-                    else                                raises exception.   <br/>
-                If  value type incompatible with type T raises exception.   <br/>
-                If  value is null or empty                                  <br/>
-                    If empty is false (allowed)         returns default.    <br/>
-                    else                                raises exception.   <br/>
-                returns value.                                              <br/>
-                                                                            <br/>
-                name supplies information for exceptions.                   </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public T val<T>(string key, bool empty = false, string name = "") {
-            object v = null;
-            Type t = typeof(T);
-            int i;
-            string s;
-
-            chk(key, "key");
-            s = (name != "") ? $"{name}[\"{key}\"] " : key;
-            i = idx(key);
-            if (i == -1) {
-                if (empty)
-                    return default;
-                exc("E_STL_VAL", s + " undefined");
-            }
-            v = setType<T>(objLst[i]);
-            if (!empty)
-                chk(v, s + " empty.", "E_STL_VAL");
-            return (T)v;
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: key                                                         <summary>
-          TASK: Returns key associated to an object from the search index.  <para/>
+          FUNC: Key                                                         <summary>
+          TASK:                                                             <br/>
+                Returns Key associated to an object from the search index.  <para/>
           ARGS:                                                             <br/>
                 aObj        : Object : Object to search for.                <br/>
                 fromIndex   : int    : Index to start the search. :DEF: 0.  <para/>
-          RETV:             : string : The key found else null.             </summary>
+          RETV:                                                             <br/>
+                            : string : The Key found else null.             </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public string key(object aObj, int fromIndex = 0) {
-            int i = idxObj(aObj, fromIndex);
+        public string Key(object aObj, int fromIndex = 0) {
+            int i = IndexObj(aObj, fromIndex);
 
             return ((i < 0) ? null : keyLst[i]);
         }
+        #endregion
+
+        #region Properties.
+        /*————————————————————————————————————————————————————————————————————————————
+            ————————————————————
+            |   Properties.    |
+            ————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
+        /**———————————————————————————————————————————————————————————————————————————
+          PROP: Count                                                       <summary>
+          GET : Returns number of entries in list.                          <br/>
+                Also part of IDictionary interface.                         </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public int Count => keyLst.Count;
 
         /**———————————————————————————————————————————————————————————————————————————
-          PROP: count: int;                                             <summary>
-          GET : Returns number of entries in list.                      </summary>
+          PROP: Capacity: int;                                          <summary>
+          GET : Returns current entry Capacity of list.                 <br/>
+          SET : Sets entry Capacity of list.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public int count => keyLst.Count;
-
-        /**———————————————————————————————————————————————————————————————————————————
-          PROP: capacity: int;                                          <summary>
-          GET : Returns current entry capacity of list.                 <br/>
-          SET : Sets entry capacity of list.                            </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public int capacity {
+        public int Capacity {
             get {
                 return keyLst.Capacity;
             }
+
             set {
                 try {
                     keyLst.Capacity = value;
                     objLst.Capacity = value;
                 } catch(Exception e) {
-                    exc("E_STL_CAP", "", e);
+                    Exc("E_STL_CAP", "", e);
                 }
             }
         }
+        #endregion
 
+        #region Conversion methods.
         /*————————————————————————————————————————————————————————————————————————————
             —————————————————————————————————————————
             |   Conversion methods.                 |
@@ -557,22 +605,24 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: byJson.                                                     <summary>
-          TASK: Converts a json string and loads it to Stl.                 <para/>
+          FUNC: ByJson.                                                     <summary>
+          TASK:                                                             <br/>
+                Converts a json string and loads it to Stl.                 <para/>
           ARGS:                                                             <br/>
                 json : string   : Json string to convert to Stl.            <br/>
-                init : bool     : If true clears stl before conversion.
+                Init : bool     : If true clears stl before conversion.
                                   :DEF: true.                               <para/>
-          RETV:      : Stl      : Stl itself.                               <para/>
+          RETV:                                                             <br/>
+                     : Stl      : Stl itself.                               <para/>
           INFO:                                                             <br/>
                 Uses Newtonsoft json library.                               <br/>
                 Json must contain an object not a primitive or array.       <br/>
                 All sub-objects which are non-primitive and non array       <br/>
                 are also converted to sub - Stl's.                          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl byJson(string json, bool init = true) {
+        public Stl ByJson(string json, bool init = true) {
             if (init) {
-                clear();
+                Clear();
                 un = true;
                 id = true;
                 wr = true;
@@ -582,122 +632,131 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toJson.                                                     <summary>
-          TASK: Converts an Stl to json string.                             <para/>
+          FUNC: ToJson.                                                     <summary>
+          TASK:                                                             <br/>
+                Converts an Stl to json string.                             <para/>
           INFO:                                                             <br/>
                 Uses Newtonsoft json library.                               <br/>
                 General json conversion rules apply.                        <br/>
                 Circular references must be avoided.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public string toJson() {
+        public string ToJson() {
             return JsonConvert.SerializeObject(this, Formatting.Indented);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toStatic.                                                   <summary>
-          TASK: Sets <b>public static fields</b> of a class from Stl.       <para/>
+          FUNC: ToStatic.                                                   <summary>
+          TASK:                                                             <br/>
+                Sets <b>public static fields</b> of a class from Stl.       <para/>
           ARGS:                                                             <br/>
-                t             : Type : Class type.                          <br/>
-                ignoreMissing : bool : When true : Do not raise exception 
-                                       if a field is missing in Stl. 
-                                       :DEF:false.                          <para/>
-          INFO: Public static fields of type t are sought in Stl.           </summary>
+                type          : Type : Class type.                          <br/>
+                ignoreMissing : bool : If true, ignores missing fields else
+                                       raises exception.:DEF:false.         <para/>
+          INFO:                                                             <br/>
+                Public static fields of type type are sought in Stl.        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public void toStatic(Type t, bool ignoreMissing = false) {
-            FieldInfo[] l;
-            object v;
+        public void ToStatic(Type type, bool ignoreMissing = false) {
+            FieldInfo[] fldInfArr;
+            object val;
 
-            chk(t, "t");
-            l = t.GetFields(BindingFlags.Public | BindingFlags.Static);
-            if (l == null)
-                return;
-            foreach(FieldInfo f in l) {
-                if (TryGetValue(f.Name, out v)) {
-                    if (f.FieldType != v.GetType())
-                        v = setType(v, f.FieldType, ignoreMissing);
-                    f.SetValue(null, v);
+            Chk(type, nameof(type));
+            fldInfArr = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+            foreach(FieldInfo fld in fldInfArr) {
+                if (TryGetValue(fld.Name, out val)) {
+                    if (fld.FieldType != val.GetType())
+                        val = setType(val, fld.FieldType, ignoreMissing);
+                    fld.SetValue(null, val);
                 } else {
                     if (!ignoreMissing)
-                        exc("E_STL_TO_STATIC", $"{t.Name}:{f.Name}?");
+                        Exc("E_STL_TO_STATIC", $"{type.Name}:{fld.Name}?");
                 }
             }
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: byStatic.                                                   <summary>
-          TASK: Loads Stl from public static fields of type.                <para/>
-          ARGS: t   : Type      : Class type.                               <para/>
-          RETV:     : Stl       : Stl itself.                               </summary>
+          FUNC: ByStatic.                                                   <summary>
+          TASK:                                                             <br/>
+                Loads Stl from <b> public static fields </b> of type.       <para/>
+          ARGS:                                                             <br/>
+                type    : Type      : Class type.                           <para/>
+          RETV:                                                             <br/>
+                        : Stl       : Stl itself.                           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl byStatic(Type t, bool init = true) {
+        public Stl ByStatic(Type type, bool init = true) {
             FieldInfo[] l;
             bool i;
 
-            chk(t, "t");
+            Chk(type, nameof(type));
             if (init) {
-                clear();
+                Clear();
                 un = true;
                 id = true;      // Identifier only.
                 wr = true;
             }
             i = id;             // Store identifier restriction status.
             id = false;         // Optimization: field names are already identifiers.
-            l = t.GetFields(BindingFlags.Public |   // Get public static Fieldinfo.
+            l = type.GetFields(BindingFlags.Public |// Get public static Fieldinfo.
                             BindingFlags.Static);   // Never returns null.
             foreach(FieldInfo f in l)               // For each field,
-                add(f.Name, f.GetValue(null));      // Add name and value to Stl.
+                Add(f.Name, f.GetValue(null));      // Add name and value to Stl.
             id = i;             // Restore identifier restriction status.
             return this;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toObj.                                                      <summary>
-          TASK: Makes an object of class T and fills corresponding properties 
+          FUNC: ToObj.                                                      <summary>
+          TASK:                                                             <br/>
+                Makes an object of class T and fills corresponding properties 
                 of it from Stl.                                             <para/>
           ARGS:                                                             <br/>
                 T             : Class : Target object class.                <br/>
                 ignoreMissing : bool  : When true : Do not raise exception 
                                         if a property is missing in Stl. 
                                         :DEF:false.                         <para/>
-          INFO: Properties of class T are sought in Keys of Stl.            </summary>
+          INFO:                                                             <br/>
+                Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public T toObj<T>(bool ignoreMissing = false) where T : new() {
-            return (T)toObj(makeObject(typeof(T)), ignoreMissing);
+        public T ToObj<T>(bool ignoreMissing = false) where T : new() {
+            return (T)ToObj(makeObject(typeof(T)), ignoreMissing);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toObj.                                                      <summary>
-          TASK: Makes an object of class type typ and fills corresponding 
+          FUNC: ToObj.                                                      <summary>
+          TASK:                                                             <br/>
+                Makes an object of class type typ and fills corresponding 
                 properties of it from Stl.                                  <para/>
           ARGS:                                                             <br/>
                 type          : Type  : Target object class type.           <br/>
                 ignoreMissing : bool  : When true : Do not raise exception 
                                         if a property is missing in Stl. 
                                         :DEF:false.                         <para/>
-          INFO: Properties of class T are sought in Keys of Stl.            </summary>
+          INFO:                                                             <br/>
+                Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public object toObj(Type typ, bool ignoreMissing = false) {
-            return toObj(makeObject(typ), ignoreMissing);
+        public object ToObj(Type typ, bool ignoreMissing = false) {
+            return ToObj(makeObject(typ), ignoreMissing);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toObj.                                                      <summary>
-          TASK: Fills corresponding properties of an object from Stl.       <para/>
+          FUNC: ToObj.                                                      <summary>
+          TASK:                                                             <br/>
+                Fills corresponding properties of an object from Stl.       <para/>
           ARGS:                                                             <br/>
                 o             : object  : Target object.                    <br/>
                 ignoreMissing : bool    : When true : Do not raise exception 
                                           if a property is missing in Stl. 
                                           :DEF:false.                       <para/>
-          INFO: Properties of class T are sought in Keys of Stl.            </summary>
+          INFO:                                                             <br/>
+                Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public object toObj(object o, bool ignoreMissing = false) {
+        public object ToObj(object o, bool ignoreMissing = false) {
             PropertyInfo[] l;
             Type t;
             object v;
             int i;
 
 
-            chk(o, "o");
+            Chk(o, "o");
             t = o.GetType();
             if (t == typeof(Stl))
                 ignoreMissing = true;
@@ -709,11 +768,11 @@ namespace Tore.Core {
             foreach(PropertyInfo p in l) {
                 if (hasAttr<StlIgnore>(p))
                     continue;
-                i = idx(p.Name);
+                i = Index(p.Name);
                 if (i == -1) {
                     if (ignoreMissing)
                         continue;
-                    exc("E_PROP_MISSING", t.Name + "." + p.Name);
+                    Exc("E_PROP_MISSING", t.Name + "." + p.Name);
                 }
                 v = objLst[i];
                 p.SetValue(o, setType(v, p.PropertyType, ignoreMissing));
@@ -721,29 +780,30 @@ namespace Tore.Core {
             return o;
         }
 
-
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: byObj.                                                      <summary>
-          TASK: Fills Stl from an objects public properties.                <para/>
+          FUNC: ByObj.                                                      <summary>
+          TASK:                                                             <br/>
+                Fills Stl from an objects public properties.                <para/>
           ARGS:                                                             <br/>
                 o   : object : Source object.                               <br/>
-                init: bool   : Clears Stl before copy if true. :DEF:true.   <para/>
-          RETV:     : Stl    : Stl itself.                                  <para/>
+                Init: bool   : Clears Stl before copy if true. :DEF:true.   <para/>
+          RETV:                                                             <br/>
+                    : Stl    : Stl itself.                                  <para/>
           INFO:                                                             <br/>
                 Shallow copy.                                               <br/>
                 Multiple object properties can be merged in to an Stl
-                by setting init = false, but either the property names
+                by setting Init = false, but either the property names
                 should be unique or Stl must accept duplicate keys.
                 like myStl = new Stl(false, true, true)                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl byObj(object o, bool init = true) {
+        public Stl ByObj(object o, bool init = true) {
             PropertyInfo[] a;
             Type t;
             bool i;
 
-            chk(o, "o");
+            Chk(o, "o");
             if (init) {
-                clear();
+                Clear();
                 un = true;
                 id = true;
                 wr = true;
@@ -757,30 +817,33 @@ namespace Tore.Core {
             foreach(PropertyInfo p in a) {
                 if (hasAttr<StlIgnore>(p))
                     continue;
-                add(p.Name, p.GetValue(o));
+                Add(p.Name, p.GetValue(o));
             }
             id = i;             // Restore identifier restriction status.
             return this;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toDST.                                                      <summary>
-          TASK: Tries to make a <b>Dictionary&lt;string, T&gt;</b> from Stl.<para/>
-          ARGS: T   : object class type for objects.                        <br/>
+          FUNC: ToDictionaryOfStringTypeT.                                  <summary>
+          TASK:                                                             <br/>
+                Tries to make a <b>Dictionary&lt;string, T&gt;</b> from Stl.<para/>
+          ARGS:                                                             <br/>
+                T             : object class type for objects.              <br/>
                 ignoreMissing : Ignore missing sub properties.:DEF: false.  <para/>
-          INFO: Objects in Stl must be compatible with type T.              <br/>
+          INFO:                                                             <br/>
+                Objects in Stl must be compatible with type T.              <br/>
                 If complicated sub property objects are in sub Stl's and    <br/>
                 their properties may be incomplete, better call with        <br/>
                 ignoreMissing set to true                                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Dictionary<string, T> toDST<T>(bool ignoreMissing = false) {
-            int i,
-                                    l;
+        public Dictionary<string, T> ToDictionaryOfStringTypeT<T>(bool ignoreMissing = false) {
+            int i;
+            int l;
             T t;
             Dictionary<string, T> d;
 
             d = new Dictionary<string, T>();
-            l = count;
+            l = Count;
             for(i = 0; i < l; i++) {
                 if (objLst[i] is T obj) {
                     t = obj;
@@ -793,158 +856,174 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: toLstKvpStr.                                                <summary>
-          TASK: Makes a List of KeyValuePair of string, string and fills it 
+          FUNC: ToListOfKeyValuePairsOfString.                              <summary>
+          TASK:                                                             <br/>
+                Makes a List of KeyValuePair of string, string and fills it <br/>
                 with the keys and values from Stl.                          <para/> 
           INFO:                                                             <br/>
                 Used at Http request form data construction in c#.          <br/>
                 Values are obtained by ToString();                          <br/>
                 Kvs is an alias to KeyValuePair of string, string.          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public List<Kvs> toLstKvpStr() {
-            int i,
-                        c;
+        public List<Kvs> ToListOfKeyValuePairsOfString() {
+            int i;
+            int c;
             List<Kvs> r;
 
-            c = count;
+            c = Count;
             r = new List<Kvs>();
             for(i = 0; i < c; i++)
                 r.Add(new Kvs(keyLst[i], objLst[i].ToString()));
             return r;
         }
+        #endregion
 
+        #region IDictionary interface.
         /*————————————————————————————————————————————————————————————————————————————
             —————————————————————————————————————————
             |   IDictionary interface.              |
             —————————————————————————————————————————
-            Recommended use: When Stl is with unique keys and overwrite is true.
+            Recommended use: When Stl is with unique keys.
         ————————————————————————————————————————————————————————————————————————————*/
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Add                                                         <summary>
-          TASK: Adds a key-value pair to Stl.                               <para/>
+          TASK:                                                             <br/>
+                Adds a Key-value pair to Stl.                               <para/>
           ARGS:                                                             <br/>
-                key  : string : Key to add.                                 <br/>
-                value: object : Object to add.          :DEF: null.         <para/>
-          INFO: IDictionary interface. Better use add().                    </summary>
+                Key  : string : Key to Add.                                 <br/>
+                value: object : Object to Add.          :DEF: null.         <para/>
+          INFO:                                                             <br/>
+                IDictionary interface. Better use Add().                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public void Add(string key, object value) => add(key, value);
+        public void Add(string key, object value) => Add(key, value, -1);
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Remove                                                      <summary>
-          TASK: Deletes first occurence of a key and 
+          TASK:                                                             <br/>
+                Deletes first occurence of a Key and                        <br/>
                 associated object from the list.                            <para/>
-          ARGS: key     : String : Key.                                     <para/>
-          RETV          : bool   : true if key found and pair deleted.      <para/>
-          INFO: IDictionary interface. Better use del().                    </summary>
+          ARGS:                                                             <br/>
+                Key     : String : Key.                                     <para/>
+          RETV:                                                             <br/>
+                        : bool   : true if Key found and pair deleted.      <para/>
+          INFO:                                                             <br/>
+                IDictionary interface. Better use Delete().                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool Remove(string key) => del(key);
+        public bool Remove(string key) => Delete(key);
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Remove                                                      <summary>
-          TASK: Deletes first occurence of a key-value pair.                <para/>
-          ARGS: item: KeyValuePair of string,object: Pair to remove.        <para/>
-          RETV:     : bool   : true if pair found and deleted.              <para/>
-          INFO: IDictionary interface. Look delPair().                      </summary>
+          TASK:                                                             <br/>
+                Deletes first occurence of a Key-value pair.                <para/>
+          ARGS:                                                             <br/>
+                item: KeyValuePair of string,object: Pair to remove.        <para/>
+          RETV:                                                             <br/>
+                    : bool   : true if pair found and deleted.              <para/>
+          INFO:                                                             <br/>
+                IDictionary interface. Look DeletePair().                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool Remove(Kvp item) => delPair(item.Key, item.Value);
+        public bool Remove(Kvp item) => DeletePair(item.Key, item.Value);
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Add                                                         <summary>
-          TASK: Adds a key-value pair to Stl.                               <br/>
-          ARGS: KeyValuePair of string,object: item.                        <br/>
-          INFO: IDictionary interface. Look add(), addPair().               </summary>
+          TASK:                                                             <br/>
+                Adds a Key-value pair to Stl.                               <br/>
+          ARGS:                                                             <br/>
+                KeyValuePair of string,object: item.                        <br/>
+          INFO:                                                             <br/>
+                IDictionary interface. Look Add(), AddPair().               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public void Add(Kvp item) => add(item.Key, item.Value);
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: Clear                                                       <summary>
-          TASK: IDictionary interface. Better use clear().                  </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public void Clear() => clear();
+        public void Add(Kvp item) => Add(item.Key, item.Value);
+        
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ContainsKey                                                 <summary>
-          TASK: IDictionary interface. Better use has().                    </summary>
+          TASK: IDictionary interface. Better use Has().                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool ContainsKey(string key) => has(key);
+        public bool ContainsKey(string key) => Has(key);
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Contains                                                    <summary>
           TASK: IDictionary interface. Better use hasPair().                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public bool Contains(Kvp item) => hasPair(item.Key, item.Value);
-        /**———————————————————————————————————————————————————————————————————————————
-          PROP: Count                                                       <summary>
-          GET : IDictionary interface. Better use count.                    </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public int Count => count;
-
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: IsReadOnly                                                  <summary>
           GET : IDictionary interface. Always false.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public bool IsReadOnly => false;
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: Keys                                                        <summary>
           GET : Gets a shallow copy of Keys list.                           <br/>
           INFO: IDictionary interface.                                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public ICollection<string> Keys => copyToList<string>(keyLst);
+        public ICollection<string> Keys => keyLst.CopyToList();
+        
         /**———————————————————————————————————————————————————————————————————————————
           PROP: Values                                                      <summary>
           GET : Gets a shallow copy of values (objects) list.               <br/>
           INFO: IDictionary interface.                                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public ICollection<object> Values => copyToList<object>(objLst);
+        public ICollection<object> Values => objLst.CopyToList();
+        
         /**<inheritdoc/>*/
         public IEnumerator<Kvp> GetEnumerator() => new StlEnumeratorKVP(this);
+        
         /**<inheritdoc/>*/
         IEnumerator IEnumerable.GetEnumerator() => keyLst.GetEnumerator();
+        
         /**<inheritdoc/>*/
         public bool TryGetValue(string key, out object value) {
             int i;
             bool b;
 
-            i = idx(key);
+            i = Index(key);
             b = (i > -1);
             value = b ? objLst[i] : null;
             return (b);
         }
+        
         /**<inheritdoc/>*/
         public void CopyTo(Kvp[] array, int arrayIndex) {
             int i,
                 j = 0,
                 c;
 
-            c = count;
+            c = Count;
             for(i = arrayIndex; i < c; i++)
                 array[j] = new Kvp(keyLst[i], objLst[i]);
         }
+        
         /**<inheritdoc/>*/
         public object this[string key] {
-            get => obj(key, 0);
+            get => Obj(key, 0);
             set {
                 int i;
-                i = idx(key);
+                i = Index(key);
                 if (i < 0) {
-                    add(key, value);
+                    Add(key, value);
                     return;
                 }
                 if (!wr) {
-                    exc("E_STL_NO_OVR", key);
+                    Exc("E_STL_NO_OVR", key);
                 }
                 objLst[i] = value;
             }
         }
+        #endregion
 
-    }// end class Stl
+    }   // end class Stl
 
     /**———————————————————————————————————————————————————————————————————————————
       CLASS : StlEnumeratorKVP.                                         <summary>
       USAGE : Stl Enumeration Support for IDictionary interface.        </summary>
     ————————————————————————————————————————————————————————————————————————————*/
-    public class StlEnumeratorKVP:IEnumerator<Kvp> {
+    public class StlEnumeratorKVP: IEnumerator<Kvp> {
 
         private Stl lst;
         private int idx;
+
         /**<inheritdoc/>*/
         public Kvp Current => new (lst.keyLst[idx], lst.objLst[idx]);
 
@@ -966,13 +1045,11 @@ namespace Tore.Core {
         }
 
         /**<inheritdoc/>*/
-        protected virtual void Dispose(bool disposing) {
-
-        }
+        protected virtual void Dispose(bool disposing) { }
 
         /**<inheritdoc/>*/
         public bool MoveNext() {
-            if ((idx + 1) == lst.count)
+            if ((idx + 1) == lst.Count)
                 return false;
             ++idx;
             return true;
@@ -981,20 +1058,23 @@ namespace Tore.Core {
 
     /**———————————————————————————————————————————————————————————————————————————
       CLASS :   NestedStlConverter.                                     <summary>
-      USAGE :   In jsonDeserializer, for supporting nested Stl.         <br/>
-  
-        This replaces all untyped sub-list elements that can be
-        IDictionary string,object lists with Stl.                      </summary>
+      USAGE :                                                           <br/>
+        In jsonDeserializer, for supporting nested Stl.                 <br/>
+        This replaces all untyped sub-list elements that can be         <br/>
+        IDictionary string,object lists with Stl.                       </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     public class NestedStlConverter: CustomCreationConverter<IDso> {
+
         /**<inheritdoc/>*/
         public override IDso Create(Type objectType) {
             return new Stl();
         }
+    
         /**<inheritdoc/>*/
         public override bool CanConvert(Type objectType) {
             return objectType == typeof(object) || base.CanConvert(objectType);
         }
+        
         /**<inheritdoc/>*/
         public override object ReadJson(JsonReader reader, Type objectType,
                 object existingValue, JsonSerializer serializer) {
@@ -1003,6 +1083,5 @@ namespace Tore.Core {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             return serializer.Deserialize(reader);
         }
-
     }   // End class NestedStlConverter.
 }

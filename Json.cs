@@ -18,7 +18,7 @@ namespace Tore.Core {
     public static class Json {
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: deserialize [static]                                        <summary>
+          FUNC: Deserialize [static]                                        <summary>
           TASK:                                                             <br/>
                 Deserializes an object from Json with cascading Stl support.<para/>
           ARGS:                                                             <br/>
@@ -31,29 +31,23 @@ namespace Tore.Core {
           WARN:                                                             <br/>
                 Throws E_JSON_DESERIALIZE on failure.                       </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static T deserialize<T>(string val) {
-            //JsonSerializerSettings ser;
+        public static T Deserialize<T>(string val) {
             T res;
 
-            if (val.isNullOrWhiteSpace())
+            if (val.IsNullOrWhiteSpace())
                 return default;
-            chk(typeof(T), "T", "E_JSON_DESERIALIZE");
-            /*
-            ser = (typeof(T).IsAssignableTo(typeof(Stl))) ?
-                        Stl.stlJsonSettings :
-                        null;
-            */
+            Chk(typeof(T), "T", "E_JSON_DESERIALIZE");
             try {
                 res = JsonConvert.DeserializeObject<T>(val, Stl.stlJsonSettings);
             } catch (Exception e) {
-                exc("E_JSON_DESERIALIZE", typeof(T).Name, e);
+                Exc("E_JSON_DESERIALIZE", typeof(T).Name, e);
                 throw;
             }
             return res;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: serialize [static]                                          <summary>
+          FUNC: Serialize [static]                                          <summary>
           TASK:                                                             <br/>
                 Serializes an object to Json.                               <para/>
           ARGS:                                                             <br/>
@@ -63,13 +57,13 @@ namespace Tore.Core {
           WARN:                                                             <br/>
                 Throws E_JSON_SERIALIZE on failure.                         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string serialize(object obj) {
+        public static string Serialize(object obj) {
             string res;
 
             try {
                 res = JsonConvert.SerializeObject(obj, Formatting.Indented);
             } catch (Exception e) {
-                exc("E_JSON_SERIALIZE", obj.GetType().Name, e);
+                Exc("E_JSON_SERIALIZE", obj?.GetType().Name, e);
                 throw;
             }
             return res;

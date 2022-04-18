@@ -80,41 +80,29 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          PROP: isInContainer [static] : bool.                              <summary>
-          TASK: GET: Returns if program is running in a container.          </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static bool isInContainer {
-            get {
-                return 
-                    Environment
-                    .GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") == "true";
-            }
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: h2i [static]                                                <summary>
+          FUNC: HexToInt [static]                                           <summary>
           TASK: Returns integer from hex string.                            <para/>
           ARGS: hex : String        : hexadecimal number.                   <para/>
           RETV:     : int           : integer value.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static int h2i(string hex) {
+        public static int HexToInt(string hex) {
             return int.Parse(hex, NumberStyles.HexNumber);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: i2h [static]                                                <summary>
+          FUNC: IntToHex [static]                                           <summary>
           TASK: Returns hex string from integer.                            <para/>
           ARGS:                                                             <br/>
                 i       : int       : integer value.                        <br/>
                 digits  : int       : Number of hex digits.                 <para/>
           RETV:         : String    : Formatted hexadecimal string.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string i2h(int i, int digits) {
+        public static string IntToHex(int i, int digits) {
             return i.ToString("x" + digits.ToString());
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: hexStrToByteArr [static]                                    <summary>
+          FUNC: HexStrToByteArr [static]                                    <summary>
           TASK: Converts a hex string to byte array.                        <para/>
           ARGS: hex : string    : Hex string.                               <para/>
           RETV:     : byte[]    : Byte array.                               <para/>
@@ -123,7 +111,7 @@ namespace Tore.Core {
                 *   Throws exception if hex string is invalid.              <br/>
                 *   'A'- 0xA => 65 - 10 = 55.                               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static byte[] hexStrToByteArr(string hex) {
+        public static byte[] HexStrToByteArr(string hex) {
             int i,      // iterator.
                 p,      // position.
                 l;      // length.
@@ -135,14 +123,14 @@ namespace Tore.Core {
                     return (n - '0');
                 if ((n >= 'A') && (n <= 'F'))
                     return (n - 55);
-                exc("E_INV_NIBBLE", $"hex[{pos}] = {n}");
+                Exc("E_INV_NIBBLE", $"hex[{pos}] = {n}");
                 return 0;
             }
 
-            chk(hex, "hex");
+            Chk(hex, "hex");
             l = hex.Length;
             if ((l % 2) != 0)
-                exc("E_INV_ARG", "hex");
+                Exc("E_INV_ARG", "hex");
             l /= 2;
             a = new byte[l];
             for(i = 0; i < l; i++) {
@@ -153,20 +141,20 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: byteArrToHexStr [static]                                    <summary>
+          FUNC: ByteArrToHexStr [static]                                    <summary>
           TASK: Converts a byte array to capital hex string.                <para/>
           ARGS: arr : byte[]    : Byte array.                               <para/>
           RETV:     : string    : Hex string.                               <para/>
           INFO: 'A'- 0xA => 65 - 10 = 55.                                   <para/>
           WARN: Throws exception if byte array is invalid.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string byteArrToHexStr(byte[] arr) {
+        public static string ByteArrToHexStr(byte[] arr) {
             int i,              // iterator.
                 l,              // length.
                 n;              // nibble value.
             StringBuilder s;    // String builder.
 
-            chk(arr, "arr");
+            Chk(arr, "arr");
             l = arr.Length;
             s = new StringBuilder(l * 2);
             for(i = 0; i < l; i++) {
@@ -184,19 +172,51 @@ namespace Tore.Core {
             ——————————————————————————
             A Practical Exception Subsystem.
         ————————————————————————————————————————————————————————————————————————————*/
-        /**———————————————————————————————————————————————————————————————————————————
-          TYPE: ExcInt [delegate]                                           <summary>
-          TASK: Exception Interceptor delegate Type                         </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public delegate void ExcInt(Exception e, Stl dta);        // Type definition.
-        /**———————————————————————————————————————————————————————————————————————————
-          PROP: excInt                                                      <summary>
-          USE: Exception Interceptor delegate property.                     </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static ExcInt excInt { get; set; } = null;
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: exc [static]                                                <summary>
+          TYPE: ExcInterceptorDelegate [delegate]                           <summary>
+          TASK: Exception Interceptor Type.                                 </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public delegate void ExcInterceptorDelegate(Exception e, Stl dta); 
+
+        /**———————————————————————————————————————————————————————————————————————————
+          PROP: excInterceptor                                              <summary>
+          USE: Exception Interceptor property, for logging etc.             </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static ExcInterceptorDelegate excInterceptor { get; set; } = null;
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: HasExcData [static]                                          <summary>
+          TASK:                                                             <br/>
+                If an exception is generated or processed through           <br/>
+                <b>Exc</b>, it Has extra data and this will return true.    <para/>
+1         ARGS:                                                             <br/>
+                e   : Exception : Any Exception.                            <para/>
+          RETV:                                                             <br/>
+                    : bool      : True if exception Has extra data.         </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static bool HasExcData(Exception? e) {
+            return (e != null) && (e.Data.Contains("dta"));
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: GetExcDta [static]                                          <summary>
+          TASK:                                                             <br/>
+                If an exception is generated or processed through           <br/>
+                <b>Exc</b>, it Has extra data and this will return it.      <para/>
+1         ARGS:                                                             <br/>
+                e   : Exception : Any Exception.                            <para/>
+          RETV:                                                             <br/>
+                    : Stl       : Extra exception data or null              </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static Stl GetExcDta(Exception? e) {
+            if (!HasExcData(e))
+                return null;
+            return (Stl)(e.Data["dta"]);
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: Exc [static]                                                <summary>
           TASK: Raises and/or logs an exception with extra control.         <para/>
           ARGS:                                                             <br/>
                 tag : String    : Message selector.                         <br/>
@@ -216,7 +236,7 @@ namespace Tore.Core {
                     returns null (must be *re-thrown* if needed).           <br/>
                                                                             <br/>
                 * Collected Data: at e.Data["dta"] as a Stl*.               <br/>
-                    "exc" = Class name of exception.                        <br/>
+                    "Exc" = Class name of exception.                        <br/>
                     "msg" = Exception message.                              <br/>
                     "tag" = Exception tag.                                  <br/>
                     "inf" = Exception info.                                 <br/>
@@ -224,15 +244,15 @@ namespace Tore.Core {
                 *Stl is a string associated object list class. 
                  Info about Stl can be found at Stl.cs.                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static object exc(string tag = "E_NO_TAG", string inf = "",
-                Exception e = null) {
-
+        public static object Exc(string tag = "E_NO_TAG", 
+                                 string inf = "", 
+                                 Exception e = null) {
             Exception cex;
             Stl dta;
             MethodBase met;
 
             cex = e ?? new ToreCoreException(tag);      // If no exception make one.
-            if (cex.Data.Contains("dta"))               // If exception already processed
+            if (HasExcData(cex))                         // If exception already processed
                 return null;                            // return.
             dta = new Stl(){                            // Collect data.
                 {"exc", cex.GetType().FullName},
@@ -246,32 +266,33 @@ namespace Tore.Core {
                     met = new StackTrace(3)?.GetFrame(0)?.GetMethod();
             }
             if (met != null)
-                dta.add("loc", $"{met.DeclaringType?.Name}.{met.Name}");
-            excInt?.Invoke(cex, dta);                   // if assigned, invoke.
+                dta.Add("loc", $"{met.DeclaringType?.Name}.{met.Name}");
+            excInterceptor?.Invoke(cex, dta);                   // if assigned, invoke.
             cex.Data.Add("dta", (object)dta);
-            excDbg(dta);
+            if (isDebug)
+                ExcDbg(dta);
             if (e == null)                              // If we made the exception
                 throw cex;                              // throw it
             return null;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: excDbg [static]                                             <summary>
+          FUNC: ExcDbg [static]                                             <summary>
           TASK: Outputs exception info via dbg() method                     <para/>
           ARGS: ed  : Stl       : Exception data in Stl form.               <para/>
           INFO: The ed Stl can be found in exception.Data["dta"].           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void excDbg(Stl ed) {
+        public static void ExcDbg(Stl ed) {
             List<string> dia,
                         inl;
-            string inf = (string)ed.obj("inf");
+            string inf = (string)ed.Obj("inf");
 
             dia = new List<string>();
             dia.Add("_LINE_");
-            dia.Add("[EXC]: " + (string)ed.obj("exc"));
-            dia.Add("[MSG]: " + (string)ed.obj("msg"));
-            dia.Add("[TAG]: " + (string)ed.obj("tag"));
-            if (inf.isNullOrWhiteSpace()) {
+            dia.Add("[EXC]: " + (string)ed.Obj("exc"));
+            dia.Add("[MSG]: " + (string)ed.Obj("msg"));
+            dia.Add("[TAG]: " + (string)ed.Obj("tag"));
+            if (inf.IsNullOrWhiteSpace()) {
                 dia.Add("[INF]: - .");
             } else {
                 inl = new List<string>(inf.Split('\n'));
@@ -282,13 +303,13 @@ namespace Tore.Core {
                         dia.Add("       " + s.Trim());
                 }
             }
-            dia.Add("[LOC]: " + (string)ed.obj("loc"));
+            dia.Add("[LOC]: " + (string)ed.Obj("loc"));
             dia.Add("_LINE_");
-            dbg(dia);
+            Dbg(dia);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: chk [static]                                            <summary>
+          FUNC: Chk [static]                                            <summary>
           TASK:                                                         <br/>
                 Checks argument and raises exception if it is null 
                 or empty.                                               <para/>
@@ -301,36 +322,37 @@ namespace Tore.Core {
                 In case of strings, white spaces are not welcome.       <br/>
                 In case of Guids, empty Guid's are not welcome.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void chk(object arg, string inf,
+        public static void Chk(object arg, string inf,
                 string tag = "E_INV_ARG") {
 
             if  ((arg == null) ||
                 ((arg is string) && (String.IsNullOrWhiteSpace((string)arg))) ||
                 ((arg is Guid) && (((Guid)arg).Equals(Guid.Empty))))
-                exc(tag, inf);
+                Exc(tag, inf);
         }
 
-        private const string dbgLine = "—————————————————————————————————" +
-                                        "—————————————————————————————————";
+        private const string dbgLine = "————————————————————————————————" +
+                                       "————————————————————————————————";
         /**———————————————————————————————————————————————————————————————————————————
-          TYPE: LogInt [delegate]                                           <summary>
+          TYPE: DbgInterceptorDelegate [delegate]                           <summary>
           TASK: Logging Interceptor delegate Type for dbg() outputs.        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public delegate void LogInt(string s);              // Type definition.
-        /**———————————————————————————————————————————————————————————————————————————
-          PROP: logInt                                                      <summary>
-          USE : Logging Interceptor delegate property for dbg() outputs.    </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static LogInt logInt { get; set; } = null;   // Function pointer.
+        public delegate void DbgInterceptorDelegate(string s);
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: dbg [static]                                                <summary>
+          PROP: dbgInterceptor                                              <summary>
+          USE : Logging Interceptor delegate property for dbg() outputs.    </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static DbgInterceptorDelegate dbgInterceptor { get; set; } = null;
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: Dbg [static]                                                <summary>
           TASK: Writes output to debug console and trace log.               <para/>
           ARGS: msg : String[]  : Message collection.                       <para/>
-          INFO: Uses Console.Write if in container, otherwise Debug.Write.  
+          INFO: Uses Debug.Write.  
                 Has a log interceptor delegate which may be useful in case. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void dbg(params string[] msg) {
+        public static void Dbg(params string[] msg) {
             StringBuilder b;
             string s;
 
@@ -348,93 +370,24 @@ namespace Tore.Core {
                 }
             }
             s = b.ToString();
-            if (isInContainer)
-                Console.Write(s);
-            else
-                Debug.Write(s);
-            logInt?.Invoke(s);
+            Debug.Write(s);
+            dbgInterceptor?.Invoke(s);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: dbg [static]                                                <summary>
+          FUNC: Dbg [static]                                                <summary>
           TASK: Writes output to debug console and to log if linked.        <para/>
           ARGS: lst : List of String  : Message collection.                 <para/>
           INFO: Uses Console.Write if in container, otherwise Debug.Write.  
                 Has a log interceptor delegate which may be useful in case. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void dbg(List<string> lst) {
+        public static void Dbg(List<string> lst) {
             if (lst == null)
                 return;
-            dbg(lst.ToArray());
+            Dbg(lst.ToArray());
         }
 
-        /*————————————————————————————————————————————————————————————————————————————
-            ——————————————————————————————
-            |   List utility functions   |
-            ——————————————————————————————
-        ————————————————————————————————————————————————————————————————————————————*/
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: addUnique [static]                                          <summary>
-          TASK: If itm of Type T does not exist in List of T lst, it is added.
-                Index of itm is returned.                                   <para/>
-          ARGS:                                                             <br/>
-                lst : List of T : List to add.                              <br/>
-                itm : T         : Item to add for.                          <para/>
-          RETV:     : int       : Index of itm in list.                     </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static int addUnique<T>(List<T> lst, T itm) {
-            int r;                                  // Return value.
-
-            chk(lst, "lst");
-            r = lst.IndexOf(itm);               // Search object in list.
-            if (r == -1) {                      // If not found
-                lst.Add(itm);                   // add the object
-                r = lst.Count - 1;              // and get the index.
-            }
-            return (r);                          // return the index.
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: copyToList [static]                                         <summary>
-          TASK: Copies a collection of type T to a list of type T.          <para/>
-          ARGS: c   : ICollection of T  : Source Collection.                <para/>
-          RETV:     : List of T         : Copy of collection as List of T.  </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static List<T> copyToList<T>(ICollection<T> c) {
-            List<T> l;
-            l = new List<T>();
-            if (c != null) {
-                foreach(T x in c)
-                    l.Add(x);
-            }
-            return l;
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: argStl [static]                                             <summary>
-          TASK: Converts an object array to Stl appropriately.              <para/>
-          ARGS: akv : object[]  : Arguments (may be key - values).          <para/>
-          RETV:     : Stl       : Arguments as Stl.                         <para/>
-          INFO:                                                             <br/>
-                If  akv length = 0 null is returned.                        <br/>
-                If  akv length = 1                                          <br/>
-                  __ if akv[0] is an Stl, it is returned.                    <br/>
-                  __ else akv[0] is assumed to be a data transfer object.    <br/>
-                  __ It is converted to an Stl and returned.                 <br/>
-                Otherwise Stl constructor with object[] is called.
-                For more info refer to Stl.                                 </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static Stl argStl(object[] akv) {
-            if (akv.Length == 0)
-                return null;
-            if (akv.Length == 1) {
-                if (akv[0] is Stl lst)
-                    return lst;
-                return new Stl(akv[0]);
-            }
-            return new Stl(akv);
-        }
+        
 
         /*————————————————————————————————————————————————————————————————————————————
             ——————————————————————————————————————
@@ -470,8 +423,8 @@ namespace Tore.Core {
                                                 not found.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static Attribute attr(Type attrType, MemberInfo memInfo) {
-            chk(attrType, "attrType");
-            chk(memInfo, "memInfo");
+            Chk(attrType, "attrType");
+            Chk(memInfo, "memInfo");
             return memInfo.GetCustomAttribute(attrType, true);
         }
 
@@ -491,7 +444,7 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: hasAttr [static]                                            <summary>
-          TASK: Checks if a member has an attribute.                        <para/>
+          TASK: Checks if a member Has an attribute.                        <para/>
           ARGS:                                                             <br/>
                 T           : Type (Class)  : Type of attribute.            <br/>
                 memInfo     : MemberInfo    : Member information.           <para/>
@@ -523,7 +476,7 @@ namespace Tore.Core {
 
         private static Type fetchType(object src, string name) {
             if (src == null)
-                exc("E_TYPE_SRC_NULL", name);
+                Exc("E_TYPE_SRC_NULL", name);
             return (src is Type t) ? t : src.GetType();
         }
 
@@ -541,7 +494,7 @@ namespace Tore.Core {
         public static PropertyInfo instanceProp(object propSrc,
                                                 string propNam,
                                                 bool inherit = true) {
-            chk(propNam, nameof(propNam));
+            Chk(propNam, nameof(propNam));
             return fetchType(propSrc, nameof(propSrc)).GetProperty(
                     propNam,
                     BindingFlags.Public |
@@ -564,7 +517,7 @@ namespace Tore.Core {
         public static PropertyInfo staticProp(object propSrc,
                                                 string propNam,
                                                 bool inherit = true) {
-            chk(propNam, nameof(propNam));
+            Chk(propNam, nameof(propNam));
             return fetchType(propSrc, nameof(propSrc)).GetProperty(
                     propNam,
                     BindingFlags.Public |
@@ -587,7 +540,7 @@ namespace Tore.Core {
         public static FieldInfo staticField(object fldSrc,
                                             string fldNam,
                                             bool inherit = true) {
-            chk(fldNam, nameof(fldNam));
+            Chk(fldNam, nameof(fldNam));
             return fetchType(fldSrc, nameof(fldSrc)).GetField(
                 fldNam,
                 BindingFlags.Public |
@@ -610,7 +563,7 @@ namespace Tore.Core {
         public static MethodInfo instanceMethod(object metSrc,
                                                 string metNam,
                                                 bool inherit = true) {
-            chk(metNam, nameof(metNam));
+            Chk(metNam, nameof(metNam));
             return fetchType(metSrc, nameof(metSrc)).GetMethod(
                 metNam,
                 BindingFlags.Public |
@@ -633,7 +586,7 @@ namespace Tore.Core {
         public static MethodInfo staticMethod(object metSrc,
                                               string metNam,
                                               bool inherit = true) {
-            chk(metNam, nameof(metNam));
+            Chk(metNam, nameof(metNam));
             return fetchType(metSrc, nameof(metSrc)).GetMethod(
                 metNam,
                 BindingFlags.Public |
@@ -659,8 +612,7 @@ namespace Tore.Core {
                                             string metNam,
                                             bool inherit = true)
                                             where T : Delegate {
-            return instanceMethod(metSrc, metNam, inherit)?
-                    .CreateDelegate<T>();
+            return instanceMethod(metSrc, metNam, inherit)?.CreateDelegate<T>();
         }
 
         /**——————————————————————————————————————————————————————————————————————————
@@ -678,8 +630,7 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public static T staticDelegate<T>(object metSrc, string metNam, bool inherit = true)
                                           where T : Delegate {
-            return staticMethod(metSrc, metNam, inherit)?
-                    .CreateDelegate<T>();
+            return staticMethod(metSrc, metNam, inherit)?.CreateDelegate<T>();
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -706,9 +657,9 @@ namespace Tore.Core {
             PropertyInfo inf;
 
             if ((tar == null) || (tar is Type))
-                exc("E_INV_INSTANCE", "tar");
+                Exc("E_INV_INSTANCE", "tar");
             inf = instanceProp(tar, propNam, true);
-            chk(inf, tar.GetType().Name + "." + propNam, "E_PROP_INV");
+            Chk(inf, tar.GetType().Name + "." + propNam, "E_PROP_INV");
             inf.SetValue(tar, setType(val, inf.PropertyType));
         }
 
@@ -724,11 +675,11 @@ namespace Tore.Core {
             Type tty;
 
             if ((tar == null) || (tar is Type))
-                exc("E_INV_INSTANCE", "tar");
-            chk(inf, "inf");
+                Exc("E_INV_INSTANCE", "tar");
+            Chk(inf, "inf");
             tty = tar.GetType();
             if (inf.DeclaringType != tty) {
-                exc("E_PROP_INV_CLASS",
+                Exc("E_PROP_INV_CLASS",
                     inf.DeclaringType.Name + "!=" + tty.Name);
             }
             inf.SetValue(tar, setType(val, inf.PropertyType));
@@ -747,7 +698,7 @@ namespace Tore.Core {
 
             inf = staticProp(tar, propNam, true);
             if (inf == null) 
-                exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
+                Exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
             inf.SetValue(null, setType(val, inf.PropertyType));
         }
 
@@ -765,7 +716,7 @@ namespace Tore.Core {
  
             inf = instanceProp(tar, propNam, true);
             if (inf == null)
-                exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
+                Exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
             return setType(val, inf.PropertyType);
         }
 
@@ -816,10 +767,10 @@ namespace Tore.Core {
                         return Guid.Parse(str);
                 }
                 if (val is Stl lst)                     // If Stl.
-                    return lst.toObj(typ, ignoreMissing);
+                    return lst.ToObj(typ, ignoreMissing);
                 return Convert.ChangeType(val, typ);    // Otherwise...
             } catch(Exception e) {
-                exc("E_TYPE_CONV",
+                Exc("E_TYPE_CONV",
                     $"{val?.GetType()?.Name} => {typ?.Name}",
                     e);
                 throw;
@@ -860,8 +811,8 @@ namespace Tore.Core {
             Type[] tArr;
             List<Type> tLst = new List<Type>();
 
-            chk(baseAsm, "baseAsm");
-            chk(baseType, "baseType");
+            Chk(baseAsm, "baseAsm");
+            Chk(baseType, "baseType");
             foreach(var asm in aArr) {                  // Scan assemblies:
                 refs = asm.GetReferencedAssemblies();   // Get referenced.
                 if (!refs.Contains(baseAsm))            // If this is not referenced,
@@ -905,7 +856,7 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: seconds [static]                                            <summary>
           TASK: Returns long number of seconds since unix epoch + offset.   <para/>
-          ARGS: offset  : long  : Offset seconds to add : DEF : 0.          <para/>
+          ARGS: offset  : long  : Offset seconds to Add : DEF : 0.          <para/>
           RETV:         : long  : Seconds since unix epoch + offset.        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static long seconds(long offset = 0) {
@@ -925,11 +876,11 @@ namespace Tore.Core {
           RETV:             : string : Utf8 encoded content of file.        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static string loadUtf8File(string fileSpec) {
-            chk(fileSpec, "fileSpec");
+            Chk(fileSpec, "fileSpec");
             try {
                 return File.ReadAllText(fileSpec, Encoding.UTF8);
             } catch(Exception e) {
-                exc("E_SYS_LOAD_FILE", fileSpec, e);
+                Exc("E_SYS_LOAD_FILE", fileSpec, e);
                 throw;
             }
         }
@@ -942,11 +893,11 @@ namespace Tore.Core {
                 text        : string : Utf8 text.                           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static void saveUtf8File(string fileSpec, string text) {
-            chk(fileSpec, "fileSpec");
+            Chk(fileSpec, "fileSpec");
             try {
                 File.WriteAllText(fileSpec, text, Encoding.UTF8);
             } catch(Exception e) {
-                exc("E_SYS_SAVE_FILE", fileSpec, e);
+                Exc("E_SYS_SAVE_FILE", fileSpec, e);
                 throw;
             }
         }

@@ -10,7 +10,7 @@ using static Tore.Core.Sys;
 namespace Tore.Core {
 
     /**———————————————————————————————————————————————————————————————————————————
-        CLASS:  Cfg [Static]                                            <summary>
+        CLASS:  ConfigFile [Static]                                     <summary>
         USAGE:                                                          <br/>
                 Contains a library of static utility methods            <br/>
                 for simple encrypted configuration file support         <br/>
@@ -18,10 +18,10 @@ namespace Tore.Core {
                 Configurations are loaded to and saved from             <br/>
                 a classes <b> public static fields </b>.                </summary>
     ————————————————————————————————————————————————————————————————————————————*/
-    public static class Cfg {
+    public static class ConfigFile {
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: load [static]                                               <summary>
+          FUNC: Load [static]                                               <summary>
           TASK:                                                             <br/>
                 Loads and decrypts contents of an encrypted file into       <br/>
                 <b> public static fields </b> of a class, using two keys.   <br/>
@@ -30,37 +30,37 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 type    : Type      : Class with public static fields.      <br/>
                 file    : string    : File specification.                   <br/>
-                encKey  : string    : Primary   encryption key.             <br/>
-                xorKey  : string    : Secondary encryption key.             <br/>
+                encKey  : string    : Primary   encryption Key.             <br/>
+                xorKey  : string    : Secondary encryption Key.             <br/>
                 strip   : string    : Characters to remove from keys.       <para/>
           WARN:                                                             <br/>
                 Throws exception if anything is null or empty except strip. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void load(Type type,
+        public static void Load(Type type,
                                 string file,
                                 string encKey,
                                 string xorKey,
                                 string strip = "-") {
             string json;
-
-            chk(type, nameof(type), "E_CFG_INV_ARG");
-            chk(file, nameof(file), "E_CFG_INV_ARG");
+            
+            Chk(type, nameof(type), "E_CFG_INV_ARG");
+            Chk(file, nameof(file), "E_CFG_INV_ARG");
             if (!File.Exists(file))
-                exc("E_CFG_FILE_NA", file);
+                Exc("E_CFG_FILE_NA", file);
             try {
                 if (Xor.isCryptoFile(file))
                     json = Xor.decryptFromFile(file, encKey, xorKey, strip);
                 else
                     json = loadUtf8File(file);
-                new Stl(json).toStatic(type, true);
+                new Stl(json).ToStatic(type, true);
             } catch (Exception e) {
-                exc("E_CFG_LOAD_FAIL", "", e);
+                Exc("E_CFG_LOAD_FAIL", "", e);
                 throw;
             }
         }
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: save [static]                                               <summary>
+          FUNC: Save [static]                                               <summary>
           TASK:                                                             <br/>
                 Encrypts and saves <b> public static fields </b> of a class <br/>
                 into a file, using two keys.                                <br/>
@@ -69,29 +69,29 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 type    : Type      : Class with public static fields.      <br/>
                 file    : string    : File specification.                   <br/>
-                encKey  : string    : Primary   encryption key.             <br/>
-                xorKey  : string    : Secondary encryption key.             <br/>
+                encKey  : string    : Primary   encryption Key.             <br/>
+                xorKey  : string    : Secondary encryption Key.             <br/>
                 strip   : string    : Characters to remove from keys.       <para/>
           WARN:                                                             <br/>
                 Throws exception if anything is null or empty except strip. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void save(Type type,
+        public static void Save(Type type,
                                 string file,
                                 string encKey,
                                 string xorKey,
                                 string strip = "-") {
             string json;
 
-            chk(type, nameof(type), "E_CFG_INV_ARG");
-            chk(file, nameof(file), "E_CFG_INV_ARG");
+            Chk(type, nameof(type), "E_CFG_INV_ARG");
+            Chk(file, nameof(file), "E_CFG_INV_ARG");
             try {
-                json = new Stl(type).toJson();
-                if (encKey.isNullOrWhiteSpace() || xorKey.isNullOrWhiteSpace()) 
+                json = new Stl(type).ToJson();
+                if (encKey.IsNullOrWhiteSpace() || xorKey.IsNullOrWhiteSpace()) 
                     saveUtf8File(file, json);
                 else
                     Xor.encryptToFile(json, file, encKey, xorKey, strip);
             } catch (Exception e) {
-                exc("E_CFG_SAVE_FAIL", "", e);
+                Exc("E_CFG_SAVE_FAIL", "", e);
                 throw;
             }
         }

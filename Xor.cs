@@ -24,7 +24,7 @@ namespace Tore.Core {
                 If xorKey is shorter, it is repeated over encDec.       <para/>
           ARGS:                                                         <br/>
                 encDec  : byte[]    : Byte array to encrypt or decrypt. <br/>   
-                xorKey  : byte[]    : Byte array used as key.           <para/>
+                xorKey  : byte[]    : Byte array used as Key.           <para/>
           RETV:                                                         <br/>
                         : byte[]    : XOR'ed byte array.                <para/>
           WARN:                                                         <br/>
@@ -37,12 +37,12 @@ namespace Tore.Core {
                 kln;
             byte[] res;
 
-            chk(encDec, nameof(encDec));
-            chk(xorKey, nameof(xorKey));
+            Chk(encDec, nameof(encDec));
+            Chk(xorKey, nameof(xorKey));
             eln = encDec.Length;
             kln = xorKey.Length;
             if (kln == 0)
-                exc("E_INV_ARG", "xorKey.Length = 0");
+                Exc("E_INV_ARG", "xorKey.Length = 0");
             res = new byte[eln];
             for (idx = 0; idx < eln; idx++)
                 res[idx] = (byte)(encDec[idx] ^ xorKey[idx % kln]);
@@ -57,7 +57,7 @@ namespace Tore.Core {
                 if xorKey is shorter, it is repeated over encDec.           <para/>
           ARGS:                                                             <br/>
                 encDec  : string    : String to encrypt or decrypt.         <br/>
-                xorKey  : string    : String used as key.                   <para/>
+                xorKey  : string    : String used as Key.                   <para/>
           RETV:                                                             <br/>
                         : byte[]    : XOR'ed byte array.                    <para/>
           WARN:                                                             <br/>
@@ -67,8 +67,8 @@ namespace Tore.Core {
             byte[] enc;
             byte[] key;
 
-            chk(encDec, nameof(encDec));
-            chk(xorKey, nameof(xorKey));
+            Chk(encDec, nameof(encDec));
+            Chk(xorKey, nameof(xorKey));
             enc = Encoding.UTF8.GetBytes(encDec);
             key = Encoding.UTF8.GetBytes(xorKey);
             return cryptByteArrays(enc, key);
@@ -81,8 +81,8 @@ namespace Tore.Core {
                 if xorKey is shorter, it is repeated over encKey.           <para/>
           ARGS:                                                             <br/>
                 hex     : string    : Hex data to decode                    <br/>
-                encKey  : string    : Primary   encryption key.             <br/>
-                xorKey  : string    : Secondary encryption key.             <br/>
+                encKey  : string    : Primary   encryption Key.             <br/>
+                xorKey  : string    : Secondary encryption Key.             <br/>
                 strip   : string    : Characters to remove from keys.       <para/>
           RETV:                                                             <br/>
                         : string    : Decoded string.                       <para/>
@@ -93,8 +93,8 @@ namespace Tore.Core {
             byte[] decBuf;
             byte[] keyArr = prepDualKey(encKey, xorKey, strip);
 
-            chk(hex, nameof(hex));
-            decBuf = hexStrToByteArr(hex);
+            Chk(hex, nameof(hex));
+            decBuf = HexStrToByteArr(hex);
             decBuf = cryptByteArrays(decBuf, keyArr);
             return Encoding.UTF8.GetString(decBuf);
         }
@@ -106,8 +106,8 @@ namespace Tore.Core {
                 if xorKey is shorter, it is repeated over encKey.           <para/>
           ARGS:                                                             <br/>
                 data    : string    : Data to encode                        <br/>
-                encKey  : string    : Primary   encryption key.             <br/>
-                xorKey  : string    : Secondary encryption key.             <br/>
+                encKey  : string    : Primary   encryption Key.             <br/>
+                xorKey  : string    : Secondary encryption Key.             <br/>
                 strip   : string    : Characters to remove from keys.       <para/>
           RETV:                                                             <br/>
                         : string    : Encoded string.                       <para/>
@@ -130,10 +130,10 @@ namespace Tore.Core {
         /// Checks and prepares dual keys.
         /// </summary>
         private static byte[] prepDualKey(string encKey, string xorKey, string strip){
-            chk(encKey, nameof(encKey));
-            chk(xorKey, nameof(xorKey));
-            encKey.removeChars(strip);
-            xorKey.removeChars(strip);
+            Chk(encKey, nameof(encKey));
+            Chk(xorKey, nameof(xorKey));
+            encKey.RemoveChars(strip);
+            xorKey.RemoveChars(strip);
             return cryptStrings(encKey, xorKey);
         }
 
@@ -168,8 +168,8 @@ namespace Tore.Core {
                 if xorKey is shorter, it is repeated over encKey.           <para/>
           ARGS:                                                             <br/>
                 file    : string    : File specification.                   <br/>
-                encKey  : string    : Primary   encryption key.             <br/>
-                xorKey  : string    : Secondary encryption key.             <br/>
+                encKey  : string    : Primary   encryption Key.             <br/>
+                xorKey  : string    : Secondary encryption Key.             <br/>
                 strip   : string    : Characters to remove from keys.       <para/>
           RETV:                                                             <br/>
                         : string    : Decoded string from file.             <para/>
@@ -182,10 +182,10 @@ namespace Tore.Core {
                                              string strip = "-") {
             string buf;
 
-            chk(file, nameof(file));
+            Chk(file, nameof(file));
             buf = loadUtf8File(file);
             if (!buf.StartsWith(CF_HDR))
-                exc("E_INV_ENC", file);
+                Exc("E_INV_ENC", file);
             return decrypt(buf.Substring(CF_HDR.Length), encKey, xorKey, strip);
         }
 
@@ -198,8 +198,8 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 data    : string    : String to encrypt.                    <br/>
                 file    : string    : File specification.                   <br/>
-                encKey  : string    : Primary   encryption key.             <br/>
-                xorKey  : string    : Secondary encryption key.             <br/>
+                encKey  : string    : Primary   encryption Key.             <br/>
+                xorKey  : string    : Secondary encryption Key.             <br/>
                 strip   : string    : Characters to remove from keys.       <para/>
           WARN:                                                             <br/>
                 Throws exception if anything is null or empty except strip. </summary>
@@ -209,7 +209,7 @@ namespace Tore.Core {
                                          string encKey,
                                          string xorKey,
                                          string strip = "-") {
-            chk(file, nameof(file));
+            Chk(file, nameof(file));
             data = encrypt(data, encKey, xorKey, strip);
             saveUtf8File(file, CF_HDR + data);
         }
