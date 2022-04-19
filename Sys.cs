@@ -35,9 +35,7 @@ namespace Tore.Core {
                 Reflection                                              <br/>
                 Type juggling                                           <br/>
                 Attributes                                              <br/>
-                Simple File Load Save                                   <br/>
-                Time,                                                   <br/>
-                Date,                                                   <br/>
+                Debug output.                                           <br/>
                 and many others.                                        <para/>
                 The best way of using them is by adding:                <br/>
                 using static Tore.Core.Sys;                             <br/>
@@ -329,7 +327,6 @@ namespace Tore.Core {
             dia.Add("_LINE_");
             Dbg(dia);
         }
-
         #endregion
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -468,8 +465,8 @@ namespace Tore.Core {
                                                 not found.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static Attribute Attr(Type attrType, MemberInfo memInfo) {
-            Chk(attrType, "attrType");
-            Chk(memInfo, "memInfo");
+            Chk(attrType, nameof(attrType));
+            Chk(memInfo, nameof(memInfo));
             return memInfo.GetCustomAttribute(attrType, true);
         }
 
@@ -484,6 +481,7 @@ namespace Tore.Core {
                                                 not found.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static Attribute Attr<T>(MemberInfo memInfo) where T : Attribute {
+            Chk(memInfo, nameof(memInfo));
             return memInfo.GetCustomAttribute(typeof(T), true);
         }
 
@@ -798,7 +796,7 @@ namespace Tore.Core {
 
             if ((target == null) || (target is Type))
                 Exc("E_INV_INSTANCE", nameof(target));
-            Chk(info, "inf");
+            Chk(info, nameof(info));
             tty = target.GetType();
             if (info.DeclaringType != tty) {
                 Exc("E_PROP_INV_CLASS",
@@ -946,8 +944,8 @@ namespace Tore.Core {
             Type[] tArr;
             List<Type> tLst = new List<Type>();
 
-            Chk(baseAsm, "baseAsm");
-            Chk(baseType, "baseType");
+            Chk(baseAsm, nameof(baseAsm));
+            Chk(baseType, nameof(baseType));
             foreach(var asm in aArr) {                  // Scan assemblies:
                 refs = asm.GetReferencedAssemblies();   // Get referenced.
                 if (!refs.Contains(baseAsm))            // If this is not referenced,

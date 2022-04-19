@@ -20,6 +20,7 @@ namespace Tore.Core {
     ————————————————————————————————————————————————————————————————————————————*/
     public static class ConfigFile {
 
+        private const string E_ARG = "E_CFG_INV_ARG";
         /**————————————————————————————————————————————————————————————————————————————
           FUNC: Load [static]                                               <summary>
           TASK:                                                             <br/>
@@ -43,8 +44,8 @@ namespace Tore.Core {
                                 string strip = "-") {
             string json;
             
-            Chk(type, nameof(type), "E_CFG_INV_ARG");
-            Chk(file, nameof(file), "E_CFG_INV_ARG");
+            Chk(type, nameof(type), E_ARG);
+            Chk(file, nameof(file), E_ARG);
             if (!File.Exists(file))
                 Exc("E_CFG_FILE_NA", file);
             try {
@@ -82,8 +83,8 @@ namespace Tore.Core {
                                 string strip = "-") {
             string json;
 
-            Chk(type, nameof(type), "E_CFG_INV_ARG");
-            Chk(file, nameof(file), "E_CFG_INV_ARG");
+            Chk(type, nameof(type), E_ARG);
+            Chk(file, nameof(file), E_ARG);
             try {
                 json = new Stl(type).ToJson();
                 if (encKey.IsNullOrWhiteSpace() || xorKey.IsNullOrWhiteSpace()) 

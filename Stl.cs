@@ -225,7 +225,7 @@ namespace Tore.Core {
                 l;
 
             Init();
-            Chk(arrKeyVal, "akv");
+            Chk(arrKeyVal, nameof(arrKeyVal));
             l = arrKeyVal.Length;
             if (arrKeyVal.Length == 0)
                 Exc("E_INV_ARG", "akv");
@@ -436,7 +436,7 @@ namespace Tore.Core {
                             : int    : The Key index else -1.               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public int Index(string aKey, int fromIndex = 0) {
-            if (String.IsNullOrWhiteSpace(aKey))
+            if (aKey.IsNullOrWhiteSpace())
                 return -1;
             return (keyLst.IndexOf(aKey, fromIndex));
         }
@@ -747,22 +747,22 @@ namespace Tore.Core {
           TASK:                                                             <br/>
                 Fills corresponding properties of an object from Stl.       <para/>
           ARGS:                                                             <br/>
-                o             : object  : Target object.                    <br/>
+                target        : object  : Target object.                    <br/>
                 ignoreMissing : bool    : When true : Do not raise exception 
                                           if a property is missing in Stl. 
                                           :DEF:false.                       <para/>
           INFO:                                                             <br/>
                 Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public object ToObj(object o, bool ignoreMissing = false) {
+        public object ToObj(object target, bool ignoreMissing = false) {
             PropertyInfo[] pLst;
             Type type;
             object v;
             int i;
 
 
-            Chk(o, "o");
-            type = o.GetType();
+            Chk(target, nameof(target));
+            type = target.GetType();
             if (type == typeof(Stl))
                 ignoreMissing = true;
             pLst = InstanceProps(type);
@@ -776,9 +776,9 @@ namespace Tore.Core {
                     Exc("E_PROP_MISSING", type.Name + "." + p.Name);
                 }
                 v = objLst[i];
-                p.SetValue(o, SetType(v, p.PropertyType, ignoreMissing));
+                p.SetValue(target, SetType(v, p.PropertyType, ignoreMissing));
             }
-            return o;
+            return target;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -786,23 +786,23 @@ namespace Tore.Core {
           TASK:                                                             <br/>
                 Fills Stl from an objects public properties.                <para/>
           ARGS:                                                             <br/>
-                o   : object : Source object.                               <br/>
-                init: bool   : Clears Stl before copy if true. :DEF:true.   <para/>
+                source  : object : Source object.                           <br/>
+                init    : bool   : Clears Stl before copy if true.:DEF:true.<para/>
           RETV:                                                             <br/>
-                    : Stl    : Stl itself.                                  <para/>
+                        : Stl    : Stl itself.                              <para/>
           INFO:                                                             <br/>
                 Shallow copy.                                               <br/>
                 Multiple object properties can be merged in to an Stl
-                by setting Init = false, but either the property names
+                by setting init = false, but either the property names
                 should be unique or Stl must accept duplicate keys.
                 like myStl = new Stl(false, true, true)                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public Stl ByObj(object o, bool init = true) {
+        public Stl ByObj(object source, bool init = true) {
             PropertyInfo[] pArr;
             Type type;
             bool irs;
 
-            Chk(o, "o");
+            Chk(source, nameof(source));
             if (init) {
                 Clear();
                 un = true;
@@ -811,12 +811,12 @@ namespace Tore.Core {
             }
             irs = id;               // Store identifier restriction status.
             id = false;             // Optimization: Incoming keys are identifiers.
-            type = o.GetType();
+            type = source.GetType();
             pArr = InstanceProps(type);    // never returns null.
             foreach(PropertyInfo p in pArr) {
                 if (hasAttr<StlIgnore>(p))
                     continue;
-                Add(p.Name, p.GetValue(o));
+                Add(p.Name, p.GetValue(source));
             }
             id = irs;             // Restore identifier restriction status.
             return this;

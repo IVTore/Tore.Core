@@ -276,8 +276,8 @@ namespace Tore.Core {
         public static T Talk<T>(string url, object content, Stl query = null) {
             string json;
 
-            Chk(url, "url");
-            Chk(content, "content");
+            Chk(url, nameof(url));
+            Chk(content, nameof(content));
             json = JsonConvert.SerializeObject(content, Formatting.Indented);
             return Com.Send(url, json, query).ResponseObjectByJson<T>();
         }
@@ -306,8 +306,8 @@ namespace Tore.Core {
             Com com;
             string jsn;
 
-            Chk(url, "url");
-            Chk(content, "content");
+            Chk(url, nameof(url));
+            Chk(content, nameof(content));
             jsn = JsonConvert.SerializeObject(content, Formatting.Indented);
             com = await Com.SendAsync(url, jsn, query);
             return com.ResponseObjectByJson<T>();
