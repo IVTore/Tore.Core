@@ -48,10 +48,10 @@ namespace Tore.Core {
             if (!File.Exists(file))
                 Exc("E_CFG_FILE_NA", file);
             try {
-                if (Xor.isCryptoFile(file))
-                    json = Xor.decryptFromFile(file, encKey, xorKey, strip);
+                if (Xor.IsCryptoFile(file))
+                    json = Xor.DecryptFromFile(file, encKey, xorKey, strip);
                 else
-                    json = loadUtf8File(file);
+                    json = Utf8File.Load(file);
                 new Stl(json).ToStatic(type, true);
             } catch (Exception e) {
                 Exc("E_CFG_LOAD_FAIL", "", e);
@@ -87,9 +87,9 @@ namespace Tore.Core {
             try {
                 json = new Stl(type).ToJson();
                 if (encKey.IsNullOrWhiteSpace() || xorKey.IsNullOrWhiteSpace()) 
-                    saveUtf8File(file, json);
+                    Utf8File.Save(file, json);
                 else
-                    Xor.encryptToFile(json, file, encKey, xorKey, strip);
+                    Xor.EncryptToFile(json, file, encKey, xorKey, strip);
             } catch (Exception e) {
                 Exc("E_CFG_SAVE_FAIL", "", e);
                 throw;

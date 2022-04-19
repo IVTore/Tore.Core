@@ -75,6 +75,15 @@ namespace Tore.Core {
                      id,                    // Keys should be identifier    if true.
                      wr;                    // Overwrite Object with same Key.
 
+        /**<summary>Used for json conversion while Stl's are nested.</summary>*/
+        public static JsonConverter[] stlJsonConverter { get; } =
+                        new JsonConverter[] { new NestedStlConverter() };
+
+        /**<summary>Used for setting json conversion for nested Stl's.</summary>*/
+        public static JsonSerializerSettings stlJsonSettings { get; } =
+                        new JsonSerializerSettings() { Converters = stlJsonConverter };
+
+
         /**———————————————————————————————————————————————————————————————————————————
           VAR : keyLst: List of string;                                     <summary>
           USE :                                                             <br/>
@@ -96,15 +105,6 @@ namespace Tore.Core {
                 Use Add(), AddPair, delObj(), DeletePair()                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public List<object> objLst;         // Objects  list.
-
-        /**<summary>Used for json conversion while Stl's are nested.</summary>*/
-        public static JsonConverter[] stlJsonConverter { get; } =
-                        new JsonConverter[] { new NestedStlConverter() };
-
-        /**<summary>Used for setting json conversion for nested Stl's.</summary>*/
-        public static JsonSerializerSettings stlJsonSettings { get; } =
-                        new JsonSerializerSettings() { Converters = stlJsonConverter };
-
 
         #region Constructor and initializer methods.
         /*————————————————————————————————————————————————————————————————————————————
@@ -660,11 +660,13 @@ namespace Tore.Core {
             object val;
 
             Chk(type, nameof(type));
-            fldInfArr = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+            fldInfArr = StaticFields(type);
             foreach(FieldInfo fld in fldInfArr) {
+                if (hasAttr<StlIgnore>(fld))
+                    continue;
                 if (TryGetValue(fld.Name, out val)) {
                     if (fld.FieldType != val.GetType())
-                        val = setType(val, fld.FieldType, ignoreMissing);
+                        val = SetType(val, fld.FieldType, ignoreMissing);
                     fld.SetValue(null, val);
                 } else {
                     if (!ignoreMissing)
@@ -678,13 +680,14 @@ namespace Tore.Core {
           TASK:                                                             <br/>
                 Loads Stl from <b> public static fields </b> of type.       <para/>
           ARGS:                                                             <br/>
-                type    : Type      : Class type.                           <para/>
+                type    : Type  : Class type.                               <br/>
+                init    : bool  : Clears Stl before copy if true. :DEF:true.<para/>
           RETV:                                                             <br/>
-                        : Stl       : Stl itself.                           </summary>
+                        : Stl   : Stl itself.                               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl ByStatic(Type type, bool init = true) {
-            FieldInfo[] l;
-            bool i;
+            FieldInfo[] fldLst;
+            bool irs;
 
             Chk(type, nameof(type));
             if (init) {
@@ -693,13 +696,15 @@ namespace Tore.Core {
                 id = true;      // Identifier only.
                 wr = true;
             }
-            i = id;             // Store identifier restriction status.
+            irs = id;           // Store identifier restriction status.
             id = false;         // Optimization: field names are already identifiers.
-            l = type.GetFields(BindingFlags.Public |// Get public static Fieldinfo.
-                            BindingFlags.Static);   // Never returns null.
-            foreach(FieldInfo f in l)               // For each field,
-                Add(f.Name, f.GetValue(null));      // Add name and value to Stl.
-            id = i;             // Restore identifier restriction status.
+            fldLst = StaticFields(type);            // Get static field info list.
+            foreach(FieldInfo fld in fldLst){       // For each field,
+                if (hasAttr<StlIgnore>(fld))        // Check if ignored.
+                    continue;
+                Add(fld.Name, fld.GetValue(null));  // Add name and value to Stl.
+            }
+            id = irs;           // Restore identifier restriction status.
             return this;
         }
 
@@ -717,7 +722,7 @@ namespace Tore.Core {
                 Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public T ToObj<T>(bool ignoreMissing = false) where T : new() {
-            return (T)ToObj(makeObject(typeof(T)), ignoreMissing);
+            return (T)ToObj(MakeObject(typeof(T)), ignoreMissing);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -734,7 +739,7 @@ namespace Tore.Core {
                 Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public object ToObj(Type typ, bool ignoreMissing = false) {
-            return ToObj(makeObject(typ), ignoreMissing);
+            return ToObj(MakeObject(typ), ignoreMissing);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -750,32 +755,28 @@ namespace Tore.Core {
                 Properties of class T are sought in Keys of Stl.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public object ToObj(object o, bool ignoreMissing = false) {
-            PropertyInfo[] l;
-            Type t;
+            PropertyInfo[] pLst;
+            Type type;
             object v;
             int i;
 
 
             Chk(o, "o");
-            t = o.GetType();
-            if (t == typeof(Stl))
+            type = o.GetType();
+            if (type == typeof(Stl))
                 ignoreMissing = true;
-            l = t.GetProperties(BindingFlags.Public |
-                                BindingFlags.Instance |
-                                BindingFlags.FlattenHierarchy);
-            if (l == null)
-                return o;
-            foreach(PropertyInfo p in l) {
+            pLst = InstanceProps(type);
+            foreach(PropertyInfo p in pLst) {
                 if (hasAttr<StlIgnore>(p))
                     continue;
                 i = Index(p.Name);
                 if (i == -1) {
                     if (ignoreMissing)
                         continue;
-                    Exc("E_PROP_MISSING", t.Name + "." + p.Name);
+                    Exc("E_PROP_MISSING", type.Name + "." + p.Name);
                 }
                 v = objLst[i];
-                p.SetValue(o, setType(v, p.PropertyType, ignoreMissing));
+                p.SetValue(o, SetType(v, p.PropertyType, ignoreMissing));
             }
             return o;
         }
@@ -786,7 +787,7 @@ namespace Tore.Core {
                 Fills Stl from an objects public properties.                <para/>
           ARGS:                                                             <br/>
                 o   : object : Source object.                               <br/>
-                Init: bool   : Clears Stl before copy if true. :DEF:true.   <para/>
+                init: bool   : Clears Stl before copy if true. :DEF:true.   <para/>
           RETV:                                                             <br/>
                     : Stl    : Stl itself.                                  <para/>
           INFO:                                                             <br/>
@@ -797,9 +798,9 @@ namespace Tore.Core {
                 like myStl = new Stl(false, true, true)                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Stl ByObj(object o, bool init = true) {
-            PropertyInfo[] a;
-            Type t;
-            bool i;
+            PropertyInfo[] pArr;
+            Type type;
+            bool irs;
 
             Chk(o, "o");
             if (init) {
@@ -808,18 +809,16 @@ namespace Tore.Core {
                 id = true;
                 wr = true;
             }
-            i = id;             // Store identifier restriction status.
-            id = false;         // Optimization: Incoming keys are identifiers.
-            t = o.GetType();
-            a = t.GetProperties(BindingFlags.Public |       // never returns null.
-                                BindingFlags.Instance |
-                                BindingFlags.FlattenHierarchy);
-            foreach(PropertyInfo p in a) {
+            irs = id;               // Store identifier restriction status.
+            id = false;             // Optimization: Incoming keys are identifiers.
+            type = o.GetType();
+            pArr = InstanceProps(type);    // never returns null.
+            foreach(PropertyInfo p in pArr) {
                 if (hasAttr<StlIgnore>(p))
                     continue;
                 Add(p.Name, p.GetValue(o));
             }
-            id = i;             // Restore identifier restriction status.
+            id = irs;             // Restore identifier restriction status.
             return this;
         }
 
@@ -848,7 +847,7 @@ namespace Tore.Core {
                 if (objLst[i] is T obj) {
                     t = obj;
                 } else {
-                    t = setType<T>(objLst[i], ignoreMissing);
+                    t = SetType<T>(objLst[i], ignoreMissing);
                 }
                 d.Add(keyLst[i], t);
             }

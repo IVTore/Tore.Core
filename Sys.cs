@@ -38,7 +38,6 @@ namespace Tore.Core {
                 Simple File Load Save                                   <br/>
                 Time,                                                   <br/>
                 Date,                                                   <br/>
-                
                 and many others.                                        <para/>
                 The best way of using them is by adding:                <br/>
                 using static Tore.Core.Sys;                             <br/>
@@ -66,24 +65,32 @@ namespace Tore.Core {
         public const string CRLF = CR + LF;
 
         /**———————————————————————————————————————————————————————————————————————————
-          PROP: isDebug [static] : bool.                                    <summary>
-          TASK: GET: Returns if program is a DEBUG compilation.             </summary>
+          VAR : isDebug [static readonly]                                   <summary>
+          TASK: True if program is a DEBUG compilation.                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static bool isDebug {
-            get {
-                bool d = false;
+        public readonly static bool isDebug =
         #if DEBUG
-                d = true;
-        #endif
-                return d;
-            }
-        }
+            true;
+#else
+            false;
+#endif
+
+
+        #region Hex conversions.
+        /*————————————————————————————————————————————————————————————————————————————
+            ——————————————————————
+            |  Hex conversions.  |
+            ——————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: HexToInt [static]                                           <summary>
-          TASK: Returns integer from hex string.                            <para/>
-          ARGS: hex : String        : hexadecimal number.                   <para/>
-          RETV:     : int           : integer value.                        </summary>
+          TASK: 
+                Returns integer from hex string.                            <para/>
+          ARGS:                                                             <br/>
+                hex : String        : hexadecimal number.                   <para/>
+          RETV:                                                             <br/>
+                    : int           : integer value.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static int HexToInt(string hex) {
             return int.Parse(hex, NumberStyles.HexNumber);
@@ -91,11 +98,13 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: IntToHex [static]                                           <summary>
-          TASK: Returns hex string from integer.                            <para/>
+          TASK:                                                             <br/>
+                Returns hex string from integer.                            <para/>
           ARGS:                                                             <br/>
                 i       : int       : integer value.                        <br/>
                 digits  : int       : Number of hex digits.                 <para/>
-          RETV:         : String    : Formatted hexadecimal string.         </summary>
+          RETV:                                                             <br/>
+                        : String    : Formatted hexadecimal string.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static string IntToHex(int i, int digits) {
             return i.ToString("x" + digits.ToString());
@@ -103,9 +112,12 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: HexStrToByteArr [static]                                    <summary>
-          TASK: Converts a hex string to byte array.                        <para/>
-          ARGS: hex : string    : Hex string.                               <para/>
-          RETV:     : byte[]    : Byte array.                               <para/>
+          TASK:                                                             <br/>
+                Converts a <b> CAPITAL </b>hex string to byte array.        <para/>
+          ARGS:                                                             <br/>
+                hex : string    : Hex string.                               <para/>
+          RETV:                                                             <br/>
+                    : byte[]    : Byte array.                               <para/>
           INFO:                                                             <br/>
                 *   Hex digit letters should be <b> CAPITAL </b>.           <br/>
                 *   Throws exception if hex string is invalid.              <br/>
@@ -127,7 +139,7 @@ namespace Tore.Core {
                 return 0;
             }
 
-            Chk(hex, "hex");
+            Chk(hex, nameof(hex));
             l = hex.Length;
             if ((l % 2) != 0)
                 Exc("E_INV_ARG", "hex");
@@ -142,11 +154,14 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ByteArrToHexStr [static]                                    <summary>
-          TASK: Converts a byte array to capital hex string.                <para/>
-          ARGS: arr : byte[]    : Byte array.                               <para/>
-          RETV:     : string    : Hex string.                               <para/>
-          INFO: 'A'- 0xA => 65 - 10 = 55.                                   <para/>
-          WARN: Throws exception if byte array is invalid.                  </summary>
+          TASK:                                                             <br/>
+                Converts a byte array to <b> CAPITAL </b> hex string.       <para/>
+          ARGS:                                                             <br/>
+                arr : byte[]    : Byte array.                               <para/>
+          RETV:                                                             <br/>
+                    : string    : Hex string.                               <para/>
+          INFO:                                                             <br/>
+                'A'- 0xA => 65 - 10 = 55.                                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static string ByteArrToHexStr(byte[] arr) {
             int i,              // iterator.
@@ -154,7 +169,7 @@ namespace Tore.Core {
                 n;              // nibble value.
             StringBuilder s;    // String builder.
 
-            Chk(arr, "arr");
+            Chk(arr, nameof(arr));
             l = arr.Length;
             s = new StringBuilder(l * 2);
             for(i = 0; i < l; i++) {
@@ -165,10 +180,12 @@ namespace Tore.Core {
             }
             return s.ToString();
         }
+        #endregion
 
+        #region Exception Subsystem.
         /*————————————————————————————————————————————————————————————————————————————
             ——————————————————————————
-            |   Exception Subsystem  |
+            |  Exception Subsystem.  |
             ——————————————————————————
             A Practical Exception Subsystem.
         ————————————————————————————————————————————————————————————————————————————*/
@@ -177,11 +194,13 @@ namespace Tore.Core {
           TYPE: ExcInterceptorDelegate [delegate]                           <summary>
           TASK: Exception Interceptor Type.                                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public delegate void ExcInterceptorDelegate(Exception e, Stl dta); 
+        public delegate void ExcInterceptorDelegate(Exception e, Stl dta);
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: excInterceptor                                              <summary>
-          USE: Exception Interceptor property, for logging etc.             </summary>
+          GET : Gets Exception Interceptor method.                          <br/>
+          SET : Sets Exception Interceptor method.                          <br/>
+          INFO: Used for logging monitoring etc.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static ExcInterceptorDelegate excInterceptor { get; set; } = null;
 
@@ -195,7 +214,7 @@ namespace Tore.Core {
           RETV:                                                             <br/>
                     : bool      : True if exception Has extra data.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static bool HasExcData(Exception? e) {
+        public static bool HasExcData(Exception e) {
             return (e != null) && (e.Data.Contains("dta"));
         }
 
@@ -203,13 +222,13 @@ namespace Tore.Core {
           FUNC: GetExcDta [static]                                          <summary>
           TASK:                                                             <br/>
                 If an exception is generated or processed through           <br/>
-                <b>Exc</b>, it Has extra data and this will return it.      <para/>
-1         ARGS:                                                             <br/>
+                <b> Exc </b>, it Has extra data and this will return it.    <para/>
+          ARGS:                                                             <br/>
                 e   : Exception : Any Exception.                            <para/>
           RETV:                                                             <br/>
                     : Stl       : Extra exception data or null              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static Stl GetExcDta(Exception? e) {
+        public static Stl GetExcDta(Exception e) {
             if (!HasExcData(e))
                 return null;
             return (Stl)(e.Data["dta"]);
@@ -217,13 +236,16 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Exc [static]                                                <summary>
-          TASK: Raises and/or logs an exception with extra control.         <para/>
+          TASK:                                                             <br/>
+                Raises and/or logs an exception with extra control.         <para/>
           ARGS:                                                             <br/>
                 tag : String    : Message selector.                         <br/>
                 inf : String    : Extra information.                        <br/>
-                e   : Exception : A thrown Exception if called in *catch*.  <para/>
-          RETV: Look info.                                                  <para/>
-          INFO: * Algorithm:                                                <br/>
+                e   : Exception : Exception to process if any. :DEF: null.  <para/>
+          RETV:                                                             <br/>
+                    : Exception : <b> e </b> If is was not null at entry.   <para/>
+          INFO:                                                             <br/>
+                * Algorithm:                                                <br/>
                 Finds the caller from stack frame.                          <br/>
                 If e is null builds an exception.                           <br/>
                 Collects exception data into exception object.              <br/>
@@ -231,9 +253,9 @@ namespace Tore.Core {
                     Interceptor function is called.                         <br/>
                 Writes exception info via dbg().                            <br/>
                 If e was null at entry
-                    *throws* the exception built.                           <br/>
+                    <b> throws </b> the exception built.                    <br/>
                 else
-                    returns null (must be *re-thrown* if needed).           <br/>
+                    returns e (for syntactic sugar).                        <br/>
                                                                             <br/>
                 * Collected Data: at e.Data["dta"] as a Stl*.               <br/>
                     "Exc" = Class name of exception.                        <br/>
@@ -244,15 +266,15 @@ namespace Tore.Core {
                 *Stl is a string associated object list class. 
                  Info about Stl can be found at Stl.cs.                     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static object Exc(string tag = "E_NO_TAG", 
-                                 string inf = "", 
-                                 Exception e = null) {
+        public static Exception Exc(string tag = "E_NO_TAG", 
+                                    string inf = "", 
+                                    Exception e = null) {
             Exception cex;
             Stl dta;
             MethodBase met;
 
             cex = e ?? new ToreCoreException(tag);      // If no exception make one.
-            if (HasExcData(cex))                         // If exception already processed
+            if (HasExcData(cex))                        // If exception already processed
                 return null;                            // return.
             dta = new Stl(){                            // Collect data.
                 {"exc", cex.GetType().FullName},
@@ -267,13 +289,13 @@ namespace Tore.Core {
             }
             if (met != null)
                 dta.Add("loc", $"{met.DeclaringType?.Name}.{met.Name}");
-            excInterceptor?.Invoke(cex, dta);                   // if assigned, invoke.
+            excInterceptor?.Invoke(cex, dta);           // if assigned, invoke.
             cex.Data.Add("dta", (object)dta);
             if (isDebug)
                 ExcDbg(dta);
             if (e == null)                              // If we made the exception
                 throw cex;                              // throw it
-            return null;
+            return cex;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -283,8 +305,8 @@ namespace Tore.Core {
           INFO: The ed Stl can be found in exception.Data["dta"].           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static void ExcDbg(Stl ed) {
-            List<string> dia,
-                        inl;
+            List<string> dia, inl;
+
             string inf = (string)ed.Obj("inf");
 
             dia = new List<string>();
@@ -308,6 +330,8 @@ namespace Tore.Core {
             Dbg(dia);
         }
 
+        #endregion
+
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Chk [static]                                            <summary>
           TASK:                                                         <br/>
@@ -317,20 +341,24 @@ namespace Tore.Core {
                 arg : object        : Argument to check validity.       <br/>
                 inf : string        : Exception info if arg invalid.    <br/>
                 tag : string        : Exception tag if arg invalid.
-                    :DEF: "E_INV_ARG".                                  <para/>
+                                        :DEF: "E_INV_ARG".              <para/>
           INFO:                                                         <br/>
                 In case of strings, white spaces are not welcome.       <br/>
                 In case of Guids, empty Guid's are not welcome.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void Chk(object arg, string inf,
-                string tag = "E_INV_ARG") {
-
-            if  ((arg == null) ||
-                ((arg is string) && (String.IsNullOrWhiteSpace((string)arg))) ||
-                ((arg is Guid) && (((Guid)arg).Equals(Guid.Empty))))
+        public static void Chk(object arg, string inf, string tag = "E_INV_ARG") {
+            if (arg == null ||
+               (arg is string && ((string)arg).IsNullOrWhiteSpace()) ||
+               (arg is Guid && ((Guid)arg).Equals(Guid.Empty)))
                 Exc(tag, inf);
         }
 
+        #region Debug Output Subsystem.
+        /*————————————————————————————————————————————————————————————————————————————
+            —————————————————————————————
+            |  Debug Output Subsystem.  |
+            —————————————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
         private const string dbgLine = "————————————————————————————————" +
                                        "————————————————————————————————";
         /**———————————————————————————————————————————————————————————————————————————
@@ -341,18 +369,23 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: dbgInterceptor                                              <summary>
-          USE : Logging Interceptor delegate property for dbg() outputs.    </summary>
+          GET : Gets debug interceptor method.                              <br/>
+          SET : Sets debug interceptor method.                              <br/>
+          INFO: Interceptor delegate property for dbg() outputs.            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static DbgInterceptorDelegate dbgInterceptor { get; set; } = null;
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Dbg [static]                                                <summary>
-          TASK: Writes output to debug console and trace log.               <para/>
-          ARGS: msg : String[]  : Message collection.                       <para/>
-          INFO: Uses Debug.Write.  
+          TASK:                                                             <br/>
+                Writes output to System.Diagnostics.Debug.Listeners.        <para/>
+          ARGS:                                                             <br/>
+                msg : object[]  : Message collection.                       <para/>
+          INFO:                                                             <br/>
+                Uses Debug.Write.                                           <br/>
                 Has a log interceptor delegate which may be useful in case. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void Dbg(params string[] msg) {
+        public static void Dbg(params object[] msg) {
             StringBuilder b;
             string s;
 
@@ -376,75 +409,89 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Dbg [static]                                                <summary>
-          TASK: Writes output to debug console and to log if linked.        <para/>
-          ARGS: lst : List of String  : Message collection.                 <para/>
-          INFO: Uses Console.Write if in container, otherwise Debug.Write.  
-                Has a log interceptor delegate which may be useful in case. </summary>
+          TASK:                                                             <br/>
+                Writes output to System.Diagnostics.Debug.Listeners.        <para/>
+          ARGS:                                                             <br/>
+                lst : List of String  : Message collection.                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void Dbg(List<string> lst) {
+        public static void Dbg(List<object> lst) {
             if (lst == null)
                 return;
             Dbg(lst.ToArray());
         }
+        #endregion
 
-        
-
+        #region Application utility functions.
         /*————————————————————————————————————————————————————————————————————————————
-            ——————————————————————————————————————
-            |   Reflection utility functions     |
-            ——————————————————————————————————————
+            ———————————————————————————————————————
+            |   Application utility functions.    |
+            ———————————————————————————————————————
         ————————————————————————————————————————————————————————————————————————————*/
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: appName [static].                                           <summary>
-          TASK: Returns application name.                                   <para/>
-          RETV:     : string : Application name.                            </summary>
+          FUNC: ApplicationName [static].                                   <summary>
+          TASK:                                                             <br/>
+                Returns application name.                                   <para/>
+          RETV:                                                             <br/>
+                    : string : Application name.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string appName() {
+        public static string ApplicationName() {
             return Assembly.GetEntryAssembly().GetName().Name;
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: appPath [static].                                           <summary>
-          TASK: Returns application path.                                   <para/>
-          RETV:     : string : Application path.                            </summary>
+          FUNC: ApplicationPath [static].                                   <summary>
+          TASK:                                                             <br/>
+                Returns application path.                                   <para/>
+          RETV:                                                             <br/>
+                    : string : Application path.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string appPath() {
+        public static string ApplicationPath() {
             return AppDomain.CurrentDomain.BaseDirectory;
         }
+        #endregion
 
+        #region Reflection utility functions.
+        /*————————————————————————————————————————————————————————————————————————————
+            ——————————————————————————————————————
+            |   Reflection utility functions.    |
+            ——————————————————————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: attr [static]                                               <summary>
-          TASK: Fetches an attribute of a member.                           <para/>
+          FUNC: Attr [static]                                               <summary>
+          TASK:                                                             <br/>
+                Fetches an attribute of a member.                           <para/>
           ARGS:                                                             <br/>
                 attrType    : Type          :   Type of attribute.          <br/>
                 memInfo     : MemberInfo    :   Member information.         <para/>
           RETV:             : Attribute     :   The attribute or null if
                                                 not found.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static Attribute attr(Type attrType, MemberInfo memInfo) {
+        public static Attribute Attr(Type attrType, MemberInfo memInfo) {
             Chk(attrType, "attrType");
             Chk(memInfo, "memInfo");
             return memInfo.GetCustomAttribute(attrType, true);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: attr [static]                                               <summary>
-          TASK: Fetches an attribute of a member.                           <para/>
+          FUNC: Attr [static]                                               <summary>
+          TASK:                                                             <br/>
+                Fetches an attribute of a member.                           <para/>
           ARGS:                                                             <br/>
                 T           : Type(Class)   :   Type of attribute.          <br/>
                 memInfo     : MemberInfo    :   Member information.         <para/>
           RETV:             : Attribute     :   The attribute or null if
                                                 not found.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static Attribute attr<T>(MemberInfo memInfo) where T : Attribute {
+        public static Attribute Attr<T>(MemberInfo memInfo) where T : Attribute {
             return memInfo.GetCustomAttribute(typeof(T), true);
         }
 
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: hasAttr [static]                                            <summary>
-          TASK: Checks if a member Has an attribute.                        <para/>
+          TASK:                                                             <br/>
+                Checks if a member Has an attribute.                        <para/>
           ARGS:                                                             <br/>
                 T           : Type (Class)  : Type of attribute.            <br/>
                 memInfo     : MemberInfo    : Member information.           <para/>
@@ -452,12 +499,13 @@ namespace Tore.Core {
                                               else false.                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static bool hasAttr<T>(MemberInfo memInfo) {
-            return (attr(typeof(T), memInfo) != null);
+            return (Attr(typeof(T), memInfo) != null);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: nameInAttr [static]                                         <summary>
-          TASK: Fetches name in a NameMetadata attribute of any member.     <para/>
+          FUNC: NameInAttr [static]                                         <summary>
+          TASK:                                                             <br/>
+                Fetches name in a NameMetadata attribute of any member.     <para/>
           ARGS:                                                             <br/>
                 T           : Type (Class)  : Type of attribute.            <br/>
                 memInfo     : MemberInfo    : Member information.           <para/>
@@ -467,10 +515,10 @@ namespace Tore.Core {
                 Attribute class must be descendant of NameMetadata class.
                 Otherwise the return value will be null.                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string nameInAttr<T>(MemberInfo memInfo) {
+        public static string NameInAttr<T>(MemberInfo memInfo) {
             Attribute a;
 
-            a = attr(typeof(T), memInfo);
+            a = Attr(typeof(T), memInfo);
             return (a is NameMetadata nmd) ? nmd.name : null;
         }
 
@@ -481,8 +529,9 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: instanceProp [static]                                       <summary>
-          TASK: Fetches Public Property info from a class.                  <para/>
+          FUNC: InstanceProp [static]                                       <summary>
+          TASK:                                                             <br/>
+                Fetches Public Property info from a class.                  <para/>
           ARGS:                                                             <br/>
                 propSrc : Object        : Type or Instance.                 <br/>
                 propNam : String        : Instance Property name.           <br/>
@@ -491,7 +540,7 @@ namespace Tore.Core {
           RETV:         : PropertyInfo  : If exists, the property info, 
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static PropertyInfo instanceProp(object propSrc,
+        public static PropertyInfo InstanceProp(object propSrc,
                                                 string propNam,
                                                 bool inherit = true) {
             Chk(propNam, nameof(propNam));
@@ -504,19 +553,40 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: staticProp [static]                                         <summary>
-          TASK: Fetches Public static Property info from a class.           <para/>
+          FUNC: InstanceProps [static]                                      <summary>
+          TASK:                                                             <br/>
+                Fetches <b> all </b> Public Property infos from a class.    <para/>
+          ARGS:                                                             <br/>
+                propSrc : Object        : Type or Instance.                 <br/>
+                inherit : bool          : Include inherited properties
+                                          :DEF:true.                        <para/>
+          RETV:                                                             <br/>
+                : PropertyInfo[]: Property info array, never null.          </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static PropertyInfo[] InstanceProps(object propSrc, bool inherit = true) {
+            return fetchType(propSrc, nameof(propSrc)).GetProperties(
+                    BindingFlags.Public |
+                    BindingFlags.Instance |
+                    (inherit ? BindingFlags.FlattenHierarchy : 0)
+            );
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: StaticProp [static]                                         <summary>
+          TASK:                                                             <br/>
+                Fetches Public static Property info from a class.           <para/>
           ARGS:                                                             <br/>
                 propSrc : Object        : Type or Instance.                 <br/>
                 propNam : String        : Static Property name.             <br/>
                 inherit : bool          : Include base classes to the
                                           search of property.:DEF:true.     <para/>
-          RETV:         : PropertyInfo  : If exists, the property info, 
+          RETV:                                                             <br/>
+                        : PropertyInfo  : If exists, the property info, 
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static PropertyInfo staticProp(object propSrc,
-                                                string propNam,
-                                                bool inherit = true) {
+        public static PropertyInfo StaticProp(object propSrc,
+                                              string propNam,
+                                              bool inherit = true) {
             Chk(propNam, nameof(propNam));
             return fetchType(propSrc, nameof(propSrc)).GetProperty(
                     propNam,
@@ -527,22 +597,43 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: staticField [static]                                        <summary>
-          TASK: Fetches Public Static Field info from a class.              <para/>
+          FUNC: StaticProps [static]                                        <summary>
+          TASK:                                                             <br/>
+                Fetches <b>all</b> Public static property infos of a class. <para/>
           ARGS:                                                             <br/>
-                fldSrc  : Object        : Type or Instance.                 <br/>
-                fldNam  : String        : Static Field name.                <br/>
-                inherit : bool          : Include base classes to the
-                                          search of field. :DEF:true.       <para/>
-          RETV:         : fieldInfo     : If exists, the field info, 
+                propSrc : Object        : Type or Instance.                 <br/>
+                inherit : bool          : Include inherited properties.
+                                          :DEF:true.                        <para/>
+          RETV:                                                             <br/>
+                : PropertyInfo[]: Property info array, never null.          </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static PropertyInfo[] StaticProps(object propSrc, bool inherit = true) {
+            return fetchType(propSrc, nameof(propSrc)).GetProperties(
+                    BindingFlags.Public |
+                    BindingFlags.Static |
+                    (inherit ? BindingFlags.FlattenHierarchy : 0)
+            );
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: StaticField [static]                                        <summary>
+          TASK:                                                             <br/>
+                Fetches Public Static Field info from a class.              <para/>
+          ARGS:                                                             <br/>
+                fieldSrc    : Object        : Type or Instance.             <br/>
+                fieldNam    : String        : Static Field name.            <br/>
+                inherit     : bool          : Include base classes to the
+                                              search of field. :DEF:true.   <para/>
+          RETV:                                                             <br/>
+                        : fieldInfo     : If exists, the field info, 
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static FieldInfo staticField(object fldSrc,
-                                            string fldNam,
+        public static FieldInfo StaticField(object fieldSrc,
+                                            string fieldNam,
                                             bool inherit = true) {
-            Chk(fldNam, nameof(fldNam));
-            return fetchType(fldSrc, nameof(fldSrc)).GetField(
-                fldNam,
+            Chk(fieldNam, nameof(fieldNam));
+            return fetchType(fieldSrc, nameof(fieldSrc)).GetField(
+                fieldNam,
                 BindingFlags.Public |
                 BindingFlags.Static |
                 (inherit ? BindingFlags.FlattenHierarchy : 0)
@@ -550,17 +641,38 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: instanceMethod [static]                                     <summary>
-          TASK: Fetches Public Method info from a class.                    <para/>
+          FUNC: StaticFields [static]                                       <summary>
+          TASK:                                                             <br/>
+                Fetches <b>all</b> Public static field infos of a class.    <para/>
+          ARGS:                                                             <br/>
+                fieldSrc : Object       : Type or Instance.                 <br/>
+                inherit  : bool         : Include inherited fields.
+                                          :DEF:true.                        <para/>
+          RETV:                                                             <br/>
+                         : FieldInfo[]  : Field info array, never null.     </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static FieldInfo[] StaticFields(object fieldSrc, bool inherit = true) {
+            return fetchType(fieldSrc, nameof(fieldSrc)).GetFields(
+                    BindingFlags.Public |
+                    BindingFlags.Static |
+                    (inherit ? BindingFlags.FlattenHierarchy : 0)
+            );
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: InstanceMethod [static]                                     <summary>
+          TASK:                                                             <br/>
+                Fetches Public Method info from a class.                    <para/>
           ARGS:                                                             <br/>
                 metSrc  : Object        : Class Type or Instance.           <br/>
                 metNam  : String        : Instance method name.             <br/>
                 inherit : bool          : Include base classes to the
                                           search of method. :DEF:true.      <para/>
-          RETV:         : MethodInfo    : If exists, the method info, 
+          RETV:                                                             <br/>
+                        : MethodInfo    : If exists, the method info, 
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static MethodInfo instanceMethod(object metSrc,
+        public static MethodInfo InstanceMethod(object metSrc,
                                                 string metNam,
                                                 bool inherit = true) {
             Chk(metNam, nameof(metNam));
@@ -573,17 +685,19 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: staticMethod [static]                                       <summary>
-          TASK: Fetches Public Static Method info from a class.             <para/>
+          FUNC: StaticMethod [static]                                       <summary>
+          TASK:                                                             <br/>
+                Fetches Public Static Method info from a class.             <para/>
           ARGS:                                                             <br/>
                 metSrc  : Object        : Class Type or Instance.           <br/>
                 metNam  : String        : Static Method name.               <br/>
                 inherit : bool          : Include base classes to the
                                           search of method. :DEF:true.      <para/>
-          RETV:         : MethodInfo    : If exists, the method info, 
+          RETV:                                                             <br/>
+                        : MethodInfo    : If exists, the method info, 
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static MethodInfo staticMethod(object metSrc,
+        public static MethodInfo StaticMethod(object metSrc,
                                               string metNam,
                                               bool inherit = true) {
             Chk(metNam, nameof(metNam));
@@ -596,8 +710,9 @@ namespace Tore.Core {
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          FUNC: instanceDelegate [static]                                   <summary>
-          TASK: Finds Public Instance Method of a class                     <br/>
+          FUNC: InstanceDelegate [static]                                   <summary>
+          TASK:                                                             <br/>
+                Finds Public Instance Method of a class                     <br/>
                 and returns it as a delegate of Type T.                     <para/>
           ARGS:                                                             <br/>
                 T       : Type          : Delegate type.                    <br/>
@@ -605,19 +720,21 @@ namespace Tore.Core {
                 metNam  : String        : Instance method name.             <br/>
                 inherit : bool          : Include base classes to the
                                           search of method. :DEF:true.      <para/>
-          RETV:         : T             : If method exists, the delegate,
+          RETV:                                                             <br/>
+                        : T             : If method exists, the delegate,
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static T instanceDelegate<T>(object metSrc,
+        public static T InstanceDelegate<T>(object metSrc,
                                             string metNam,
                                             bool inherit = true)
                                             where T : Delegate {
-            return instanceMethod(metSrc, metNam, inherit)?.CreateDelegate<T>();
+            return InstanceMethod(metSrc, metNam, inherit)?.CreateDelegate<T>();
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          FUNC: staticDelegate [static]                                     <summary>
-          TASK: Finds Public Static Method of a class                       <br/>
+          FUNC: StaticDelegate [static]                                     <summary>
+          TASK:                                                             <br/>
+                Finds Public Static Method of a class                       <br/>
                 and returns it as a delegate of Type T.                     <para/>
           ARGS:                                                             <br/>
                 T       : Type          : Delegate type.                    <br/>
@@ -625,107 +742,118 @@ namespace Tore.Core {
                 metNam  : String        : Static method name.               <br/>
                 inherit : bool          : Include base classes to the
                                           search of method. :DEF:true.      <para/>
-          RETV:         : T             : If method exists, the delegate,
+          RETV:                                                             <br/>
+                        : T             : If method exists, the delegate,
                                           else null.                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static T staticDelegate<T>(object metSrc, string metNam, bool inherit = true)
+        public static T StaticDelegate<T>(object metSrc, string metNam, bool inherit = true)
                                           where T : Delegate {
-            return staticMethod(metSrc, metNam, inherit)?.CreateDelegate<T>();
+            return StaticMethod(metSrc, metNam, inherit)?.CreateDelegate<T>();
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: makeObject [static]                                         <summary>
-          TASK: Builds an object of a given type.                           <para/>
+          FUNC: MakeObject [static]                                         <summary>
+          TASK:                                                             <br/>
+                Builds an object of a given type.                           <para/>
           ARGS:                                                             <br/>
                 template: object            : Object or Type of object.     <br/>
                 args    : params object[]   : Constructor parameters if any.<para/>
-          RETV:         : object            : Object constructed.           </summary>
+          RETV:                                                             <br/>
+                        : object            : Object constructed.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static object makeObject(object template, params object[] args) {
+        public static object MakeObject(object template, params object[] args) {
             return Activator.CreateInstance(fetchType(template, nameof(template)), args);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: setInstProp [static]                                        <summary>
-          TASK: Sets an instance property on target instance to a value.    <para/>
+          FUNC: SetInstanceProp [static]                                    <summary>
+          TASK:                                                             <br/>
+                Sets a property on target instance to a value.              <para/>
           ARGS:                                                             <br/>
+                target  : object    : Instance.                             <br/>
                 propNam : string    : Property name.                        <br/>
-                tar     : object    : Instance.                             <br/>
                 val     : object    : Value to set to target's property.    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void setInstProp(string propNam, object tar, object val) {
+        public static void SetInstanceProp(object target, string propNam, object val) {
             PropertyInfo inf;
 
-            if ((tar == null) || (tar is Type))
-                Exc("E_INV_INSTANCE", "tar");
-            inf = instanceProp(tar, propNam, true);
-            Chk(inf, tar.GetType().Name + "." + propNam, "E_PROP_INV");
-            inf.SetValue(tar, setType(val, inf.PropertyType));
+            if ((target == null) || (target is Type))
+                Exc("E_INV_INSTANCE", nameof(target));
+            inf = InstanceProp(target, propNam, true);
+            Chk(inf, target.GetType().Name + "." + propNam, "E_INV_PROP");
+            inf.SetValue(target, SetType(val, inf.PropertyType));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: setInstProp [static]                                        <summary>
-          TASK: Sets an instance property on target instance to a value.    <para/>
+          FUNC: SetInstanceProp [static]                                    <summary>
+          TASK:                                                             <br/>
+                Sets a property on target instance to a value.              <para/>
           ARGS:                                                             <br/>
-                inf     : PropertyInfo  : Property info.                    <br/>
-                tar     : object        : Instance.                         <br/>
+                info    : PropertyInfo  : Property info.                    <br/>
+                target  : object        : Instance.                         <br/>
                 val     : object        : Value to set to target property.  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void setInstProp(PropertyInfo inf, object tar, object val) {
+        public static void SetInstanceProp(PropertyInfo info, object target, object val) {
             Type tty;
 
-            if ((tar == null) || (tar is Type))
-                Exc("E_INV_INSTANCE", "tar");
-            Chk(inf, "inf");
-            tty = tar.GetType();
-            if (inf.DeclaringType != tty) {
+            if ((target == null) || (target is Type))
+                Exc("E_INV_INSTANCE", nameof(target));
+            Chk(info, "inf");
+            tty = target.GetType();
+            if (info.DeclaringType != tty) {
                 Exc("E_PROP_INV_CLASS",
-                    inf.DeclaringType.Name + "!=" + tty.Name);
+                    info.DeclaringType.Name + "!=" + tty.Name);
             }
-            inf.SetValue(tar, setType(val, inf.PropertyType));
+            info.SetValue(target, SetType(val, info.PropertyType));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: setStatProp [static]                                        <summary>
-          TASK: Sets a static property on target class to a value.          <para/>
+          FUNC: SetStaticProp [static]                                      <summary>
+          TASK:                                                             <br/>
+                Sets a static property on target class to a value.          <para/>
           ARGS:                                                             <br/>
+                target  : object    : Class Type or Instance.               <br/>
                 propNam : string    : Property name.                        <br/>
-                tar     : object    : Class Type or Instance.               <br/>
                 val     : object    : Value to set to target's property.    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void setStatProp(string propNam, object tar, object val) {
+        public static void SetStaticProp(object target, string propNam, object val) {
             PropertyInfo inf;
 
-            inf = staticProp(tar, propNam, true);
+            inf = StaticProp(target, propNam, true);
             if (inf == null) 
-                Exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
-            inf.SetValue(null, setType(val, inf.PropertyType));
+                Exc("E_INV_PROP", fetchType(target, nameof(target)).Name + "." + propNam);
+            inf.SetValue(null, SetType(val, inf.PropertyType));
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: setInstPropType [static]                                    <summary>
-          TASK: Checks type of a value and if it is not compatible to
+          FUNC: SetInstancePropType [static]                                <summary>
+          TASK:                                                             <br/>
+                Checks type of a value and if it is not compatible to       <br/>
                 property type on target object class, tries to convert it.  <para/>
           ARGS:                                                             <br/>
                 propNam : string    : Property name in object.              <br/>
-                tar     : object    : Target object type or object.         <br/>
-                val     : object    : Value to convert to property type.    </summary>
+                target  : object    : Target object type or object.         <br/>
+                val     : object    : Value to convert to property type.    <para/>
+          INFO:                                                             <br/>
+                This method only returns a value at required type.          <br/>
+                It does not set the property in the target object.          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static object setInstPropType(string propNam, object tar, object val) {
+        public static object SetInstancePropType(string propNam, object target, object val) {
             PropertyInfo inf;
  
-            inf = instanceProp(tar, propNam, true);
+            inf = InstanceProp(target, propNam, true);
             if (inf == null)
-                Exc("E_INV_PROP", fetchType(tar, nameof(tar)).Name + "." + propNam);
-            return setType(val, inf.PropertyType);
+                Exc("E_INV_PROP", fetchType(target, nameof(target)).Name + "." + propNam);
+            return SetType(val, inf.PropertyType);
         }
 
-        // Used in setType...
+        // Used in SetType...
         private static readonly Type NULLABLE = typeof(Nullable<>);
-        
+
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: setType [static]                                            <summary>
-          TASK: Checks type of a value and if required, tries to change it. <para/>
+          FUNC: SetType [static]                                            <summary>
+          TASK:                                                             <br/>
+                Checks type of a value and if required, tries to change it. <para/>
           ARGS:                                                             <br/>
                 val : object    : Value to check and if required convert.   <br/>
                 typ : Type      : Expected value type.                      <br/>
@@ -733,10 +861,12 @@ namespace Tore.Core {
                                       will be assigned to a sub object,
                                       true    : ignores missing properties
                                       false   : raises exception.           <para/>
-          RETV:     : object        : Value of Type typ if possible.        <para/>
-          WARN: Throws E_TYPE_CONV on failure.                              </summary>
+          RETV:                                                             <br/>
+                    : object    : Value of Type typ if possible.            <para/>
+          WARN:                                                             <br/>
+                Throws E_TYPE_CONV on failure.                              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static object setType(object val,
+        public static object SetType(object val,
                                      Type typ,
                                      bool ignoreMissing = false) {
 
@@ -751,7 +881,7 @@ namespace Tore.Core {
             }
             if (n) {                                    // If null,
                 val = (typ.IsValueType) ?               // If value
-                        makeObject(typ) :               // make a default,
+                        MakeObject(typ) :               // make a default,
                         null;                           // else null.
                 return val;
             }
@@ -778,8 +908,9 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: setType [static]                                            <summary>
-          TASK: Checks type of a value and if required, tries to change it. <para/>
+          FUNC: SetType [static]                                            <summary>
+          TASK:                                                             <br/>
+                Checks type of a value and if required, tries to change it. <para/>
           ARGS:                                                             <br/>
                 T   : Type (Class)  : Expected value type.                  <br/>
                 val : object        : Value to check, if required convert.  <br/>
@@ -787,25 +918,29 @@ namespace Tore.Core {
                                       will be assigned to a sub object,
                                       true    : ignores missing properties
                                       false   : raises exception.           <para/>
-          RETV:     : object        : Value of Type T if possible.          <para/>
-          WARN: Throws E_TYPE_CONV on failure.                              </summary>
+          RETV:                                                             <br/>
+                    : object        : Value of Type T if possible.          <para/>
+          WARN:                                                             <br/>
+                Throws E_TYPE_CONV on failure.                              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static T setType<T>(object val, bool ignoreMissing = false) {
-            return (T)setType(val, typeof(T), ignoreMissing);
+        public static T SetType<T>(object val, bool ignoreMissing = false) {
+            return (T)SetType(val, typeof(T), ignoreMissing);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: discoverTypes [static]                                      <summary>
-          TASK: Finds all Types that are subclass of a base type and        
+          FUNC: DiscoverTypes [static]                                      <summary>
+          TASK:                                                             <br/>
+                Finds all Types that are subclass of a base type and        <br/>
                 defined in any assembly referring to the base assembly.     <para/>
           ARGS:                                                             <br/>
                 baseAsm : AssemblyName : This assembly must be referred.    <br/>
                 baseType: Type         : Types should be subclass of this.  <para/>
-          RETV:         : List of Type : List of types that are subclass
+          RETV:                                                             <br/>
+                        : List of Type : List of types that are subclass    
                           of base type and defined in any assembly referring
                           to assembly with name baseAsm.                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static List<Type> discoverTypes(AssemblyName baseAsm, Type baseType) {
+        public static List<Type> DiscoverTypes(AssemblyName baseAsm, Type baseType) {
             Assembly[] aArr = AppDomain.CurrentDomain.GetAssemblies();
             AssemblyName[] refs;
             Type[] tArr;
@@ -828,79 +963,7 @@ namespace Tore.Core {
             return tLst;
         }
 
-        /*————————————————————————————————————————————————————————————————————————————
-            ————————————————————————
-            |  UTC Time functions  |
-            ————————————————————————
-        ————————————————————————————————————————————————————————————————————————————*/
-        private static CultureInfo timeProvider = CultureInfo.InvariantCulture;
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC:   strUtcNow [static]                                        <summary>
-          TASK:   Returns UTC current time as string.                       <para/>
-          RETV:           : string : UTC time string : "yyyyMMddHHmmssfff". </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static string strUtcNow() {
-            return DateTime.UtcNow.ToString("yyyyMMddHHmmssfff", timeProvider);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC:   strToDateTime [static]                                    <summary>
-          TASK:   Returns string formatted time as DateTime.                <para/>
-          ARGS:   time    : string    : Time string: "yyyyMMddHHmmssfff".   <para/>
-          RETV:           : DateTime  : DateTime translation of time string.</summary> 
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static DateTime strToDateTime(string time) {
-            return DateTime.ParseExact(time, "yyyyMMddHHmmssfff", timeProvider);
-        }
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: seconds [static]                                            <summary>
-          TASK: Returns long number of seconds since unix epoch + offset.   <para/>
-          ARGS: offset  : long  : Offset seconds to Add : DEF : 0.          <para/>
-          RETV:         : long  : Seconds since unix epoch + offset.        </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static long seconds(long offset = 0) {
-            DateTimeOffset dto = new DateTimeOffset(DateTime.UtcNow);
-            return (dto.ToUnixTimeSeconds() + offset);
-        }
-
-        /*————————————————————————————————————————————————————————————————————————————
-            —————————————————————————————————————
-            |   UTF8 File utility functions     |
-            —————————————————————————————————————
-        ————————————————————————————————————————————————————————————————————————————*/
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: loadUtf8File [static]                                       <summary>
-          TASK: Reads an Utf8 encoded file to a string.                     <para/>
-          ARGS: filespec    : string : filename with path.                  <para/>
-          RETV:             : string : Utf8 encoded content of file.        </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static string loadUtf8File(string fileSpec) {
-            Chk(fileSpec, "fileSpec");
-            try {
-                return File.ReadAllText(fileSpec, Encoding.UTF8);
-            } catch(Exception e) {
-                Exc("E_SYS_LOAD_FILE", fileSpec, e);
-                throw;
-            }
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: saveUtf8File [static].                                      <summary>
-          TASK: Writes an Utf8 string to a file.                            <para/>
-          ARGS:                                                             <br/>
-                fileSpec    : string : filename with path.                  <br/>
-                text        : string : Utf8 text.                           </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static void saveUtf8File(string fileSpec, string text) {
-            Chk(fileSpec, "fileSpec");
-            try {
-                File.WriteAllText(fileSpec, text, Encoding.UTF8);
-            } catch(Exception e) {
-                Exc("E_SYS_SAVE_FILE", fileSpec, e);
-                throw;
-            }
-        }
+        #endregion
 
     }   // End static class Sys.
 
@@ -944,7 +1007,7 @@ namespace Tore.Core {
             nameList = new List<string>();
             if (names != null) {
                 foreach(string n in names)
-                    Sys.addUnique(nameList, n);
+                    nameList.AddUnique( n);
             }
         }
         /**———————————————————————————————————————————————————————————————————————————

@@ -18,12 +18,12 @@ namespace Tore.Core {
 
     public static class Xor {
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: cryptByteArrays [static]                                <summary>
+          FUNC: CryptByteArrays [static]                                <summary>
           TASK:                                                         <br/>
                 XOR's two byte arrays.                                  <br/>
                 If xorKey is shorter, it is repeated over encDec.       <para/>
           ARGS:                                                         <br/>
-                encDec  : byte[]    : Byte array to encrypt or decrypt. <br/>   
+                encDec  : byte[]    : Byte array to Encrypt or Decrypt. <br/>   
                 xorKey  : byte[]    : Byte array used as Key.           <para/>
           RETV:                                                         <br/>
                         : byte[]    : XOR'ed byte array.                <para/>
@@ -31,7 +31,7 @@ namespace Tore.Core {
                 Throws exception if byte arrays are null or             <br/>
                 xorKey length = 0.                                      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static byte[] cryptByteArrays(byte[] encDec, byte[] xorKey) {
+        public static byte[] CryptByteArrays(byte[] encDec, byte[] xorKey) {
             int idx,
                 eln,
                 kln;
@@ -50,20 +50,20 @@ namespace Tore.Core {
         }
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: cryptStrings [static]                                       <summary>
+          FUNC: CryptStrings [static]                                       <summary>
           TASK:                                                             <br/>
                 Encodes UTF8 strings to byte arrays, XOR's them,            <br/>
                 returns XOR'ed byte array.                                  <br/>
                 if xorKey is shorter, it is repeated over encDec.           <para/>
           ARGS:                                                             <br/>
-                encDec  : string    : String to encrypt or decrypt.         <br/>
+                encDec  : string    : String to Encrypt or Decrypt.         <br/>
                 xorKey  : string    : String used as Key.                   <para/>
           RETV:                                                             <br/>
                         : byte[]    : XOR'ed byte array.                    <para/>
           WARN:                                                             <br/>
                 Throws exception if strings are null or empty               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static byte[] cryptStrings(string encDec, string xorKey) {
+        public static byte[] CryptStrings(string encDec, string xorKey) {
             byte[] enc;
             byte[] key;
 
@@ -71,11 +71,11 @@ namespace Tore.Core {
             Chk(xorKey, nameof(xorKey));
             enc = Encoding.UTF8.GetBytes(encDec);
             key = Encoding.UTF8.GetBytes(xorKey);
-            return cryptByteArrays(enc, key);
+            return CryptByteArrays(enc, key);
         }
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: decrypt [static]                                            <summary>
+          FUNC: Decrypt [static]                                            <summary>
           TASK:                                                             <br/>
                 Decodes an hex string into an UTF8 string, using two keys.  <br/>
                 if xorKey is shorter, it is repeated over encKey.           <para/>
@@ -89,18 +89,18 @@ namespace Tore.Core {
           WARN:                                                             <br/>
                 Throws exception if hex, encKey or xorKey are null or empty.</summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string decrypt(string hex, string encKey, string xorKey, string strip = "-"){
+        public static string Decrypt(string hex, string encKey, string xorKey, string strip = "-"){
             byte[] decBuf;
-            byte[] keyArr = prepDualKey(encKey, xorKey, strip);
+            byte[] keyArr = PrepDualKey(encKey, xorKey, strip);
 
             Chk(hex, nameof(hex));
             decBuf = HexStrToByteArr(hex);
-            decBuf = cryptByteArrays(decBuf, keyArr);
+            decBuf = CryptByteArrays(decBuf, keyArr);
             return Encoding.UTF8.GetString(decBuf);
         }
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: encrypt [static]                                            <summary>
+          FUNC: Encrypt [static]                                            <summary>
           TASK:                                                             <br/>
                 Encodes an UTF8 string into an hex string, using two keys.  <br/>
                 if xorKey is shorter, it is repeated over encKey.           <para/>
@@ -114,27 +114,27 @@ namespace Tore.Core {
           WARN:                                                             <br/>
             Throws exception if data, encKey or xorKey are null or empty.   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string encrypt(string data,
+        public static string Encrypt(string data,
                                      string encKey, 
                                      string xorKey, 
                                      string strip = "-") {
             byte[] encBuf;
-            byte[] keyArr = prepDualKey(encKey, xorKey, strip);
+            byte[] keyArr = PrepDualKey(encKey, xorKey, strip);
             
             encBuf = Encoding.UTF8.GetBytes(data);
-            encBuf = cryptByteArrays(encBuf, keyArr);
+            encBuf = CryptByteArrays(encBuf, keyArr);
             return Encoding.UTF8.GetString(encBuf);
         }
 
         /// <summary>
         /// Checks and prepares dual keys.
         /// </summary>
-        private static byte[] prepDualKey(string encKey, string xorKey, string strip){
+        private static byte[] PrepDualKey(string encKey, string xorKey, string strip){
             Chk(encKey, nameof(encKey));
             Chk(xorKey, nameof(xorKey));
             encKey.RemoveChars(strip);
             xorKey.RemoveChars(strip);
-            return cryptStrings(encKey, xorKey);
+            return CryptStrings(encKey, xorKey);
         }
 
         #region Crypto File routines.
@@ -146,13 +146,13 @@ namespace Tore.Core {
         private const string CF_HDR = "TORE:CF01:";
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC:  isCryptoFile [static]                                      <summary>
+          FUNC:  IsCryptoFile [static]                                      <summary>
           TASK:                                                             <br/>
                  Checks if given file contains Crypto File header.          <para/>
           ARGS:                                                             <br/>
                  file : string  : filename                                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static bool isCryptoFile(string file) {
+        public static bool IsCryptoFile(string file) {
             char[] buf = new char[CF_HDR.Length];
 
             using (StreamReader reader = new StreamReader(file, Encoding.UTF8))
@@ -161,7 +161,7 @@ namespace Tore.Core {
         }
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: decryptFromFile [static]                                    <summary>
+          FUNC: DecryptFromFile [static]                                    <summary>
           TASK:                                                             <br/>
                 Loads and decrypts contents of an encrypted file into       <br/>
                 an UTF8 string, using two keys.                             <br/>
@@ -176,27 +176,27 @@ namespace Tore.Core {
           WARN:                                                             <br/>
                 Throws exception if anything is null or empty except strip. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static string decryptFromFile(string file, 
+        public static string DecryptFromFile(string file, 
                                              string encKey, 
                                              string xorKey, 
                                              string strip = "-") {
             string buf;
 
             Chk(file, nameof(file));
-            buf = loadUtf8File(file);
+            buf = Utf8File.Load(file);
             if (!buf.StartsWith(CF_HDR))
                 Exc("E_INV_ENC", file);
-            return decrypt(buf.Substring(CF_HDR.Length), encKey, xorKey, strip);
+            return Decrypt(buf.Substring(CF_HDR.Length), encKey, xorKey, strip);
         }
 
         /**————————————————————————————————————————————————————————————————————————————
-          FUNC: encryptToFile [static]                                      <summary>
+          FUNC: EncryptToFile [static]                                      <summary>
           TASK:                                                             <br/>
                 Encrypts contents of an UTF8 string, using two keys, then   <br/>
                 writes it into a file.                                      <br/>
                 if xorKey is shorter, it is repeated over encKey.           <para/>
           ARGS:                                                             <br/>
-                data    : string    : String to encrypt.                    <br/>
+                data    : string    : String to Encrypt.                    <br/>
                 file    : string    : File specification.                   <br/>
                 encKey  : string    : Primary   encryption Key.             <br/>
                 xorKey  : string    : Secondary encryption Key.             <br/>
@@ -204,14 +204,14 @@ namespace Tore.Core {
           WARN:                                                             <br/>
                 Throws exception if anything is null or empty except strip. </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void encryptToFile(string data,
+        public static void EncryptToFile(string data,
                                          string file,
                                          string encKey,
                                          string xorKey,
                                          string strip = "-") {
             Chk(file, nameof(file));
-            data = encrypt(data, encKey, xorKey, strip);
-            saveUtf8File(file, CF_HDR + data);
+            data = Encrypt(data, encKey, xorKey, strip);
+            Utf8File.Save(file, CF_HDR + data);
         }
 
         #endregion
