@@ -759,8 +759,7 @@ namespace Tore.Core {
             Type type;
             object v;
             int i;
-
-
+            
             Chk(target, nameof(target));
             type = target.GetType();
             if (type == typeof(Stl))

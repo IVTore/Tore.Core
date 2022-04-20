@@ -70,8 +70,8 @@ Com objects give both standard and micro managed request types and response hand
 For simple standard http requests use STATIC functions 
 
 ```C#
-   Com.send(...);
-   Com.sendAsync(...); 
+   Com.Send(...);
+   Com.SendAsync(...);
    Com.Talk<T>(...);
    Com.TalkAsync<T>(...);
 ```
@@ -79,7 +79,7 @@ For simple standard http requests use STATIC functions
 Otherwise, create a Com object and manipulate the request via
 
    - The Com instance properties, like: content, accept, mediaType.
-   - The Com instance req, the HttpRequestMessage property, directly. 
+   - The Com instance req, the HttpRequestMessage property, directly.
 
 Then use INSTANCE send() or sendAsync() routines. 
   

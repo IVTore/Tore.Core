@@ -385,10 +385,12 @@ namespace Tore.Core {
         public static void Dbg(params object[] msg) {
             StringBuilder b;
             string s;
+            string m;
 
             b = new StringBuilder();
             if (msg != null) {
-                foreach(string m in msg) {
+                foreach(object o in msg) {
+                    m = o.ToString();
                     switch(m) {
                     case "_LINE_":
                     b.AppendLine(dbgLine);
@@ -938,15 +940,19 @@ namespace Tore.Core {
                           of base type and defined in any assembly referring
                           to assembly with name baseAsm.                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static List<Type> DiscoverTypes(AssemblyName baseAsm, Type baseType) {
-            Assembly[] aArr = AppDomain.CurrentDomain.GetAssemblies();
+        public static List<Type> DiscoverTypes<T>(AssemblyName baseAsm = null) {
+            Assembly[] asmArr = AppDomain.CurrentDomain.GetAssemblies();
             AssemblyName[] refs;
             Type[] tArr;
             List<Type> tLst = new List<Type>();
+            Type baseType = typeof(T);
 
-            Chk(baseAsm, nameof(baseAsm));
-            Chk(baseType, nameof(baseType));
-            foreach(var asm in aArr) {                  // Scan assemblies:
+            
+            Chk(baseType, "<T>");
+            if (baseAsm == null)
+                baseAsm = baseType.Assembly.GetName();
+
+            foreach(var asm in asmArr) {                // Scan assemblies:
                 refs = asm.GetReferencedAssemblies();   // Get referenced.
                 if (!refs.Contains(baseAsm))            // If this is not referenced,
                     continue;                           // ignore.

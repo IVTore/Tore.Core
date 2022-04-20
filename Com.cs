@@ -362,7 +362,7 @@ namespace Tore.Core {
           RETV:     : Com : this object.                                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public Com Send() {
-            sendRequestAsync(false).GetAwaiter().GetResult();
+            SendRequestAsync(false).GetAwaiter().GetResult();
             return this;
         }
 
@@ -372,7 +372,7 @@ namespace Tore.Core {
           RETV:     : Com : this object.                                    </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public async Task<Com> SendAsync() {
-            await sendRequestAsync(true);
+            await SendRequestAsync(true);
             return this;
         }
 
@@ -502,7 +502,7 @@ namespace Tore.Core {
                 If  mediaType is defined
                     adds it to request headers.
 
-          WARN: This routine is called by sendRequestAsync().
+          WARN: This routine is called by SendRequestAsync().
                 IT WORKS AT EVERY REQUEST.
                 If accept, mediaType (content type) is
                 very special, they should be assigned via request property and
@@ -547,7 +547,7 @@ namespace Tore.Core {
                     request content is loaded with it as string content
                     with encoding and mediaType settings.
 
-          WARN: This routine is called by sendRequestAsync().
+          WARN: This routine is called by SendRequestAsync().
                 IT WORKS AT EVERY REQUEST.
                 If you set request.content manually,
                 leave the Com object content property empty.
@@ -578,14 +578,14 @@ namespace Tore.Core {
         }
 
         /*———————————————————————————————————————————————————————————————————————————
-          FUNC: sendRequestAsync [private].
+          FUNC: SendRequestAsync [private].
           TASK: Chooses completion context and sends request asynchronously.
           ARGS: onCaptured : bool : If true,    await lands on calling context.
                                     If false,   await lands on any context available.
           INFO: For synchronous calls onCapture should be false.
           WARN: Rethrows all exceptions coming from HttpClient sendAsync.
         ————————————————————————————————————————————————————————————————————————————*/
-        private async Task sendRequestAsync(bool onCaptured) {
+        private async Task SendRequestAsync(bool onCaptured) {
             string exs;
             try {
                 RequestSetup();
