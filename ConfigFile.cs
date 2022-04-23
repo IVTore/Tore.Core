@@ -8,9 +8,8 @@ namespace Tore.Core {
     /**———————————————————————————————————————————————————————————————————————————
         CLASS:  ConfigFile [Static]                                     <summary>
         USAGE:                                                          <br/>
-                Contains a library of static utility methods            <br/>
-                for simple encrypted configuration file support         <br/>
-                with fallbacks.                                         <para/>
+                Contains static utility methods for:                    <br/>
+                simple encrypted configuration file support.            <para/>
                 Configurations are loaded to and saved from             <br/>
                 a classes <b> public static fields </b>.                </summary>
     ————————————————————————————————————————————————————————————————————————————*/

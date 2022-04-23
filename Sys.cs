@@ -15,13 +15,12 @@ History             :
 ————————————————————————————————————————————————————————————————————————————*/
 
 using System;
-using System.Reflection;
-using System.IO;
-using System.Globalization;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 using System.Linq;
+using System.Reflection;
+using System.Text;
+
 using Newtonsoft.Json.Linq;
 
 namespace Tore.Core {
@@ -73,113 +72,6 @@ namespace Tore.Core {
             false;
 #endif
 
-
-        #region Hex conversions.
-        /*————————————————————————————————————————————————————————————————————————————
-            ——————————————————————
-            |  Hex conversions.  |
-            ——————————————————————
-        ————————————————————————————————————————————————————————————————————————————*/
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: HexToInt [static]                                           <summary>
-          TASK: 
-                Returns integer from hex string.                            <para/>
-          ARGS:                                                             <br/>
-                hex : String        : hexadecimal number.                   <para/>
-          RETV:                                                             <br/>
-                    : int           : integer value.                        </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static int HexToInt(string hex) {
-            return int.Parse(hex, NumberStyles.HexNumber);
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: IntToHex [static]                                           <summary>
-          TASK:                                                             <br/>
-                Returns hex string from integer.                            <para/>
-          ARGS:                                                             <br/>
-                i       : int       : integer value.                        <br/>
-                digits  : int       : Number of hex digits.                 <para/>
-          RETV:                                                             <br/>
-                        : String    : Formatted hexadecimal string.         </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static string IntToHex(int i, int digits) {
-            return i.ToString("x" + digits.ToString());
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: HexStrToByteArr [static]                                    <summary>
-          TASK:                                                             <br/>
-                Converts a <b> CAPITAL </b>hex string to byte array.        <para/>
-          ARGS:                                                             <br/>
-                hex : string    : Hex string.                               <para/>
-          RETV:                                                             <br/>
-                    : byte[]    : Byte array.                               <para/>
-          INFO:                                                             <br/>
-                *   Hex digit letters should be <b> CAPITAL </b>.           <br/>
-                *   Throws exception if hex string is invalid.              <br/>
-                *   'A'- 0xA => 65 - 10 = 55.                               </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static byte[] HexStrToByteArr(string hex) {
-            int i,      // iterator.
-                p,      // position.
-                l;      // length.
-            byte[] a;   // array.
-
-            int n2i(int pos) {
-                char n = hex[pos];
-                if ((n >= '0') && (n <= '9'))
-                    return (n - '0');
-                if ((n >= 'A') && (n <= 'F'))
-                    return (n - 55);
-                Exc("E_INV_NIBBLE", $"hex[{pos}] = {n}");
-                return 0;
-            }
-
-            Chk(hex, nameof(hex));
-            l = hex.Length;
-            if ((l % 2) != 0)
-                Exc("E_INV_ARG", "hex");
-            l /= 2;
-            a = new byte[l];
-            for(i = 0; i < l; i++) {
-                p = i * 2;
-                a[i] = (byte)((n2i(p) << 4) | n2i(p + 1));
-            }
-            return a;
-        }
-
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: ByteArrToHexStr [static]                                    <summary>
-          TASK:                                                             <br/>
-                Converts a byte array to <b> CAPITAL </b> hex string.       <para/>
-          ARGS:                                                             <br/>
-                arr : byte[]    : Byte array.                               <para/>
-          RETV:                                                             <br/>
-                    : string    : Hex string.                               <para/>
-          INFO:                                                             <br/>
-                'A'- 0xA => 65 - 10 = 55.                                   </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static string ByteArrToHexStr(byte[] arr) {
-            int i,              // iterator.
-                l,              // length.
-                n;              // nibble value.
-            StringBuilder s;    // String builder.
-
-            Chk(arr, nameof(arr));
-            l = arr.Length;
-            s = new StringBuilder(l * 2);
-            for(i = 0; i < l; i++) {
-                n = (arr[i] & 0xF0) >> 4;
-                s.Append((char)((n < 0xA) ? (n + '0') : (n + 55)));
-                n = (arr[i] & 0x0F);
-                s.Append((char)((n < 0xA) ? (n + '0') : (n + 55)));
-            }
-            return s.ToString();
-        }
-        #endregion
-
         #region Exception Subsystem.
         /*————————————————————————————————————————————————————————————————————————————
             ——————————————————————————
@@ -217,7 +109,7 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: GetExcDta [static]                                          <summary>
+          FUNC: GetExcData [static]                                         <summary>
           TASK:                                                             <br/>
                 If an exception is generated or processed through           <br/>
                 <b> Exc </b>, it Has extra data and this will return it.    <para/>
@@ -226,7 +118,7 @@ namespace Tore.Core {
           RETV:                                                             <br/>
                     : Stl       : Extra exception data or null              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static Stl GetExcDta(Exception e) {
+        public static Stl GetExcData(Exception e) {
             if (!HasExcData(e))
                 return null;
             return (Stl)(e.Data["dta"]);
@@ -386,19 +278,19 @@ namespace Tore.Core {
             StringBuilder b;
             string s;
             string m;
-
+            
+            if ((msg == null) || (msg.Length == 0))
+                return;
             b = new StringBuilder();
-            if (msg != null) {
-                foreach(object o in msg) {
-                    m = o.ToString();
-                    switch(m) {
-                    case "_LINE_":
+            foreach(object o in msg) {
+                m = o.ToString();
+                switch(m) {
+                case "_LINE_":
                     b.AppendLine(dbgLine);
                     break;
-                    default:
+                default:
                     b.AppendLine(m);
                     break;
-                    }
                 }
             }
             s = b.ToString();
@@ -413,7 +305,7 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 lst : List of String  : Message collection.                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void Dbg(List<object> lst) {
+        public static void Dbg(List<string> lst) {
             if (lst == null)
                 return;
             Dbg(lst.ToArray());

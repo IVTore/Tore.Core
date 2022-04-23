@@ -997,16 +997,14 @@ namespace Tore.Core {
         public object this[string key] {
             get => Obj(key, 0);
             set {
-                int i;
-                i = Index(key);
-                if (i < 0) {
-                    Add(key, value);
-                    return;
+                int i = Index(key);
+                if (i < 0) 
+                    Add(key, value, -1);
+                else { 
+                    if (!wr) 
+                        Exc("E_STL_NO_OVR", key);
+                    objLst[i] = value;
                 }
-                if (!wr) {
-                    Exc("E_STL_NO_OVR", key);
-                }
-                objLst[i] = value;
             }
         }
         #endregion

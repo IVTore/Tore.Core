@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 using static Tore.Core.Sys;
 
 namespace Tore.Core {
@@ -94,7 +95,7 @@ namespace Tore.Core {
             byte[] keyArr = PrepDualKey(encKey, xorKey, strip);
 
             Chk(hex, nameof(hex));
-            decBuf = HexStrToByteArr(hex);
+            decBuf = Hex.ToByteArray(hex);
             decBuf = CryptByteArrays(decBuf, keyArr);
             return Encoding.UTF8.GetString(decBuf);
         }

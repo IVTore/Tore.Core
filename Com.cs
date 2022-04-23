@@ -209,7 +209,7 @@ namespace Tore.Core {
             method    : HttpMethod : Http method. :DEF: null -> POST.       <br/>
             mediaType : string     : Media type.  :DEF: "application/json". <br/>
             encoding  : Encoding   : Encoding.    :DEF: null -> UTF8.       <br/>
-            bool      : isForm     : If true content will be FormUrlEncoded.
+            isForm    : bool       : If true content will be FormUrlEncoded.
                                                   :DEF: false.              <para/>
           RETV:                                                             <br/>
                       : Com        : Com object with response.              <para/>
@@ -344,7 +344,7 @@ namespace Tore.Core {
           TASK:                                                         <br/>
                 Constructs a Com object.                                <para/>
           INFO:                                                         <br/>
-                Sets request to a new HttpRequestMessage.                   <br/>
+                Sets request to a new HttpRequestMessage.               <br/>
                 Sets method to POST.                                    <br/>
                 Sets encoding to UTF8.                                  <br/>
                 Sets mediaType (content type) to "application/json".    </summary>                                  

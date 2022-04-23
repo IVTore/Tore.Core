@@ -6,8 +6,7 @@ namespace Tore.Core {
     /**———————————————————————————————————————————————————————————————————————————
         CLASS:  Utc [Static]                                            <summary>
         USAGE:                                                          <br/>
-            Contains a library of static utility methods for            <br/>
-            DateTime conversions.                                       <para/>
+            Contains static utility methods for DateTime conversions.   <para/>
             String, Seconds, Milliseconds return <b>UtcNow</b> values.  <para/>
             CultureInfo is <b>CultureInfo.InvariantCulture.</b>         </summary>
     ————————————————————————————————————————————————————————————————————————————*/
