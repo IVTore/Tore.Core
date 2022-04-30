@@ -57,7 +57,7 @@ Please read the comments on the code at least once for using this class efficien
  Contains static utility methods for simple encrypted configuration file support. 
  Configurations are loaded to and saved from <b> public static fields </b> of a class.
  ```C#
- —————————————————————————————————————————————————————————————————
+——————————————————————————————————————————————————————————————————
  FUNC: Load [static]                                              
  TASK:                                                            
        Loads and decrypts contents of an encrypted file into      
@@ -74,26 +74,30 @@ Please read the comments on the code at least once for using this class efficien
        Throws exception if anything is null or empty except strip.
 ——————————————————————————————————————————————————————————————————
 ```
- ```C#
-/**————————————————————————————————————————————————————————————————————————————
-    FUNC: Save [static]                                               <summary>
-    TASK:                                                             <br/>
-        Encrypts and saves <b> public static fields </b> of a class <br/>
-        into a file, using two keys.                                <br/>
-        If keys are empty file is not encrypted.                    <br/>
-        If xorKey is shorter, it is repeated over encKey.           <para/>
-    ARGS:                                                             <br/>
-        type    : Type      : Class with public static fields.      <br/>
-        file    : string    : File specification.                   <br/>
-        encKey  : string    : Primary   encryption Key.             <br/>
-        xorKey  : string    : Secondary encryption Key.             <br/>
-        strip   : string    : Characters to remove from keys.       <para/>
-    WARN:                                                             <br/>
-        Throws exception if anything is null or empty except strip. </summary>
-————————————————————————————————————————————————————————————————————————————*/
+ 
+```C#
+——————————————————————————————————————————————————————————————————
+ FUNC: Save [static]                                              
+ TASK:                                                            
+       Encrypts and saves <b> public static fields </b> of a class
+       into a file, using two keys.                               
+       If keys are empty file is not encrypted.                   
+       If xorKey is shorter, it is repeated over encKey.          
+ ARGS:                                                            
+       type    : Type      : Class with public static fields.     
+       file    : string    : File specification.                  
+       encKey  : string    : Primary   encryption Key.            
+       xorKey  : string    : Secondary encryption Key.            
+       strip   : string    : Characters to remove from keys.      
+ WARN:                                                            
+       Throws exception if anything is null or empty except strip.
+——————————————————————————————————————————————————————————————————
+```
 
- ```
-
+```C#
+——————————————————————————————————————————————————————————————————
+——————————————————————————————————————————————————————————————————
+```
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:
