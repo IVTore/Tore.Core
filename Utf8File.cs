@@ -48,7 +48,5 @@ namespace Tore.Core {
                 throw;
             }
         }
-
-
     }
 }
