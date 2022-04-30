@@ -56,7 +56,7 @@ Please read the comments on the code at least once for using this class efficien
 ## ConfigFile.cs :
  Contains static utility methods for simple encrypted configuration file support. 
  Configurations are loaded to and saved from <b> public static fields </b> of a class.
-
+ ```C#
  —————————————————————————————————————————————————————————————————
  FUNC: Load [static]                                              
  TASK:                                                            
@@ -73,7 +73,7 @@ Please read the comments on the code at least once for using this class efficien
  WARN:                                                            
        Throws exception if anything is null or empty except strip.
 ——————————————————————————————————————————————————————————————————
-
+```
 
 
 
