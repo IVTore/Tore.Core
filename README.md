@@ -61,7 +61,7 @@ Please read the comments on the code at least once for using this class efficien
  FUNC: Load [static]                                              
  TASK:                                                            
        Loads and decrypts contents of an encrypted file into      
-       <b> public static fields </b> of a class, using two keys.  
+       public static fields of a class, using two keys.  
        If file is not encrypted, it is not decrypted.             
        If xorKey is shorter, it is repeated over encKey.          
  ARGS:                                                            
@@ -74,9 +74,25 @@ Please read the comments on the code at least once for using this class efficien
        Throws exception if anything is null or empty except strip.
 ——————————————————————————————————————————————————————————————————
 ```
+ ```C#
+/**————————————————————————————————————————————————————————————————————————————
+    FUNC: Save [static]                                               <summary>
+    TASK:                                                             <br/>
+        Encrypts and saves <b> public static fields </b> of a class <br/>
+        into a file, using two keys.                                <br/>
+        If keys are empty file is not encrypted.                    <br/>
+        If xorKey is shorter, it is repeated over encKey.           <para/>
+    ARGS:                                                             <br/>
+        type    : Type      : Class with public static fields.      <br/>
+        file    : string    : File specification.                   <br/>
+        encKey  : string    : Primary   encryption Key.             <br/>
+        xorKey  : string    : Secondary encryption Key.             <br/>
+        strip   : string    : Characters to remove from keys.       <para/>
+    WARN:                                                             <br/>
+        Throws exception if anything is null or empty except strip. </summary>
+————————————————————————————————————————————————————————————————————————————*/
 
-
-
+ ```
 
 
 ## Sys.cs :
