@@ -56,158 +56,17 @@ respective Com accept and mediaType properties must be empty.
 Please read the comments on the code at least once for using this class efficiently.
 
 ## ConfigFile.cs :
- Contains static utility methods for simple encrypted configuration file support. 
- Configurations are loaded to and saved from <b> public static fields </b> of a class.
- ```
-——————————————————————————————————————————————————————————————————
- FUNC: Load [static]                                              
- TASK:                                                            
-       Loads and decrypts contents of an encrypted file into      
-       public static fields of a class, using two keys.  
-       If file is not encrypted, it is not decrypted.             
-       If xorKey is shorter, it is repeated over encKey.          
- ARGS:                                                            
-       type    : Type      : Class with public static fields.     
-       file    : string    : File specification.                  
-       encKey  : string    : Primary   encryption Key.            
-       xorKey  : string    : Secondary encryption Key.            
-       strip   : string    : Characters to remove from keys.      
- WARN:                                                            
-       Throws exception if anything is null or empty except strip.
-——————————————————————————————————————————————————————————————————
-```
- 
-```
-——————————————————————————————————————————————————————————————————
- FUNC: Save [static]                                              
- TASK:                                                            
-       Encrypts and saves public static fields of a class
-       into a file, using two keys.                               
-       If keys are empty file is not encrypted.                   
-       If xorKey is shorter, it is repeated over encKey.          
- ARGS:                                                            
-       type    : Type      : Class with public static fields.     
-       file    : string    : File specification.                  
-       encKey  : string    : Primary   encryption Key.            
-       xorKey  : string    : Secondary encryption Key.            
-       strip   : string    : Characters to remove from keys.      
- WARN:                                                            
-       Throws exception if anything is null or empty except strip.
-——————————————————————————————————————————————————————————————————
-```
+Contains static utility methods for simple encrypted configuration file support. 
+Configurations are loaded to and saved from <b> public static fields </b> of a class.
 
-## Extensions.cs
-Contains static utility extension methods for
-string, char, ICollection, List of T.
+## Extensions.cs :
+Contains static utility extension methods for string, char, ICollection, List of T.
 
+## Hex.cs :
+Contains static utility methods for Hex string conversions.
 
-```C#
-——————————————————————————————————————————————————————————————————
-FUNC: IsNullOrWhiteSpace [static, extension]                   
-TASK:                                                          
-      Shorthand for String.IsNullOrWhiteSpace.                 
-ARGS:                                                          
-      str : string : Source string to check.                   
-RETV:                                                          
-          : bool   : True if string is null or only whitespaces.
-
-——————————————————————————————————————————————————————————————————
-```
-
-```C#
-——————————————————————————————————————————————————————————————————
-FUNC: IsIdentifier [static, extension]                    
-TASK:                                                     
-      Checks if an identifier name has a valid syntax.    
-ARGS:                                                     
-      s   : string    : identifier candidate stri         
-RETV:     : boolean   : true if valid else false.         
-INFO:                                                     
-      *   This checks for unicode identifiers for runtime,
-          not ASCII only.                                 
-      *   The C# keywords are intentionally not checked.  
-      *   @ as first character is not supported.          
-      *   Optimized for speed.                            
-——————————————————————————————————————————————————————————————————
-```
-
-```C#
-——————————————————————————————————————————————————————————————————
-FUNC: RemoveWhiteSpaces [static, extension]                  
-TASK:                                                        
-      removes all whitespaces from str.                      
-ARGS:                                                        
-      str : string    : Source string to strip whitespaces.  
-RETV:                                                        
-          : string    : String stripped of white spaces.     
-WARN:                                                        
-      Throws E_INV_ARG if string is null.                    
-——————————————————————————————————————————————————————————————————
-```
-
-```C#
-——————————————————————————————————————————————————————————————————
-FUNC: WhiteSpacesToSpace [static, extension]                    
-TASK:                                                           
-      Converts all single or consequtive whitespaces            
-      to single space in string str.                            
-ARGS:                                                           
-      str : string    : String to strip multi whitespaces.      
-RETV:                                                           
-          : string    : String stripped of multi white spaces.  
-INFO:                                                           
-      White space characters other than space will be converted 
-      to space. Modified from the solution of Felipe Machado.   
-WARN:                                                           
-      Throws E_INV_ARG if string is null.                       
-——————————————————————————————————————————————————————————————————
-```
-
-```C#
-——————————————————————————————————————————————————————————————————
-FUNC: RemoveChars [static, extension].                       
-TASK:                                                        
-      Removes chars in remove from string.                   
-ARGS:                                                        
-      str     : string :  String to remove characters from.  
-      remove  : string :  String containing characters to 
-                          remove from Key.                   
-WARN:                                                        
-      Throws E_INV_ARG if string is null.                    
-——————————————————————————————————————————————————————————————————
-```
-
-```C#
-——————————————————————————————————————————————————————————————————
-——————————————————————————————————————————————————————————————————
-```
-
-```C#
-——————————————————————————————————————————————————————————————————
-——————————————————————————————————————————————————————————————————
-```
-```C#
-——————————————————————————————————————————————————————————————————
-——————————————————————————————————————————————————————————————————
-```
-
-## Sys.cs :
-Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:
-  - Output by dbg().
-  - Exceptions by exc().
-  - Reflection.
-  - Type juggling.
-  - Attributes. 
-  - Simple File Load Save. 
-  - Time, Date.
-  
-and many others.
-
-The best way of using them is by adding: 
-```C#
-using static Tore.Core.Sys;
-```                            
-to the source file.    
+## Json.cs :
+Contains static utility methods for Json conversions.
 
 ## Stl.cs :
 Defines the class Stl which is a string associated object list (key - value) class with tricks.     
@@ -231,4 +90,28 @@ Stl provides:
 Has Enumerator and Nested conversion support.           
 Note : Stl is neither suitable nor built for millions of entries.
 
-                           
+## Sys.cs :
+Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:
+  - Output by Dbg().
+  - Exceptions by Exc().
+  - Reflection.
+  - Type juggling.
+  - Attributes. 
+
+The best way of using them is by adding: 
+```C#
+using static Tore.Core.Sys;
+```                            
+to the source file.    
+
+## Utc.cs :
+Contains static utility methods for DateTime conversions. 
+String, Seconds, Milliseconds return <b>UtcNow</b> values.
+CultureInfo is <b>CultureInfo.InvariantCulture.</b>       
+
+## Utf8File.cs :
+Contains static utility methods to load and save UTF8 files.
+
+## Xor.cs :
+Contains static utility methods for simple xor encryption and decryption.
+
