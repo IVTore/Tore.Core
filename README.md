@@ -96,6 +96,96 @@ Please read the comments on the code at least once for using this class efficien
 ——————————————————————————————————————————————————————————————————
 ```
 
+## Extensions.cs
+Contains static utility extension methods for
+string, char, ICollection, List of T.
+
+
+```C#
+——————————————————————————————————————————————————————————————————
+FUNC: IsNullOrWhiteSpace [static, extension]                   
+TASK:                                                          
+      Shorthand for String.IsNullOrWhiteSpace.                 
+ARGS:                                                          
+      str : string : Source string to check.                   
+RETV:                                                          
+          : bool   : True if string is null or only whitespaces.
+
+——————————————————————————————————————————————————————————————————
+```
+
+```C#
+——————————————————————————————————————————————————————————————————
+FUNC: IsIdentifier [static, extension]                    
+TASK:                                                     
+      Checks if an identifier name has a valid syntax.    
+ARGS:                                                     
+      s   : string    : identifier candidate stri         
+RETV:     : boolean   : true if valid else false.         
+INFO:                                                     
+      *   This checks for unicode identifiers for runtime,
+          not ASCII only.                                 
+      *   The C# keywords are intentionally not checked.  
+      *   @ as first character is not supported.          
+      *   Optimized for speed.                            
+——————————————————————————————————————————————————————————————————
+```
+
+```C#
+——————————————————————————————————————————————————————————————————
+FUNC: RemoveWhiteSpaces [static, extension]                  
+TASK:                                                        
+      removes all whitespaces from str.                      
+ARGS:                                                        
+      str : string    : Source string to strip whitespaces.  
+RETV:                                                        
+          : string    : String stripped of white spaces.     
+WARN:                                                        
+      Throws E_INV_ARG if string is null.                    
+——————————————————————————————————————————————————————————————————
+```
+
+```C#
+——————————————————————————————————————————————————————————————————
+FUNC: WhiteSpacesToSpace [static, extension]                    
+TASK:                                                           
+      Converts all single or consequtive whitespaces            
+      to single space in string str.                            
+ARGS:                                                           
+      str : string    : String to strip multi whitespaces.      
+RETV:                                                           
+          : string    : String stripped of multi white spaces.  
+INFO:                                                           
+      White space characters other than space will be converted 
+      to space. Modified from the solution of Felipe Machado.   
+WARN:                                                           
+      Throws E_INV_ARG if string is null.                       
+——————————————————————————————————————————————————————————————————
+```
+
+```C#
+——————————————————————————————————————————————————————————————————
+FUNC: RemoveChars [static, extension].                       
+TASK:                                                        
+      Removes chars in remove from string.                   
+ARGS:                                                        
+      str     : string :  String to remove characters from.  
+      remove  : string :  String containing characters to 
+                          remove from Key.                   
+WARN:                                                        
+      Throws E_INV_ARG if string is null.                    
+——————————————————————————————————————————————————————————————————
+```
+
+```C#
+——————————————————————————————————————————————————————————————————
+——————————————————————————————————————————————————————————————————
+```
+
+```C#
+——————————————————————————————————————————————————————————————————
+——————————————————————————————————————————————————————————————————
+```
 ```C#
 ——————————————————————————————————————————————————————————————————
 ——————————————————————————————————————————————————————————————————

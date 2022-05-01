@@ -11,8 +11,8 @@ namespace Tore.Core {
     /**———————————————————————————————————————————————————————————————————————————
         CLASS:  Extensions [Static]                                     <summary>
         USAGE:                                                          <br/>
-                Contains a library of static extension methods for      <br/>
-                string, char.                                           </summary>
+                Contains static utility extension methods for           <br/>
+                string, char, ICollection, List of T.                   </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     public static class Extensions {
 
@@ -39,7 +39,7 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: IsIdentifier [static, extension]                        <summary>
           TASK:                                                         <br/>
-                Checks if an identifier name Has a valid syntax.        <para/>
+                Checks if an identifier name has a valid syntax.        <para/>
           ARGS:                                                         <br/>
                 s   : string    : identifier candidate stri             <para/>
           RETV:     : boolean   : true if valid else false.             <para/>
