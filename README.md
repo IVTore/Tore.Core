@@ -2,10 +2,11 @@
 Core utilities and extensions library for C# By İ. Volkan Töre.
 
 Language: C#.
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://choosealicense.com/licenses/mit/)
 
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
-<b>WARNING</b>: <br/>
+###WARNING : 
 Tore.Core v7.0.0+ has undergone radical changes.<br/>
 It is not compatible to previous versions! <br/>
 <br/>
