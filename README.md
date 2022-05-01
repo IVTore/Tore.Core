@@ -10,12 +10,10 @@ Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 #### WARNING : 
 Tore.Core v7.0.0+ has undergone radical changes.<br/>
 It is not compatible to previous versions! <br/>
-<br/>
 
 Deprecated Versions are available on Nuget as :
   - Deprecated Tore.Core v5.0.0  for net5.0 .
   - Deprecated Tore.Core v6.0.0+ for net6.0 .
-
 
 Dependencies: <br/>
 net6.0
