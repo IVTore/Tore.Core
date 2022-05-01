@@ -41,8 +41,8 @@ namespace Tore.Core {
           TASK:                                                         <br/>
                 Checks if an identifier name Has a valid syntax.        <para/>
           ARGS:                                                         <br/>
-                s   : string : identifier candidate stri         <para/>
-          RETV:     : boolean       : true if valid else false.         <para/>
+                s   : string    : identifier candidate stri             <para/>
+          RETV:     : boolean   : true if valid else false.             <para/>
           INFO:                                                         <br/>
                 *   This checks for unicode identifiers for runtime,    <br/>
                     not ASCII only.                                     <br/>

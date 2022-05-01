@@ -24,7 +24,9 @@ Defines the class Com which manages Http client requests and responses.
 
 Com gathers sub components required for a proper request and its response into an instance.
 Since client requests and responses differ dramatically, 
-Com objects give both standard and micro managed request types and response handling.                            
+Com objects give both standard and micro managed request types and response handling.
+It maintains and uses a single static HttpClient object as recommended by Microsoft.
+
 For simple standard http requests use STATIC functions 
 
 ```C#
@@ -48,8 +50,8 @@ Tricky assignments must be done via;
    - request.Content.Headers.ContentType.MediaType properties,
   
 When request.content is non null, content property of instance is ignored.
-If accept or mediaType is set through request.Content.Headers respective Com instance 
-properties must be empty.  
+If accept or mediaType is set through request.Content.Headers
+respective Com accept and mediaType properties must be empty.  
 
 Please read the comments on the code at least once for using this class efficiently.
 
