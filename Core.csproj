@@ -6,20 +6,18 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>İhsan Volkan Töre</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>2021 İhsan Volkan Töre</Copyright>
-    <Description>Sys: A static library of many utility functions.
-Stl: A versatile string associated object list class.
-Com: A Http Client for keeping things neat, tidy and simple.
+    <Copyright>2022 İhsan Volkan Töre</Copyright>
+    <Description>C# core utility library.
 </Description>
-    <PackageTags>Tore Core Sys Stl Com Utilities Http Client</PackageTags>
+    <PackageTags>Tore Core Com Config File Extensions Hex Json Stl Sys Utc Utf8  Xor Utilities Http Client</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
-    <PackageReleaseNotes>This is for Net 6.0.</PackageReleaseNotes>
+    <PackageReleaseNotes>Radically changed, not compatible to previous versions.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>6.0.0</Version>
+    <Version>7.0.0</Version>
     <PackageProjectUrl>https://github.com/IVTore/Tore.Core</PackageProjectUrl>
   </PropertyGroup>
 
