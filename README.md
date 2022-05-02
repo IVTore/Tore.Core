@@ -104,6 +104,47 @@ using static Tore.Core.Sys;
 ```                            
 to the source file.    
 
+Since the nuget package is Release version, to see exception messages add 
+code similar to the ones below at appropriate place.
+
+
+```C#
+        // At some initializer method:
+
+        Sys.dbgInterceptor = DebugInterceptor;
+        Sys.excInterceptor = ExceptionInterceptor;
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC:  ExceptionInterceptor [static]                              <summary>
+          TASK:                                                             <br/>
+                 Method to show exception data under certain conditions.    <para/>
+          ARGS:                                                             <br/>
+                 e      : Exception : The exception intercepted.            <br/>
+                 dta    : Stl       : Exception data after processing.      <para/>
+          INFO:                                                             <br/>
+                 This method needs WebApplication object app or             <br/>
+                 app.Environment.isDevelopment in a boolean.                </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static void ExceptionInterceptor(Exception e, Stl dta) {
+            if (isDebug)
+                return;
+            if ((app != null) && (!app.Environment.isDevelopment))
+                return;
+            ExcDbg(dta);
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC:  DebugInterceptor [static]                                  <summary>
+          TASK:                                                             <br/>
+                 Method to route Dbg output.                                <para/>
+          ARGS:                                                             <br/>
+                 s      : string : Dbg output.                              </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static void DebugInterceptor(string s) {
+            Debug.Write(s);
+        }
+```
+
 ## Utc.cs :
 Contains static utility methods for DateTime conversions. 
 String, Seconds, Milliseconds return <b>UtcNow</b> values.
