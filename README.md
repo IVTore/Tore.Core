@@ -104,7 +104,7 @@ using static Tore.Core.Sys;
 ```                            
 to the source file.    
 
-Since the nuget package is Release version, to see exception messages add 
+Since the nuget package is Release version, to see the debug and exception messages add 
 code similar to the ones below :
 
 ```C#
@@ -140,6 +140,10 @@ code similar to the ones below :
         ————————————————————————————————————————————————————————————————————————————*/
         public static void DebugInterceptor(string s) {
             Debug.Write(s);
+            
+            // Or if preferred :
+
+            // Console.Write(s); 
         }
 ```
 
