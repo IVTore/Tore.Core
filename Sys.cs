@@ -42,9 +42,9 @@ namespace Tore.Core {
     ————————————————————————————————————————————————————————————————————————————*/
     public static class Sys {
 
-        /*————————————————————————————————————————————————————————————————————————————
-          Handy constants.
-        ————————————————————————————————————————————————————————————————————————————*/
+
+        #region Handy constants.
+
         /**———————————————————————————————————————————————————————————————————————————
           CONST: CR                                                         <summary>
           USE  : Constant string for carriage return character 0x0D (\r)    </summary> 
@@ -71,6 +71,7 @@ namespace Tore.Core {
 #else
             false;
 #endif
+        #endregion
 
         #region Exception Subsystem.
         /*————————————————————————————————————————————————————————————————————————————
@@ -863,7 +864,7 @@ namespace Tore.Core {
 
     }   // End static class Sys.
 
-
+    #region Attribute base classes.
     /**———————————————————————————————————————————————————————————————————————————
                                                                         <summary>
       CLASS :   NameMetadata [attribute].                               <para/>
@@ -914,6 +915,9 @@ namespace Tore.Core {
 
     }   // End NameListMetadata Attribute class.
 
+    #endregion
+
+    #region ToreCoreException class.
     /**———————————————————————————————————————————————————————————————————————————
                                                                         <summary>
       CLASS :   ToreCoreException.                                      <para/>
@@ -927,5 +931,6 @@ namespace Tore.Core {
         /**<inheritdoc/>*/
         public ToreCoreException(string message, Exception inner): base(message, inner) { }
     }
+    #endregion
 
-}   // End namespace.
+}
