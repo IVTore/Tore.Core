@@ -105,8 +105,7 @@ using static Tore.Core.Sys;
 to the source file.    
 
 Since the nuget package is Release version, to see exception messages add 
-code similar to the ones below at appropriate place.
-
+code similar to the ones below :
 
 ```C#
         // At some initializer method:
@@ -122,8 +121,7 @@ code similar to the ones below at appropriate place.
                  e      : Exception : The exception intercepted.            <br/>
                  dta    : Stl       : Exception data after processing.      <para/>
           INFO:                                                             <br/>
-                 This method needs WebApplication object app or             <br/>
-                 app.Environment.isDevelopment in a boolean.                </summary>
+                 This method needs WebApplication object app.               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static void ExceptionInterceptor(Exception e, Stl dta) {
             if (isDebug)
