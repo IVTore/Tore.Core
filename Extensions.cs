@@ -71,7 +71,7 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: RemoveWhiteSpaces [static, extension]                       <summary>
           TASK:                                                             <br/>
-                removes all whitespaces from str.                           <para/>
+                Removes all whitespaces from str.                           <para/>
           ARGS:                                                             <br/>
                 str : string    : Source string to strip whitespaces.       <para/>
           RETV:                                                             <br/>
@@ -140,13 +140,12 @@ namespace Tore.Core {
         /**——————————————————————————————————————————————————————————————————————————
           FUNC: RemoveChars [static, extension].                            <summary>
           TASK:                                                             <br/>
-                Removes chars in remove from string.                        <para/>
+                Removes chars in remove string from string str.             <para/>
           ARGS:                                                             <br/>
                 str     : string :  String to remove characters from.       <br/>
-                remove  : string :  String containing characters to 
-                                    remove from Key.                        <para/>
+                remove  : string :  String containing characters to remove. <para/>
           WARN:                                                             <br/>
-                Throws E_INV_ARG if string is null.                         </summary>
+                Throws E_INV_ARG if string str is null.                     </summary>
        ————————————————————————————————————————————————————————————————————————————*/
         public static string RemoveChars(this string str, string remove) {
             StringBuilder ret;
