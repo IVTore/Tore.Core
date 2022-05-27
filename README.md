@@ -119,14 +119,10 @@ code similar to the ones below :
                  Method to show exception data under certain conditions.    <para/>
           ARGS:                                                             <br/>
                  e      : Exception : The exception intercepted.            <br/>
-                 dta    : Stl       : Exception data after processing.      <para/>
-          INFO:                                                             <br/>
-                 This method needs WebApplication object app.               </summary>
+                 dta    : Stl       : Exception data after processing.      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static void ExceptionInterceptor(Exception e, Stl dta) {
             if (isDebug)
-                return;
-            if ((app != null) && (!app.Environment.isDevelopment))
                 return;
             ExcDbg(dta);
         }

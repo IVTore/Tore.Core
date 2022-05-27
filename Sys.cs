@@ -222,27 +222,6 @@ namespace Tore.Core {
         }
         #endregion
 
-        /**———————————————————————————————————————————————————————————————————————————
-          FUNC: Chk [static]                                            <summary>
-          TASK:                                                         <br/>
-                Checks argument and raises exception if it is null 
-                or empty.                                               <para/>
-          ARGS:                                                         <br/>
-                arg : object        : Argument to check validity.       <br/>
-                inf : string        : Exception info if arg invalid.    <br/>
-                tag : string        : Exception tag if arg invalid.
-                                        :DEF: "E_INV_ARG".              <para/>
-          INFO:                                                         <br/>
-                In case of strings, white spaces are not welcome.       <br/>
-                In case of Guids, empty Guid's are not welcome.         </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static void Chk(object arg, string inf, string tag = "E_INV_ARG") {
-            if (arg == null ||
-               (arg is string && ((string)arg).IsNullOrWhiteSpace()) ||
-               (arg is Guid && ((Guid)arg).Equals(Guid.Empty)))
-                Exc(tag, inf);
-        }
-
         #region Debug Output Subsystem.
         /*————————————————————————————————————————————————————————————————————————————
             —————————————————————————————
@@ -319,6 +298,27 @@ namespace Tore.Core {
             |   Application utility functions.    |
             ———————————————————————————————————————
         ————————————————————————————————————————————————————————————————————————————*/
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: Chk [static]                                            <summary>
+          TASK:                                                         <br/>
+                Checks argument and raises exception if it is null 
+                or empty.                                               <para/>
+          ARGS:                                                         <br/>
+                arg : object        : Argument to check validity.       <br/>
+                inf : string        : Exception info if arg invalid.    <br/>
+                tag : string        : Exception tag if arg invalid.
+                                        :DEF: "E_INV_ARG".              <para/>
+          INFO:                                                         <br/>
+                In case of strings, white spaces are not welcome.       <br/>
+                In case of Guids, empty Guid's are not welcome.         </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static void Chk(object arg, string inf, string tag = "E_INV_ARG") {
+            if (arg == null ||
+               (arg is string && ((string)arg).IsNullOrWhiteSpace()) ||
+               (arg is Guid && ((Guid)arg).Equals(Guid.Empty)))
+                Exc(tag, inf);
+        }
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ApplicationName [static].                                   <summary>
