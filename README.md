@@ -5,7 +5,7 @@ Language: C#.
 
 Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?)](https://choosealicense.com/licenses/mit/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 #### WARNING : 
 Tore.Core v7.0.0+ has undergone radical changes.<br/>
