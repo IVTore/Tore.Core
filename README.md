@@ -7,11 +7,21 @@ Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
+Dependencies: <br/>
+net7.0
+Newtonsoft.Json 13+
+
+
 #### WARNING : 
 Tore.Core has undergone radical changes.<br/>
 It is not compatible to previous versions! <br/>
 
-Changes in v7.0.1: 
+Deprecated Versions are available on Nuget as :
+  - Deprecated Tore.Core v5.0.0  for net5.0 .
+  - Deprecated Tore.Core v6.0.0+ for net6.0 .
+  - Deprecated Tore.Core v7.0.0  for net6.0 (Modularized).
+
+Changes in v8.0.0: 
     
     Upgraded to .net 7.0.
     
@@ -27,7 +37,6 @@ Changes in v7.0.1:
         * Log output subsystem is added.
         * Static ILogger Sys.logger property is added.
         * Static Sys.Log method and overrides added.
-        
 
     Com.cs:
         
@@ -49,14 +58,43 @@ Changes in v7.0.1:
             Throw an exception with 'E_STL_UNIQUE' tag in such cases.
         * Upgraded Append() by using List:AddRange methods. 
 
-Deprecated Versions are available on Nuget as :
-  - Deprecated Tore.Core v5.0.0  for net5.0 .
-  - Deprecated Tore.Core v6.0.0+ for net6.0 .
-  - Deprecated Tore.Core v7.0.0  for net6.0 (Modularized).
 
-Dependencies: <br/>
-net7.0
-Newtonsoft.Json 13+
+## ConfigFile.cs :
+Contains static utility methods for simple encrypted configuration file support. 
+Configurations are loaded to and saved from <b> public static fields </b> of a class.
+
+## Extensions.cs :
+Contains static utility extension methods for string, char, ICollection, List of T.
+
+## Hex.cs :
+Contains static utility methods for Hex string conversions.
+
+## Json.cs :
+Contains static utility methods for Json conversions.
+
+## Reflect.cs :
+Contains static utility methods for attributes, reflection and type juggling.
+
+## StrLst.cs :
+Defines the class StrLst which is a string associated object list (key - value) class with tricks.
+
+StrLst provides:
+1) Numerically indexed access to keys and objects.
+2) Ordering.
+3) Translation forward and backward to various formats.
+4) Duplicate key support.
+
+* Keys can not be null empty or whitespace.            
+* Lists are public in this class intentionally.        
+* StrLst also acts as a bridge for,
+
+   - Json, 
+   - Objects (public properties), 
+   - Static classes (public static fields),
+   - IDictionary <string, object> and
+   - List KeyValuePair <string, string>.     
+ 
+Has Enumerator and Nested conversion support.           
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:
@@ -79,41 +117,6 @@ For logging, assign your logger to sys.logger.
 
         Sys.logger = myLogger;
 ```
-
-## ConfigFile.cs :
-Contains static utility methods for simple encrypted configuration file support. 
-Configurations are loaded to and saved from <b> public static fields </b> of a class.
-
-## Extensions.cs :
-Contains static utility extension methods for string, char, ICollection, List of T.
-
-## Hex.cs :
-Contains static utility methods for Hex string conversions.
-
-## Json.cs :
-Contains static utility methods for Json conversions.
-
-## StrLst.cs :
-Defines the class StrLst which is a string associated object list (key - value) class with tricks.
-                                                       
-StrLst provides:                                          
-1) Numerically indexed access to keys and objects.      
-2) Ordering.                                           
-3) Translation forward and backward to various formats.
-4) Duplicate key support.
-
-* Keys can not be null empty or whitespace.            
-* Lists are public in this class intentionally.        
-* StrLst also acts as a bridge for,
-
-   - Json, 
-   - Objects (public properties), 
-   - Static classes (public static fields),
-   - IDictionary <string, object> and
-   - List KeyValuePair <string, string>.     
- 
-Has Enumerator and Nested conversion support.           
-
 
 ## Utc.cs :
 Contains static utility methods for DateTime conversions. 

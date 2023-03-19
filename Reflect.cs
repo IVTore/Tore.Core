@@ -477,7 +477,7 @@ namespace Tore.Core {
                     if (val is string str)              // string support only.
                         return Guid.Parse(str);
                 }
-                if (val is StrLst lst)                     // If StrLst.
+                if (val is StrLst lst)                  // If StrLst.
                     return lst.ToObj(typ, ignoreMissing);
                 return Convert.ChangeType(val, typ);    // Otherwise...
             } catch (Exception e) {
