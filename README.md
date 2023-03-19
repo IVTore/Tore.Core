@@ -17,20 +17,17 @@ Changes in v7.0.1:
     
     Sys.cs: 
     
-        * Methods of reflection is moved to Reflect.cs into Reflect static class.
+        * Debug output subsystem is removed.
+        * static readonly Sys.isDebug property removed.
+        * Methods of reflection are moved to Reflect static class in Reflect.cs.
         * ExcInterceptorDelegate type renamed as ExceptionInterceptorDelegate.
         * Sys.excInterceptor property is renamed as Sys.exceptionInterceptor.
         * exception debug output is removed, and routed to Log subsystem.
         * public ExcDbg method modified into private ExcLog.
-        * Debug output subsystem is removed.
-        * static readonly Sys.isDebug property removed.
         * Log output subsystem is added.
         * Static ILogger Sys.logger property is added.
         * Static Sys.Log method and overrides added.
-        * boolean sys.logToConsole property is added and it defaults to true.
-            When a logger is connected to Sys.logger, if that 
-            outputs to console, setting logToConsole to false will avoid
-            console logging duplication.
+        
 
     Com.cs:
         
@@ -40,8 +37,9 @@ Changes in v7.0.1:
 
     Stl.cs:
 
-        * Renamed as StrLst. 
-          It was confused with C++ STL library.
+        * Renamed as StrLst:
+          For avoiding confusion with C++ STL library.
+          New name is not StrList to avoid confusion with List<string>.
     
 
 Deprecated Versions are available on Nuget as :

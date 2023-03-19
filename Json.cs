@@ -10,14 +10,14 @@ namespace Tore.Core {
         CLASS:  Json                                                    <summary>
         USAGE:                                                          <br/>
                 Json deserialization and serialization routines.        <br/>
-                It also addresses cascading Stl conversion problems.    </summary>
+                It also addresses cascading StrLst conversion problems.    </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     public static class Json {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Deserialize [static]                                        <summary>
           TASK:                                                             <br/>
-                Deserializes an object from Json with cascading Stl support.<para/>
+                Deserializes an object from Json with cascading StrLst support.<para/>
           ARGS:                                                             <br/>
                 T   : Type (Class)  : Expected object type.                 <br/>
                 val : string        : Json string.                          <para/>
@@ -35,7 +35,7 @@ namespace Tore.Core {
                 return default;
             Chk(typeof(T), "T", "E_JSON_DESERIALIZE");
             try {
-                res = JsonConvert.DeserializeObject<T>(val, Stl.stlJsonSettings);
+                res = JsonConvert.DeserializeObject<T>(val, StrLst.stlJsonSettings);
             } catch (Exception e) {
                 Exc("E_JSON_DESERIALIZE", typeof(T).Name, e);
                 throw;

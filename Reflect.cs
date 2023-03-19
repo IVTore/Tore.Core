@@ -438,7 +438,7 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 val : object    : Value to check and if required convert.   <br/>
                 typ : Type      : Expected value type.                      <br/>
-                ignoreMissing: bool : If value or subvalues is Stl and 
+                ignoreMissing: bool : If value or subvalues is StrLst and 
                                       will be assigned to a sub object,
                                       true    : ignores missing properties
                                       false   : raises exception.           <para/>
@@ -477,7 +477,7 @@ namespace Tore.Core {
                     if (val is string str)              // string support only.
                         return Guid.Parse(str);
                 }
-                if (val is Stl lst)                     // If Stl.
+                if (val is StrLst lst)                     // If StrLst.
                     return lst.ToObj(typ, ignoreMissing);
                 return Convert.ChangeType(val, typ);    // Otherwise...
             } catch (Exception e) {
@@ -495,7 +495,7 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 T   : Type (Class)  : Expected value type.                  <br/>
                 val : object        : Value to check, if required convert.  <br/>
-                ignoreMissing: bool : If value or subvalues is Stl and      
+                ignoreMissing: bool : If value or subvalues is StrLst and      
                                       will be assigned to a sub object,
                                       true    : ignores missing properties
                                       false   : raises exception.           <para/>

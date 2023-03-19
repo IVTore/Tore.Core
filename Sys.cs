@@ -61,18 +61,6 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public const string CRLF = CR + LF;
 
-        /**———————————————————————————————————————————————————————————————————————————
-          VAR : isDebug [static readonly]                                   <summary>
-          TASK: True if program is a DEBUG compilation.                     </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public readonly static bool isDebug =
-        #if DEBUG
-            true;
-#else
-            false;
-#endif
-        #endregion
-
         #region Exception Subsystem.
         /*————————————————————————————————————————————————————————————————————————————
             ——————————————————————————
@@ -85,7 +73,7 @@ namespace Tore.Core {
           TYPE: ExceptionInterceptorDelegate [delegate]                     <summary>
           TASK: Exception Interceptor Type.                                 </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public delegate void ExceptionInterceptorDelegate(Exception e, Stl dta);
+        public delegate void ExceptionInterceptorDelegate(Exception e, StrLst dta);
 
         /**———————————————————————————————————————————————————————————————————————————
           PROP: exceptionInterceptor: ExceptionInterceptorDelegate [static].<summary>
@@ -117,12 +105,12 @@ namespace Tore.Core {
           ARGS:                                                             <br/>
                 e   : Exception : Any Exception.                            <para/>
           RETV:                                                             <br/>
-                    : Stl       : Extra exception data or null              </summary>
+                    : StrLst       : Extra exception data or null              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static Stl GetExcData(Exception e) {
+        public static StrLst GetExcData(Exception e) {
             if (!HasExcData(e))
                 return null;
-            return (Stl)(e.Data["dta"]);
+            return (StrLst)(e.Data["dta"]);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -148,26 +136,26 @@ namespace Tore.Core {
                 else
                     returns e (for syntactic sugar).                        <br/>
                                                                             <br/>
-                * Collected Data: at e.Data["dta"] as a Stl*.               <br/>
+                * Collected Data: at e.Data["dta"] as a StrLst*.            <br/>
                     "Exc" = Class name of exception.                        <br/>
                     "msg" = Exception message.                              <br/>
                     "tag" = Exception tag.                                  <br/>
                     "inf" = Exception info.                                 <br/>
                     "loc" = Call location (Class and method).               <para/>
-                *Stl is a string associated object list class. 
-                 Info about Stl can be found at Stl.cs.                     </summary>
+                *StrLst is a string associated object list class. 
+                 Info about StrLst can be found at StrLst.cs.               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static Exception Exc(string tag = "E_NO_TAG", 
                                     string inf = "", 
                                     Exception e = null) {
             Exception cex;
-            Stl dta;
+            StrLst dta;
             MethodBase met;
 
             cex = e ?? new ToreCoreException(tag);      // If no exception make one.
             if (HasExcData(cex))                        // If exception already processed
                 return null;                            // return.
-            dta = new Stl(){                            // Collect data.
+            dta = new StrLst(){                            // Collect data.
                 {"exc", cex.GetType().FullName},
                 {"msg", cex.Message},
                 {"tag", tag},
@@ -182,7 +170,8 @@ namespace Tore.Core {
                 dta.Add("loc", $"{met.DeclaringType?.Name}.{met.Name}");
             exceptionInterceptor?.Invoke(cex, dta);     // if assigned, invoke.
             cex.Data.Add("dta", (object)dta);
-            ExcLog(dta);
+            if (logger == null)                         // if no logger.
+                ExcLog(dta);                            // log exception to console.
             if (e == null)                              // If we made the exception
                 throw cex;                              // throw it
             return cex;
@@ -190,11 +179,11 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ExcLog [static]                                             <summary>
-          TASK: Outputs exception info via dbg() method                     <para/>
-          ARGS: ed  : Stl       : Exception data in Stl form.               <para/>
-          INFO: The ed Stl can be found in exception.Data["dta"].           </summary>
+          TASK: Outputs exception info to console.                          <para/>
+          ARGS: ed  : StrLst       : Exception data in StrLst form.         <para/>
+          INFO: The ed StrLst can be found in exception.Data["dta"].        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        private static void ExcLog(Stl ed) {
+        private static void ExcLog(StrLst ed) {
             List<string> dia, inl;
 
             string inf = (string)ed.Obj("inf");
@@ -229,7 +218,7 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
 
         /**———————————————————————————————————————————————————————————————————————————
-          PROP: logger : ILogger                                            <summary>
+          PROP: logger : ILogger [Static]                                   <summary>
           GET : Gets logger object.                                         <br/>
           SET : Sets logger object.                                         <br/>
           TASK: Logger object for systemwide log support.                   <br/>
@@ -237,21 +226,6 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public static ILogger logger;
 
-        /**———————————————————————————————————————————————————————————————————————————
-          PROP: logMethod: LogDelegate [static].                            <summary>
-          GET : Gets logging method.                                        <br/>
-          SET : Sets logging method.                                        <br/>
-          INFO: Used for logging monitoring etc. It must be a static method.</summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static LogDelegate logMethod { get; set; } = null;
-
-        /**———————————————————————————————————————————————————————————————————————————
-          PROP: logToConsole: boolean [static].                             <summary>
-          GET : Gets If logs will be echoed to console.                     <br/>
-          SET : Sets If logs will be echoed to console.                     <br/>
-          INFO: Default value is true.                                      </summary>
-        ————————————————————————————————————————————————————————————————————————————*/
-        public static bool logToConsole { get; set; } = true;
 
 
 

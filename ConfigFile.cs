@@ -48,7 +48,7 @@ namespace Tore.Core {
                     json = Xor.DecryptFromFile(file, encKey, xorKey, strip);
                 else
                     json = Utf8File.Load(file);
-                new Stl(json).ToStatic(type, true);
+                new StrLst(json).ToStatic(type, true);
             } catch (Exception e) {
                 Exc("E_CFG_LOAD_FAIL", "", e);
                 throw;
@@ -81,7 +81,7 @@ namespace Tore.Core {
             Chk(type, nameof(type), E_ARG);
             Chk(file, nameof(file), E_ARG);
             try {
-                json = new Stl(type).ToJson();
+                json = new StrLst(type).ToJson();
                 if (encKey.IsNullOrWhiteSpace() || xorKey.IsNullOrWhiteSpace()) 
                     Utf8File.Save(file, json);
                 else
