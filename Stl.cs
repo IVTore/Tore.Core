@@ -25,6 +25,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 using static Tore.Core.Sys;
+using static Tore.Core.Reflect;
+
 using Kvp = System.Collections.Generic.KeyValuePair<string, object>;
 using Kvs = System.Collections.Generic.KeyValuePair<string, string>;
 using IDso = System.Collections.Generic.IDictionary<string, object>;
