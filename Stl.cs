@@ -6,10 +6,11 @@
 © Copyright 2020 İhsan Volkan Töre.
 
 Author              : IVT.  (İhsan Volkan Töre)
-Version             : 202003101300. 
+Version             : 202303171724. 
 Licenses            : MIT.
 
 History             :
+202303171724: IVT   : 
 202101261231: IVT   : - Removed unnecessary mapped enc/dec.
 202003101300: IVT   : + ToListOfKeyValuePairsOfString() + mapped enc/dec.
 202002011604: IVT   : ToObj behaviour changed. Added ToObj<T>.

@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <PackageId>Tore.Core</PackageId>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>İhsan Volkan Töre</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>2022 İhsan Volkan Töre</Copyright>
+    <Copyright>2023 İhsan Volkan Töre</Copyright>
     <Description>C# core utility library.
 </Description>
-    <PackageTags>Tore Core Com Config File Extensions Hex Json Stl Sys Utc Utf8  Xor Utilities Http Client</PackageTags>
+    <PackageTags>Tore Core Config File Extensions Hex Json Stl Sys Utc Utf8 Xor Utilities</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
     <PackageReleaseNotes>Radically changed, not compatible to previous versions.</PackageReleaseNotes>
@@ -22,7 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
 </Project>

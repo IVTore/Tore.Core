@@ -8,52 +8,44 @@ Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 #### WARNING : 
-Tore.Core v7.0.0+ has undergone radical changes.<br/>
+Tore.Core has undergone radical changes.<br/>
 It is not compatible to previous versions! <br/>
+
+Changes in v7.0.1: 
+    
+    Upgraded to .net 7.0.
+    
+    Sys: 
+    
+        * Methods of reflection is moved to Reflect.cs into Reflect static class.
+        * ExcInterceptorDelegate type renamed as ExceptionInterceptorDelegate.
+        * sys.excInterceptor property is renamed as sys.exceptionInterceptor.
+        * exception debug output is removed, and routed to Log subsystem.
+        * public ExcDbg method modified into private ExcLog.
+        * Debug output subsystem is removed.
+        * Log output subsystem is added.
+        * LogDelegate type is added.
+        * LogDelegate sys.logMethod property is added.
+        * boolean sys.logToConsole property is added and it defaults to true.
+            When an additional logger is connected to logMethod, if that 
+            logger outputs to console, setting logToConsole to false will avoid
+            console logging duplication.
+
+    Com:
+        
+        * Com is removed from Tore.Core. 
+        * It is now in Tore.Http package as Tore.Http.Client class.
+    
 
 Deprecated Versions are available on Nuget as :
   - Deprecated Tore.Core v5.0.0  for net5.0 .
   - Deprecated Tore.Core v6.0.0+ for net6.0 .
+  - Deprecated Tore.Core v7.0.0  for net6.0 (Modularized).
 
 Dependencies: <br/>
-net6.0
+net7.0
 Newtonsoft.Json 13+
 
-## Com.cs :
-Defines the class Com which manages Http client requests and responses.
-
-Com gathers sub components required for a proper request and its response into an instance.
-Since client requests and responses differ dramatically, 
-Com objects give both standard and micro managed request types and response handling.
-It maintains and uses a single static HttpClient object as recommended by Microsoft.
-
-For simple standard http requests use STATIC functions 
-
-```C#
-   Com.Send(...);
-   Com.SendAsync(...);
-   Com.Talk<T>(...);
-   Com.TalkAsync<T>(...);
-```
-Otherwise, create a Com object and manipulate the request via
-
-   - The Com instance properties, like: content, accept, mediaType.
-   - The Com.request, the HttpRequestMessage property, directly.
-
-Then use INSTANCE send() or sendAsync() routines. 
-  
-IMPORTANT:
-Instance content, accept and mediaType properties are transferred to request just before sending it.
-Tricky assignments must be done via;
-   - request.Content,
-   - request.Content.Headers.Accept,
-   - request.Content.Headers.ContentType.MediaType properties,
-  
-When request.content is non null, content property of instance is ignored.
-If accept or mediaType is set through request.Content.Headers
-respective Com accept and mediaType properties must be empty.  
-
-Please read the comments on the code at least once for using this class efficiently.
 
 ## ConfigFile.cs :
 Contains static utility methods for simple encrypted configuration file support. 
