@@ -35,13 +35,18 @@ Changes in v7.0.1:
         * It is now in Tore.Http namespace 
             packaged as Tore.Http.Client.
 
-    Stl.cs:
+    Stl.cs: (StrLst.cs).
 
-        * Renamed as StrLst:
+        * Renamed as StrLst.cs and StrLst class:
             For avoiding confusion with C++ STL library.
           New name is not also StringList or StrList 
             For avoiding confusion with List<string>.
-    
+        * Corrected add method.
+            When StrLst allows only unique keys, 
+            It is not allowed to add unique key, value pairs.
+            add()     with uniquePair true.
+            addPair() with uniquePair true.
+            Throw an exception with 'E_STL_UNIQUE' tag in such cases.
 
 Deprecated Versions are available on Nuget as :
   - Deprecated Tore.Core v5.0.0  for net5.0 .
@@ -88,7 +93,7 @@ Contains static utility methods for Hex string conversions.
 Contains static utility methods for Json conversions.
 
 ## StrLst.cs :
-Defines the class StrLst which is a string associated object list (key - value) class with tricks.     
+Defines the class StrLst which is a string associated object list (key - value) class with tricks.
                                                        
 StrLst provides:                                          
 1) Numerically indexed access to keys and objects.      

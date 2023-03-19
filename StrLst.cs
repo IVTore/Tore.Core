@@ -1,16 +1,16 @@
 ﻿/*————————————————————————————————————————————————————————————————————————————
     ——————————————————————————————————————————————
-    |   StrLst : String associated object list      |
+    |   StrLst : String associated object list   |
     ——————————————————————————————————————————————
 
-© Copyright 2020 İhsan Volkan Töre.
+© Copyright 2023 İhsan Volkan Töre.
 
 Author              : IVT.  (İhsan Volkan Töre)
 Version             : 202303171724. 
 Licenses            : MIT.
 
 History             :
-202303171724: IVT   : 
+202303171724: IVT   : Renamed from Stl to StrLst.
 202101261231: IVT   : - Removed unnecessary mapped enc/dec.
 202003101300: IVT   : + ToListOfKeyValuePairsOfString() + mapped enc/dec.
 202002011604: IVT   : ToObj behaviour changed. Added ToObj<T>.
@@ -34,12 +34,12 @@ using IDso = System.Collections.Generic.IDictionary<string, object>;
 namespace Tore.Core {
     /**———————————————————————————————————————————————————————————————————————————
                                                                         <summary>
-      CLASS :   StrLstIgnore [property attribute].                         <para/>
+      CLASS :   StrLstIgnore [property attribute].                      <para/>
       USAGE :                                                           <br/>
                 This attribute excludes                                 <br/>
                 <b> Instance properties </b> from ToObj and ByObj,      <br/>
                 <b> Static fields </b> from ToStatic and ByStatic,      <br/>
-                operations of StrLst.                                      </summary>
+                operations of StrLst.                                   </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     [System.AttributeUsage(
         System.AttributeTargets.Property|
@@ -70,7 +70,7 @@ namespace Tore.Core {
                 Has Enumerator and Nested converter support.            </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     [Serializable]
-    [JsonConverter(typeof(NestedStlConverter))]     // For web api conversions.
+    [JsonConverter(typeof(NestedStrLstConverter))]     // For web api conversions.
 
     public class StrLst:IEnumerable, IEnumerable<Kvp>, IDso {
 
@@ -79,12 +79,12 @@ namespace Tore.Core {
                      wr;                    // Overwrite Object with same Key.
 
         /**<summary>Used for json conversion while StrLst's are nested.</summary>*/
-        public static JsonConverter[] stlJsonConverter { get; } =
-                        new JsonConverter[] { new NestedStlConverter() };
+        public static JsonConverter[] strLstJsonConverter { get; } =
+                  new JsonConverter[] { new NestedStrLstConverter() };
 
         /**<summary>Used for setting json conversion for nested StrLst's.</summary>*/
-        public static JsonSerializerSettings stlJsonSettings { get; } =
-                        new JsonSerializerSettings() { Converters = stlJsonConverter };
+        public static JsonSerializerSettings strLstJsonSettings { get; } =
+                  new JsonSerializerSettings() { Converters = strLstJsonConverter };
 
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -119,18 +119,18 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ByArgs [static]                                             <summary>
           TASK:                                                             <br/>
-                Converts an object array to StrLst appropriately.              <para/>
+                Converts an object array to StrLst appropriately.           <para/>
           ARGS:                                                             <br/>
                 args    : object[]  : Arguments (may be Key - values).      <para/>
           RETV:                                                             <br/>
-                        : StrLst       : Arguments as StrLst.                     <para/>
+                        : StrLst       : Arguments as StrLst.               <para/>
           INFO:                                                             <br/>
                 If args length = 0 null is returned.                        <br/>
                 If args length = 1 then if args[0] is                       <br/>
-                   * either an StrLst, and it is returned.                     <br/>
-                   * or an object, then converted to an StrLst and returned.   <br/>
-                Otherwise StrLst constructor with object[] is called.          <br/>
-                For more info refer to StrLst.                                 </summary>
+                   * either an StrLst, and it is returned.                  <br/>
+                   * or an object, then converted to an StrLst and returned.<br/>
+                Otherwise StrLst constructor with object[] is called.       <br/>
+                For more info refer to StrLst.                              </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static StrLst ByArgs(object[] args) {
             if (args.Length == 0)
@@ -144,7 +144,7 @@ namespace Tore.Core {
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          CTOR: StrLst                                                     <summary>
+          CTOR: StrLst                                                  <summary>
           TASK:                                                         <br/>
                 Constructs a string associated object list.             <para/>
           ARGS:                                                         <br/>
@@ -162,7 +162,7 @@ namespace Tore.Core {
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          CTOR: StrLst                                                     <summary>
+          CTOR: StrLst                                                  <summary>
           TASK:                                                         <br/>
                 Constructs a string associated object list.             <para/>
           INFO:                                                         <br/>
@@ -175,7 +175,7 @@ namespace Tore.Core {
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          CTOR: StrLst                                                         <summary>
+          CTOR: StrLst                                                      <summary>
           TASK:                                                             <br/>
                 Constructs a string associated object list.                 <para/>
           ARGS:                                                             <br/>
@@ -183,15 +183,15 @@ namespace Tore.Core {
                 *   If string, it is assumed to be json and StrLst is
                     loaded via json conversion.                             <br/>
                 *   If Type, the <b>public static fields</b> of the type 
-                    will be used to load the StrLst.                           <br/>
-                *   If StrLst, it will be cloned [look info].                  <br/>
+                    will be used to load the StrLst.                        <br/>
+                *   If StrLst, it will be cloned [look info].               <br/>
                 *   If any other object the <b>public properties</b> of
-                    object will be used to load the StrLst.                    <para/>
+                    object will be used to load the StrLst.                 <para/>
           INFO:                                                             <br/>
                 Keys must be always unique identifiers.                     <br/>
                 Objects can be overwritten if added with same Key.          <br/>
                 These may be different for StrLst cloning case
-                since it copies the properties of the original StrLst.         </summary>
+                since it copies the properties of the original StrLst.      </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public StrLst(object o) {
             if (o is StrLst lst) {
@@ -212,7 +212,7 @@ namespace Tore.Core {
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          CTOR: StrLst                                                     <summary>
+          CTOR: StrLst                                                  <summary>
           TASK:                                                         <br/>
                 Constructs a string associated object list.             <para/>
           ARGS:                                                         <br/>
@@ -243,7 +243,7 @@ namespace Tore.Core {
         }
 
         /**——————————————————————————————————————————————————————————————————————————
-          DTOR: ~StrLst                                                        <summary>
+          DTOR: ~StrLst                                                     <summary>
           TASK: Destroys a string associated object list.                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         ~StrLst() {
@@ -287,7 +287,7 @@ namespace Tore.Core {
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Clone                                                       <summary>
-          TASK: Clones this StrLst into a new StrLst.                             </summary>
+          TASK: Clones this StrLst into a new StrLst.                       </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public StrLst Clone() {
             StrLst clone = new (un, id, wr);
@@ -300,17 +300,10 @@ namespace Tore.Core {
           TASK: Shallow transfer of all entries.                            </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public void Append(StrLst src) {
-            int i,
-                l = Count;
-            List<string> sKey;
-            List<object> sObj;
-
             if (src == null)
                 return;
-            sKey = src.keyLst;
-            sObj = src.objLst;
-            for(i = 0; i < l; i++)
-                Add(sKey[i], sObj[i], -1);
+            keyLst.AddRange(src.keyLst);
+            objLst.AddRange(src.objLst);
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -334,23 +327,29 @@ namespace Tore.Core {
 
             if (aKey.IsNullOrWhiteSpace())
                 Exc("E_INV_ARG", nameof(aKey));
-            if (id && (!aKey.IsIdentifier()))               // Check if Identifier.
+            if (id && (!aKey.IsIdentifier()))           // Check if Identifier.
                 Exc("E_INV_IDENT", $"aKey = {aKey}");
-            i = (uniquePair) ? 
-                    IndexPair(aKey, aObj) : Index(aKey);    // Search (look: uniquePair).
-            if (uniquePair && (i > -1))                     // If we have this 
-                return (i);                                 // return index.
-            if ((!un) || (i == -1)) {                       // If not unique or not found
-                if ((aIdx < 0) || (aIdx >= keyLst.Count))   // If insert to end
-                    aIdx = keyLst.Count;                    // set index to Append.
-                keyLst.Insert(aIdx, aKey);                  // insert Key to index
-                objLst.Insert(aIdx, aObj);                  // insert object to index
-                return (aIdx);                              // Return index.
+            if (uniquePair) {                           // If unique pair insertion.
+                if (un)                                 // Unique key conflicts with unique pair.
+                    Exc("E_STL_UNIQUE", "unique == true && uniquePair == true");
+                i = IndexPair(aKey, aObj);              // Find pair.
+                if (i > -1)                             // If exists,
+                    return i;                           // return index.
+            } 
+            if (un) {                                   // If not unique pair and unique,
+                i = Index(aKey);                        // Find key index.
+                if (i > -1) {                           // If found,
+                    if (!wr)                            // If no overwrite
+                        Exc("E_STL_NO_OVR", aKey);      // Error.
+                    objLst[i] = aObj;                   // Overwrite object.
+                    return i;                           // return index.
+                }
             }
-            if (!wr)                                        // If no overwrite
-                Exc("E_STL_NO_OVR", aKey);                  // Error.
-            objLst[i] = aObj;                               // Overwrite object
-            return i;
+            if ((aIdx < 0) || (aIdx >= keyLst.Count))   // If insert to end
+                aIdx = keyLst.Count;                    // set index to Append.
+            keyLst.Insert(aIdx, aKey);                  // insert Key to index
+            objLst.Insert(aIdx, aObj);                  // insert object to index
+            return (aIdx);                              // Return index.
         }
 
         /**———————————————————————————————————————————————————————————————————————————
@@ -630,7 +629,7 @@ namespace Tore.Core {
                 id = true;
                 wr = true;
             }
-            JsonConvert.PopulateObject(json, this, stlJsonSettings);
+            JsonConvert.PopulateObject(json, this, strLstJsonSettings);
             return this;
         }
 
@@ -1056,13 +1055,13 @@ namespace Tore.Core {
     }   // end class StlEnumeratorKVP.
 
     /**———————————————————————————————————————————————————————————————————————————
-      CLASS :   NestedStlConverter.                                     <summary>
+      CLASS :   NestedStrLstConverter.                                     <summary>
       USAGE :                                                           <br/>
         In jsonDeserializer, for supporting nested StrLst.                 <br/>
         This replaces all untyped sub-list elements that can be         <br/>
         IDictionary string,object lists with StrLst.                       </summary>
     ————————————————————————————————————————————————————————————————————————————*/
-    public class NestedStlConverter: CustomCreationConverter<IDso> {
+    public class NestedStrLstConverter: CustomCreationConverter<IDso> {
 
         /**<inheritdoc/>*/
         public override IDso Create(Type objectType) {
@@ -1082,5 +1081,5 @@ namespace Tore.Core {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             return serializer.Deserialize(reader);
         }
-    }   // End class NestedStlConverter.
+    }   // End class NestedStrLstConverter.
 }

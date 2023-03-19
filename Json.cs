@@ -35,7 +35,7 @@ namespace Tore.Core {
                 return default;
             Chk(typeof(T), "T", "E_JSON_DESERIALIZE");
             try {
-                res = JsonConvert.DeserializeObject<T>(val, StrLst.stlJsonSettings);
+                res = JsonConvert.DeserializeObject<T>(val, StrLst.strLstJsonSettings);
             } catch (Exception e) {
                 Exc("E_JSON_DESERIALIZE", typeof(T).Name, e);
                 throw;
