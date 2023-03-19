@@ -69,7 +69,7 @@ to the source file.
 For logging, assign your logger to sys.logger.
 
 ```C#
-        // At some initializer method:
+        // At some program wide initializer method:
 
         Sys.logger = myLogger;
 ```
@@ -87,10 +87,10 @@ Contains static utility methods for Hex string conversions.
 ## Json.cs :
 Contains static utility methods for Json conversions.
 
-## Stl.cs :
-Defines the class Stl which is a string associated object list (key - value) class with tricks.     
+## StrLst.cs :
+Defines the class StrLst which is a string associated object list (key - value) class with tricks.     
                                                        
-Stl provides:                                          
+StrLst provides:                                          
 1) Numerically indexed access to keys and objects.      
 2) Ordering.                                           
 3) Translation forward and backward to various formats.
@@ -98,16 +98,15 @@ Stl provides:
 
 * Keys can not be null empty or whitespace.            
 * Lists are public in this class intentionally.        
-* Stl also acts as a bridge for,
+* StrLst also acts as a bridge for,
 
    - Json, 
    - Objects (public properties), 
    - Static classes (public static fields),
-   - IDictionary string key, object value [Alias: IDso] and
-   - List KeyValuePair string,string      [Alias: Kvs].     
+   - IDictionary <string, object> and
+   - List KeyValuePair <string, string>.     
  
 Has Enumerator and Nested conversion support.           
-Note : Stl is neither suitable nor built for millions of entries.
 
 
 ## Utc.cs :
