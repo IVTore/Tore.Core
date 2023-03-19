@@ -10,7 +10,10 @@ Version             : 202303171724.
 Licenses            : MIT.
 
 History             :
-202303171724: IVT   : Renamed from Stl to StrLst.
+202303171724: IVT   : * Renamed from Stl to StrLst.
+                      * Corrected Add method avoiding uniquePair when 
+                        StrLst allows only unique keys.
+                      * Upgraded Append() by using List:AddRange methods. 
 202101261231: IVT   : - Removed unnecessary mapped enc/dec.
 202003101300: IVT   : + ToListOfKeyValuePairsOfString() + mapped enc/dec.
 202002011604: IVT   : ToObj behaviour changed. Added ToObj<T>.
@@ -26,10 +29,6 @@ using Newtonsoft.Json.Converters;
 
 using static Tore.Core.Sys;
 using static Tore.Core.Reflect;
-
-using Kvp = System.Collections.Generic.KeyValuePair<string, object>;
-using Kvs = System.Collections.Generic.KeyValuePair<string, string>;
-using IDso = System.Collections.Generic.IDictionary<string, object>;
 
 namespace Tore.Core {
     /**———————————————————————————————————————————————————————————————————————————
@@ -72,7 +71,7 @@ namespace Tore.Core {
     [Serializable]
     [JsonConverter(typeof(NestedStrLstConverter))]     // For web api conversions.
 
-    public class StrLst:IEnumerable, IEnumerable<Kvp>, IDso {
+    public class StrLst:IEnumerable, IEnumerable<KeyValuePair<string, object>>, IDictionary<string, object> {
 
         private bool un,                    // Keys should be unique        if true.
                      id,                    // Keys should be identifier    if true.
@@ -609,18 +608,18 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ByJson.                                                     <summary>
           TASK:                                                             <br/>
-                Converts a json string and loads it to Stl.                 <para/>
+                Converts a json string and loads it to StrLst.              <para/>
           ARGS:                                                             <br/>
-                json : string   : Json string to convert to Stl.            <br/>
-                Init : bool     : If true clears stl before conversion.
+                json : string   : Json string to convert to StrLst.         <br/>
+                Init : bool     : If true clears StrLst before conversion.
                                   :DEF: true.                               <para/>
           RETV:                                                             <br/>
-                     : Stl      : Stl itself.                               <para/>
+                     : StrLst   : StrLst itself.                            <para/>
           INFO:                                                             <br/>
                 Uses Newtonsoft json library.                               <br/>
                 Json must contain an object not a primitive or array.       <br/>
                 All sub-objects which are non-primitive and non array       <br/>
-                are also converted to sub - Stl's.                          </summary>
+                are also converted to sub - StrLst's                        </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public StrLst ByJson(string json, bool init = true) {
             if (init) {
@@ -636,7 +635,7 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ToJson.                                                     <summary>
           TASK:                                                             <br/>
-                Converts an StrLst to json string.                             <para/>
+                Converts a StrLst to json string.                           <para/>
           INFO:                                                             <br/>
                 Uses Newtonsoft json library.                               <br/>
                 General json conversion rules apply.                        <br/>
@@ -649,13 +648,13 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ToStatic.                                                   <summary>
           TASK:                                                             <br/>
-                Sets <b>public static fields</b> of a class from StrLst.       <para/>
+                Sets <b>public static fields</b> of a class from StrLst.    <para/>
           ARGS:                                                             <br/>
                 type          : Type : Class type.                          <br/>
                 ignoreMissing : bool : If true, ignores missing fields else
                                        raises exception.:DEF:false.         <para/>
           INFO:                                                             <br/>
-                Public static fields of type type are sought in StrLst.        </summary>
+                Public static fields of type type are sought in StrLst.     </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public void ToStatic(Type type, bool ignoreMissing = false) {
             FieldInfo[] fldInfArr;
@@ -680,12 +679,13 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ByStatic.                                                   <summary>
           TASK:                                                             <br/>
-                Loads StrLst from <b> public static fields </b> of type.       <para/>
+                Loads StrLst from <b> public static fields </b> of type.    <para/>
           ARGS:                                                             <br/>
                 type    : Type  : Class type.                               <br/>
-                init    : bool  : Clears StrLst before copy if true. :DEF:true.<para/>
+                init    : bool  : Clears StrLst before copy if true. 
+                                    :DEF:true.                              <para/>
           RETV:                                                             <br/>
-                        : StrLst   : StrLst itself.                               </summary>
+                        : StrLst   : StrLst itself.                         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public StrLst ByStatic(Type type, bool init = true) {
             FieldInfo[] fldLst;
@@ -700,11 +700,11 @@ namespace Tore.Core {
             }
             irs = id;           // Store identifier restriction status.
             id = false;         // Optimization: field names are already identifiers.
-            fldLst = StaticFields(type);            // Get static field info list.
-            foreach(FieldInfo fld in fldLst){       // For each field,
-                if (hasAttr<StrLstIgnore>(fld))        // Check if ignored.
+            fldLst = StaticFields(type);                // Get static field info list.
+            foreach(FieldInfo fld in fldLst){           // For each field,
+                if (hasAttr<StrLstIgnore>(fld))         // Check if ignored.
                     continue;
-                Add(fld.Name, fld.GetValue(null));  // Add name and value to StrLst.
+                Add(fld.Name, fld.GetValue(null));      // Add name and value to StrLst.
             }
             id = irs;           // Restore identifier restriction status.
             return this;
@@ -714,14 +714,14 @@ namespace Tore.Core {
           FUNC: ToObj.                                                      <summary>
           TASK:                                                             <br/>
                 Makes an object of class T and fills corresponding properties 
-                of it from StrLst.                                             <para/>
+                of it from StrLst.                                          <para/>
           ARGS:                                                             <br/>
                 T             : Class : Target object class.                <br/>
                 ignoreMissing : bool  : When true : Do not raise exception 
                                         if a property is missing in StrLst. 
                                         :DEF:false.                         <para/>
-          INFO:                                                             <br/>
-                Properties of class T are sought in Keys of StrLst.            </summary>
+          RETV:               : T     : Object built from StrLst.           <para/>
+          INFO: Public properties of class T are sought in Keys of StrLst.  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public T ToObj<T>(bool ignoreMissing = false) where T : new() {
             return (T)ToObj(MakeObject(typeof(T)), ignoreMissing);
@@ -731,14 +731,14 @@ namespace Tore.Core {
           FUNC: ToObj.                                                      <summary>
           TASK:                                                             <br/>
                 Makes an object of class type typ and fills corresponding 
-                properties of it from StrLst.                                  <para/>
+                properties of it from StrLst.                               <para/>
           ARGS:                                                             <br/>
                 type          : Type  : Target object class type.           <br/>
                 ignoreMissing : bool  : When true : Do not raise exception 
                                         if a property is missing in StrLst. 
                                         :DEF:false.                         <para/>
-          INFO:                                                             <br/>
-                Properties of class T are sought in Keys of StrLst.            </summary>
+          RETV:               : object: Object built from StrLst.           <para/>
+          INFO: Properties of class typ are sought in Keys of StrLst.       </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public object ToObj(Type typ, bool ignoreMissing = false) {
             return ToObj(MakeObject(typ), ignoreMissing);
@@ -747,14 +747,14 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ToObj.                                                      <summary>
           TASK:                                                             <br/>
-                Fills corresponding properties of an object from StrLst.       <para/>
+                Fills corresponding properties of an object from StrLst.    <para/>
           ARGS:                                                             <br/>
                 target        : object  : Target object.                    <br/>
                 ignoreMissing : bool    : When true : Do not raise exception 
                                           if a property is missing in StrLst. 
                                           :DEF:false.                       <para/>
-          INFO:                                                             <br/>
-                Properties of class T are sought in Keys of StrLst.            </summary>
+          RETV:               : object  : Target object.                    <para/>
+          INFO: Properties of target object are sought in Keys of StrLst.   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public object ToObj(object target, bool ignoreMissing = false) {
             PropertyInfo[] pLst;
@@ -785,18 +785,20 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ByObj.                                                      <summary>
           TASK:                                                             <br/>
-                Fills StrLst from an objects public properties.                <para/>
+                Fills StrLst from an objects public properties.             <para/>
           ARGS:                                                             <br/>
                 source  : object : Source object.                           <br/>
-                init    : bool   : Clears StrLst before copy if true.:DEF:true.<para/>
+                init    : bool   : Clears StrLst before copy if true.
+                                    :DEF: true.                             <para/>
           RETV:                                                             <br/>
-                        : StrLst    : StrLst itself.                              <para/>
+                        : StrLst : StrLst itself.                           <para/>
           INFO:                                                             <br/>
                 Shallow copy.                                               <br/>
                 Multiple object properties can be merged in to an StrLst
                 by setting init = false, but either the property names
                 should be unique or StrLst must accept duplicate keys.
-                like myStl = new StrLst(false, true, true)                     </summary>
+                like myStl = new StrLst(false, true, true).
+                Otherwise they will be overwritten.                         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public StrLst ByObj(object source, bool init = true) {
             PropertyInfo[] pArr;
@@ -813,7 +815,7 @@ namespace Tore.Core {
             irs = id;               // Store identifier restriction status.
             id = false;             // Optimization: Incoming keys are identifiers.
             type = source.GetType();
-            pArr = InstanceProps(type);    // never returns null.
+            pArr = InstanceProps(type);             // never returns null.
             foreach(PropertyInfo p in pArr) {
                 if (hasAttr<StrLstIgnore>(p))
                     continue;
@@ -826,13 +828,19 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ToDictionaryOfStringTypeT.                                  <summary>
           TASK:                                                             <br/>
-                Tries to make a <b>Dictionary&lt;string, T&gt;</b> from StrLst.<para/>
+                Tries to make a <b>Dictionary&lt;string, T&gt;</b> 
+                from StrLst.                                                <para/>
           ARGS:                                                             <br/>
-                T             : object class type for objects.              <br/>
-                ignoreMissing : Ignore missing sub properties.:DEF: false.  <para/>
+                              : T       : object class type for values.     <br/>
+                ignoreMissing : bool    :Ignore missing sub properties of T.
+                                            :DEF: false.                    <para/>
+          RETV:                 
           INFO:                                                             <br/>
-                Objects in StrLst must be compatible with type T.              <br/>
-                If complicated sub property objects are in sub StrLst's and    <br/>
+                * StrLst must be compatible with Dictionary of (string, T). <br/>
+                  StrLst must be with unique keys since dictionaries do not <br/>
+                  allow duplicate keys.                                     <br/>
+                * Objects in StrLst must be compatible with type T.         <br/>
+                If complicated sub property objects are in sub StrLst's and <br/>
                 their properties may be incomplete, better call with        <br/>
                 ignoreMissing set to true                                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
@@ -859,21 +867,21 @@ namespace Tore.Core {
           FUNC: ToListOfKeyValuePairsOfString.                              <summary>
           TASK:                                                             <br/>
                 Makes a List of KeyValuePair of string, string and fills it <br/>
-                with the keys and values from StrLst.                          <para/> 
+                with the keys and values from StrLst.                       <para/> 
           INFO:                                                             <br/>
                 Used at Http request form data construction in c#.          <br/>
                 Values are obtained by ToString();                          <br/>
                 Kvs is an alias to KeyValuePair of string, string.          </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public List<Kvs> ToListOfKeyValuePairsOfString() {
+        public List<KeyValuePair<string, string>> ToListOfKeyValuePairsOfString() {
             int i;
             int c;
-            List<Kvs> r;
+            List<KeyValuePair<string, string>> r;
 
             c = Count;
-            r = new List<Kvs>();
+            r = new();
             for(i = 0; i < c; i++)
-                r.Add(new Kvs(keyLst[i], objLst[i].ToString()));
+                r.Add(new KeyValuePair<string, string>(keyLst[i], objLst[i].ToString()));
             return r;
         }
         #endregion
@@ -922,7 +930,7 @@ namespace Tore.Core {
           INFO:                                                             <br/>
                 IDictionary interface. Look DeletePair().                   </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool Remove(Kvp item) => DeletePair(item.Key, item.Value);
+        public bool Remove(KeyValuePair<string, object> item) => DeletePair(item.Key, item.Value);
 
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Add                                                         <summary>
@@ -933,7 +941,7 @@ namespace Tore.Core {
           INFO:                                                             <br/>
                 IDictionary interface. Look Add(), AddPair().               </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public void Add(Kvp item) => Add(item.Key, item.Value);
+        public void Add(KeyValuePair<string, object> item) => Add(item.Key, item.Value);
         
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: ContainsKey                                                 <summary>
@@ -945,7 +953,7 @@ namespace Tore.Core {
           FUNC: Contains                                                    <summary>
           TASK: IDictionary interface. Better use hasPair().                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool Contains(Kvp item) => hasPair(item.Key, item.Value);
+        public bool Contains(KeyValuePair<string, object> item) => hasPair(item.Key, item.Value);
         
         /**———————————————————————————————————————————————————————————————————————————
           PROP: IsReadOnly                                                  <summary>
@@ -968,7 +976,7 @@ namespace Tore.Core {
         public ICollection<object> Values => objLst.CopyToList();
         
         /**<inheritdoc/>*/
-        public IEnumerator<Kvp> GetEnumerator() => new StlEnumeratorKVP(this);
+        public IEnumerator<KeyValuePair<string, object>> GetEnumerator() => new StrLstEnumeratorKeyValuePair(this);
         
         /**<inheritdoc/>*/
         IEnumerator IEnumerable.GetEnumerator() => keyLst.GetEnumerator();
@@ -985,14 +993,14 @@ namespace Tore.Core {
         }
         
         /**<inheritdoc/>*/
-        public void CopyTo(Kvp[] array, int arrayIndex) {
+        public void CopyTo(KeyValuePair<string, object>[] array, int arrayIndex) {
             int i,
                 j = 0,
                 c;
 
             c = Count;
             for(i = arrayIndex; i < c; i++)
-                array[j] = new Kvp(keyLst[i], objLst[i]);
+                array[j] = new KeyValuePair<string, object>(keyLst[i], objLst[i]);
         }
         
         /**<inheritdoc/>*/
@@ -1014,20 +1022,20 @@ namespace Tore.Core {
     }   // end class StrLst
 
     /**———————————————————————————————————————————————————————————————————————————
-      CLASS : StlEnumeratorKVP.                                         <summary>
-      USAGE : StrLst Enumeration Support for IDictionary interface.        </summary>
+      CLASS : StrLstEnumeratorKeyValuePair.                                      <summary>
+      USAGE : StrLst Enumeration Support for IDictionary interface.     </summary>
     ————————————————————————————————————————————————————————————————————————————*/
-    public class StlEnumeratorKVP: IEnumerator<Kvp> {
+    public class StrLstEnumeratorKeyValuePair: IEnumerator<KeyValuePair<string, object>> {
 
         private StrLst lst;
         private int idx;
 
         /**<inheritdoc/>*/
-        public Kvp Current => new (lst.keyLst[idx], lst.objLst[idx]);
+        public KeyValuePair<string, object> Current => new (lst.keyLst[idx], lst.objLst[idx]);
 
         object IEnumerator.Current => Current;
         /**<summary> Constructor for enumerator class. </summary>*/
-        public StlEnumeratorKVP(StrLst stl) {
+        public StrLstEnumeratorKeyValuePair(StrLst stl) {
             lst = stl;
             idx = -1;
         }
@@ -1052,19 +1060,19 @@ namespace Tore.Core {
             ++idx;
             return true;
         }
-    }   // end class StlEnumeratorKVP.
+    }   // end class StrLstEnumeratorKeyValuePair.
 
     /**———————————————————————————————————————————————————————————————————————————
-      CLASS :   NestedStrLstConverter.                                     <summary>
+      CLASS :   NestedStrLstConverter.                                  <summary>
       USAGE :                                                           <br/>
-        In jsonDeserializer, for supporting nested StrLst.                 <br/>
+        In jsonDeserializer, for supporting nested StrLst.              <br/>
         This replaces all untyped sub-list elements that can be         <br/>
-        IDictionary string,object lists with StrLst.                       </summary>
+        IDictionary string, object lists with StrLst.                   </summary>
     ————————————————————————————————————————————————————————————————————————————*/
-    public class NestedStrLstConverter: CustomCreationConverter<IDso> {
+    public class NestedStrLstConverter: CustomCreationConverter<IDictionary<string, object>> {
 
         /**<inheritdoc/>*/
-        public override IDso Create(Type objectType) {
+        public override IDictionary<string, object> Create(Type objectType) {
             return new StrLst();
         }
     

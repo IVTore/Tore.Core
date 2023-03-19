@@ -47,6 +47,7 @@ Changes in v7.0.1:
             add()     with uniquePair true.
             addPair() with uniquePair true.
             Throw an exception with 'E_STL_UNIQUE' tag in such cases.
+        * Upgraded Append() by using List:AddRange methods. 
 
 Deprecated Versions are available on Nuget as :
   - Deprecated Tore.Core v5.0.0  for net5.0 .
