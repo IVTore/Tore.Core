@@ -38,8 +38,9 @@ Changes in v7.0.1:
     Stl.cs:
 
         * Renamed as StrLst:
-          For avoiding confusion with C++ STL library.
-          New name is not StrList to avoid confusion with List<string>.
+            For avoiding confusion with C++ STL library.
+          New name is not also StringList or StrList 
+            For avoiding confusion with List<string>.
     
 
 Deprecated Versions are available on Nuget as :
