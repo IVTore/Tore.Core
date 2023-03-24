@@ -28,7 +28,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 using static Tore.Core.Sys;
-using static Tore.Core.Reflect;
 
 namespace Tore.Core {
     /**———————————————————————————————————————————————————————————————————————————

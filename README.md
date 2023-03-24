@@ -8,7 +8,7 @@ Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Dependencies: <br/>
-net7.0
+net7.0<br/>
 Newtonsoft.Json 13+
 
 
@@ -27,22 +27,28 @@ Changes in v8.0.0:
     
     Sys.cs: 
     
-        * Debug output subsystem is removed.
-        * static readonly Sys.isDebug property removed.
-        * Methods of reflection are moved to Reflect static class in Reflect.cs.
+        * Debug output subsystem Sys.Dbg(), Sys.isDebug etc. removed.
         * ExcInterceptorDelegate type renamed as ExceptionInterceptorDelegate.
         * Sys.excInterceptor property is renamed as Sys.exceptionInterceptor.
-        * exception debug output is removed, and routed to Log subsystem.
-        * public ExcDbg method modified into private ExcLog.
-        * Log output subsystem is added.
-        * Static ILogger Sys.logger property is added.
-        * Static Sys.Log method and overrides added.
+        * exception debug output is removed, and routed to console.
+        * public HasExcData moved into Extensions.cs as Exception.HasInfo();
+        * public GetExcData moved into Extensions.cs as Exception.Info();
+        * public ExcDbg     moved into Extensions.cs as Exception.InfoToConsole();
+        
 
     Com.cs:
         
         * Com is renamed into Client, removed from Tore.Core. 
         * It is now in Tore.Http namespace 
             packaged as Tore.Http.Client.
+
+    Extensions.cs:
+
+        * Added Exception extensions for exception info built by Sys.Exc:
+            bool   Exception.HasInfo().
+            StrLst Exception.Info().
+            void   Exception.InfoToConsole().
+            string Exception.InfoToPrettyString().
 
     Stl.cs: (StrLst.cs).
 
@@ -72,9 +78,6 @@ Contains static utility methods for Hex string conversions.
 ## Json.cs :
 Contains static utility methods for Json conversions.
 
-## Reflect.cs :
-Contains static utility methods for attributes, reflection and type juggling.
-
 ## StrLst.cs :
 Defines the class StrLst which is a string associated object list (key - value) class with tricks.
 
@@ -98,11 +101,10 @@ Has Enumerator and Nested conversion support.
 
 ## Sys.cs :
 Defines the static class Sys containing a library of utility methods treated as global functions which is used for managing:
-  - Logging by Log().
   - Exceptions by Exc().
   - Parameter checking by Chk().
   - Several application information routines.
-  
+  - Attributes, reflection and type juggling.  
 
 The best way of using them is by adding: 
 ```C#

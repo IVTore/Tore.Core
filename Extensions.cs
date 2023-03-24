@@ -12,9 +12,109 @@ namespace Tore.Core {
         CLASS:  Extensions [Static]                                     <summary>
         USAGE:                                                          <br/>
                 Contains static utility extension methods for           <br/>
-                string, char, ICollection, List of T.                   </summary>
+                Exception, string, char, ICollection, List of T.        </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     public static class Extensions {
+
+        #region Exception extensions.
+        /*————————————————————————————————————————————————————————————————————————————
+            ——————————————————————————
+            |  Exception extensions  |
+            ——————————————————————————
+        ————————————————————————————————————————————————————————————————————————————*/
+        
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: HasInfo [static, extension].                                <summary>
+          TASK:                                                             <br/>
+            If an exception is generated or processed through               <br/>
+            <b>Exc</b>, it has extra info and this will return true.        <para/>
+          ARGS:                                                             <br/>
+            e   : Exception : Any Exception.                                <para/>
+          RETV:                                                             <br/>
+                : bool      : True if exception is not null and has info.   </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static bool HasInfo(this Exception e) {
+            return (e != null) && (e.Data.Contains("dta"));
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: Info [static, extension]                                    <summary>
+          TASK:                                                             <br/>
+                If an exception is generated or processed through           <br/>
+                <b> Exc </b>, it has extra data and this will return it.    <para/>
+          ARGS:                                                             <br/>
+                e   : Exception : Any Exception.                            <para/>
+          RETV:                                                             <br/>
+                    : StrLst    : Extra exception info or null              </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static StrLst Info(this Exception e) {
+           return e.HasInfo() ? (StrLst)(e.Data["dta"]) : null;
+        }
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: InfoToConsole [static, extension]                           <summary>
+          TASK: Outputs exception info to console.                          <para/>
+          ARGS: e  : Exception : Exception.                                 <para/>
+          INFO: If e is null or has no info this does nothing.              </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static void InfoToConsole(this Exception e) {
+            if (!e.HasInfo())
+                return;
+            Console.Write(e.InfoToPrettyString());
+        }
+
+        private static string seperator = new string('—', 60);
+
+        /**———————————————————————————————————————————————————————————————————————————
+          FUNC: InfoToPrettyString [static, extension]                      <summary>
+          TASK: Outputs exception info to console.                          <para/>
+          ARGS: e  : Exception  : Exception.                                <para/>
+          RETV:    : string     : A printable string made of info or        <br/>
+                                  "Exception is null." if e is null or      <br/>
+                                  "Exception has no info." if no info.      </summary>
+        ————————————————————————————————————————————————————————————————————————————*/
+        public static string InfoToPrettyString(this Exception e) {
+            bool f;
+            string k,
+                   v;
+            string[] l;
+            StrLst d;
+            StringBuilder s;
+
+            if (e == null)
+                return "Exception is null.";
+            if (!e.Data.Contains("dta"))
+                return "Exception has no info.";
+            s = new();
+            d = e.Info();
+            s.AppendLine(seperator);
+            foreach (var kv in d) {
+                k = kv.Key.ToUpper();
+                v = (string)kv.Value;
+                s.Append('[');
+                s.Append(k);
+                s.Append("]: ");
+                if (v.IsNullOrWhiteSpace())
+                    v = "- .";
+                if (!v.Contains('\n')) {
+                    s.AppendLine(v);
+                    continue;
+                }
+                l = v.Split('\n');
+                f = false;
+                foreach (var str in l) {
+                    s.Append(f ? "       " : "");
+                    s.AppendLine(str.Trim());
+                    f = true;
+                }
+            }
+            s.AppendLine(seperator);
+            return s.ToString();
+        }
+
+
+        #endregion
+
 
         #region String extensions.
         /*————————————————————————————————————————————————————————————————————————————
