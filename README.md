@@ -27,7 +27,7 @@ Changes in v8.0.0:
     
     Sys.cs: 
     
-        * Debug output subsystem Sys.Dbg(), Sys.isDebug etc. removed.
+        * Sys.Dbg(), Sys.isDebug removed.
         * ExcInterceptorDelegate type renamed as ExceptionInterceptorDelegate.
         * Sys.excInterceptor property is renamed as Sys.exceptionInterceptor.
         * exception debug output is removed, and routed to console.
@@ -59,9 +59,9 @@ Changes in v8.0.0:
         * Corrected add method.
             When StrLst allows only unique keys, 
             It is not allowed to add unique key, value pairs.
-            add()     with uniquePair true.
-            addPair() with uniquePair true.
-            Throw an exception with 'E_STL_UNIQUE' tag in such cases.
+            add()     with uniquePair true and
+            addPair() with uniquePair true will throw an exception 
+            with 'E_STL_UNIQUE' tag in such cases.
         * Upgraded Append() by using List:AddRange methods. 
 
 
