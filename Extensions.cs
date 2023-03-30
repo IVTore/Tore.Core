@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 using static Tore.Core.Sys;
 
 namespace Tore.Core {
@@ -114,7 +113,6 @@ namespace Tore.Core {
 
 
         #endregion
-
 
         #region String extensions.
         /*————————————————————————————————————————————————————————————————————————————

@@ -27,14 +27,14 @@ Changes in v8.0.0:
     
     Sys.cs: 
     
-        * Sys.Dbg(), Sys.isDebug removed.
+        * Dbg(),isDebug removed.
+        * Exception debug output is removed, and routed to console.
         * ExcInterceptorDelegate type renamed as ExceptionInterceptorDelegate.
-        * Sys.excInterceptor property is renamed as Sys.exceptionInterceptor.
-        * exception debug output is removed, and routed to console.
+        * excInterceptor property is renamed as exceptionInterceptor.
+        * Added bool exceptionInfoToConsole property.
         * public HasExcData moved into Extensions.cs as Exception.HasInfo();
         * public GetExcData moved into Extensions.cs as Exception.Info();
         * public ExcDbg     moved into Extensions.cs as Exception.InfoToConsole();
-        
 
     Com.cs:
         
