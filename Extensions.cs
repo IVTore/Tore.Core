@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 using static Tore.Core.Sys;
@@ -88,7 +89,7 @@ namespace Tore.Core {
             d = e.Info();
             s.AppendLine(seperator);
             foreach (var kv in d) {
-                k = kv.Key.ToUpper();
+                k = kv.Key.ToUpper(CultureInfo.InvariantCulture);
                 v = (string)kv.Value;
                 s.Append('[');
                 s.Append(k);

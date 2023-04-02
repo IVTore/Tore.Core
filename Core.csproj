@@ -12,7 +12,7 @@
     <PackageTags>Tore Core Config File Extensions Hex Json Stl Sys Utc Utf8 Xor Utilities</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
-    <PackageReleaseNotes>Radically changed, not compatible to previous versions.</PackageReleaseNotes>
+    <PackageReleaseNotes>Radically changed, not compatible with previous versions.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>false</SignAssembly>
     <ApplicationIcon />
