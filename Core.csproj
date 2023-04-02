@@ -7,18 +7,29 @@
     <Authors>İhsan Volkan Töre</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Copyright>2023 İhsan Volkan Töre</Copyright>
-    <Description>C# core utility library.
+    <Description>C# core utility library By İ. V. Töre.
 </Description>
     <PackageTags>Tore Core Config File Extensions Hex Json Stl Sys Utc Utf8 Xor Utilities</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
     <PackageReleaseNotes>Radically changed, not compatible with previous versions.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>False</SignAssembly>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>7.0.0</Version>
+    <Version>8.0.0</Version>
     <PackageProjectUrl>https://github.com/IVTore/Tore.Core</PackageProjectUrl>
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Title>C# core utility library By İ. V. Töre.</Title>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
