@@ -122,7 +122,7 @@ namespace Tore.Core {
                 If e was null at entry:
                     <b> throws </b> the exception built.                    <br/>
                 else
-                    returns e (for syntactic sugar).                        <br/>
+                    returns e (for rethrowing etc.).                        <br/>
                                                                             <br/>
                 * Collected Data: at e.Data["dta"] as a StrLst*.            <br/>
                     "Exc" = Class name of exception.                        <br/>
