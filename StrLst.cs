@@ -47,11 +47,11 @@ namespace Tore.Core {
     public class StrLstIgnore: System.Attribute { }
 
     /**——————————————————————————————————————————————————————————————————————————— 
-        CLASS:  StrLst                                                     <summary>
+        CLASS:  StrLst                                                  <summary>
         USAGE:                                                          <br/>
                 A string associated object list class with tricks.      <br/>
                                                                         <br/>
-                StrLst provides:                                           <br/>
+                StrLst provides:                                        <br/>
                 1) Numerically indexed access to keys and objects       <br/>
                 2) Ordering.                                            <br/>
                 3) Translation forward and backward to various formats. <br/>
@@ -59,7 +59,7 @@ namespace Tore.Core {
                                                                         <br/>
                 * Keys can not be null empty or whitespace.             <br/>
                 * Lists are public in this class intentionally.         <br/>
-                * StrLst also acts as a bridge for,                        <br/>
+                * StrLst also acts as a bridge for,                     <br/>
                 json,                                                   <br/>
                 objects <b> (public properties with get and set) </b>,  <br/>
                 static classes <b> (public static fields) </b>,         <br/>
