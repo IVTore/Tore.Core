@@ -934,7 +934,7 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Add                                                         <summary>
           TASK:                                                             <br/>
-                Adds a Key-value pair to StrLst.                               <br/>
+                Adds a Key-value pair to StrLst.                            <br/>
           ARGS:                                                             <br/>
                 KeyValuePair of string,object: item.                        <br/>
           INFO:                                                             <br/>
@@ -1021,7 +1021,7 @@ namespace Tore.Core {
     }   // end class StrLst
 
     /**———————————————————————————————————————————————————————————————————————————
-      CLASS : StrLstEnumeratorKeyValuePair.                                      <summary>
+      CLASS : StrLstEnumeratorKeyValuePair.                              <summary>
       USAGE : StrLst Enumeration Support for IDictionary interface.     </summary>
     ————————————————————————————————————————————————————————————————————————————*/
     public class StrLstEnumeratorKeyValuePair: IEnumerator<KeyValuePair<string, object>> {
