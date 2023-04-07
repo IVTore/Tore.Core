@@ -181,10 +181,10 @@ namespace Tore.Core {
                 In case of strings, white spaces are not welcome.       <br/>
                 In case of Guids, empty Guid's are not welcome.         </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static void Chk(object arg, string inf, string tag = "E_INV_ARG") {
+        public static void Chk(object arg = null, string inf = null, string tag = "E_INV_ARG") {
             if (arg == null ||
-               (arg is string && ((string)arg).IsNullOrWhiteSpace()) ||
-               (arg is Guid && ((Guid)arg).Equals(Guid.Empty)))
+               (arg is string str && str.IsNullOrWhiteSpace()) ||
+               (arg is Guid guid && guid.Equals(Guid.Empty)))
                 Exc(tag, inf);
         }
 
