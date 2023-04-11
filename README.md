@@ -110,11 +110,12 @@ The best way of using them is by adding:
 ```C#
 using static Tore.Core.Sys;
 ```
-to the source file or by adding:
+to the source for filewide or by adding:
+
 ```C#
 global using static Tore.Core.Sys;
 ```
-to the usings.cs file.
+to the usings.cs file for projectwide access.
 
 ## Utc.cs :
 Contains static utility methods for DateTime conversions. 
