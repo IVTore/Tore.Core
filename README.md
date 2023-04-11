@@ -109,16 +109,12 @@ Defines the static class Sys containing a library of utility methods treated as 
 The best way of using them is by adding: 
 ```C#
 using static Tore.Core.Sys;
-```                            
-to the source file.    
-
-For logging, assign your logger to sys.logger.
-
-```C#
-        // At some program wide initializer method:
-
-        Sys.logger = myLogger;
 ```
+to the source file or by adding:
+```C#
+global using static Tore.Core.Sys;
+```
+to the usings.cs file.
 
 ## Utc.cs :
 Contains static utility methods for DateTime conversions. 
