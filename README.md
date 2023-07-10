@@ -19,16 +19,16 @@ Changes in v8.0.1:
     Json.cs:
         Added Json.Populate(object obj, string json) method.
 
-#### WARNING : 
-Tore.Core has undergone radical changes in version 8.<br/>
-It is not compatible to previous versions! <br/>
-
-Deprecated Versions are available on Nuget as :
-  - Deprecated Tore.Core v5.0.0  for net5.0 .
-  - Deprecated Tore.Core v6.0.0+ for net6.0 .
-  - Deprecated Tore.Core v7.0.0  for net6.0 (Modularized).
-
 Changes in v8.0.0: 
+
+    #### WARNING : 
+    Tore.Core has undergone radical changes in version 8.<br/>
+    It is not compatible to previous versions! <br/>
+
+    Deprecated Versions are available on Nuget as :
+    - Deprecated Tore.Core v5.0.0  for net5.0 .
+    - Deprecated Tore.Core v6.0.0+ for net6.0 .
+    - Deprecated Tore.Core v7.0.0  for net6.0 (Modularized).
     
     Upgraded to .net 7.0.
     
