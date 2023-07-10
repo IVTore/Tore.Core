@@ -17,7 +17,7 @@
     <SignAssembly>False</SignAssembly>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>8.0.0</Version>
+    <Version>8.0.1</Version>
     <PackageProjectUrl>https://github.com/IVTore/Tore.Core</PackageProjectUrl>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
