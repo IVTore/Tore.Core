@@ -11,9 +11,16 @@ Dependencies: <br/>
 net7.0<br/>
 Newtonsoft.Json 13+
 
+Changes in v8.0.1: 
+
+    Minor corrections on documentation.
+    Sys.cs:
+        Corrected Sys.Attr<T> method to return type T instead of Attribute.
+    Json.cs:
+        Added Json.Populate(object obj, string json) method.
 
 #### WARNING : 
-Tore.Core has undergone radical changes.<br/>
+Tore.Core has undergone radical changes in version 8.<br/>
 It is not compatible to previous versions! <br/>
 
 Deprecated Versions are available on Nuget as :

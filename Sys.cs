@@ -3,13 +3,14 @@
     |   Sys : C# Utility methods library         |
     ——————————————————————————————————————————————
 
-© Copyright 2020 İhsan Volkan Töre.
+© Copyright 2023 İhsan Volkan Töre.
 
 Author              : IVT.  (İhsan Volkan Töre)
-Version             : 202303191158 (v8.0.0).
+Version             : 202310071044 (v8.0.1).
 License             : MIT.
 
 History             :
+202310071044: IVT   : Generic Attr<T>() method modified to return T.
 202303191158: IVT   : 
     * Dbg(), isDebug etc. removed.
     * ExcInterceptorDelegate type renamed as ExceptionInterceptorDelegate.
@@ -199,7 +200,7 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Attr [static]                                               <summary>
           TASK:                                                             <br/>
-                Fetches an attribute of a member.                           <para/>
+                Fetches an attribute of a member. Non-generic version.      <para/>
           ARGS:                                                             <br/>
                 attrType    : Type          :   Type of attribute.          <br/>
                 memInfo     : MemberInfo    :   Member information.         <para/>
@@ -215,16 +216,16 @@ namespace Tore.Core {
         /**———————————————————————————————————————————————————————————————————————————
           FUNC: Attr [static]                                               <summary>
           TASK:                                                             <br/>
-                Fetches an attribute of a member.                           <para/>
+                Fetches an attribute of a member. Generic version.          <para/>
           ARGS:                                                             <br/>
                 T           : Type(Class)   :   Type of attribute.          <br/>
                 memInfo     : MemberInfo    :   Member information.         <para/>
-          RETV:             : Attribute     :   The attribute or null if
+          RETV:             : T             :   The attribute or null if
                                                 not found.                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public static Attribute Attr<T>(MemberInfo memInfo) where T : Attribute {
+        public static T Attr<T>(MemberInfo memInfo) where T : Attribute {
             Chk(memInfo, nameof(memInfo));
-            return memInfo.GetCustomAttribute(typeof(T), true);
+            return (T)memInfo.GetCustomAttribute(typeof(T), true);
         }
 
 
