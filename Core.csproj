@@ -12,7 +12,7 @@
     <PackageTags>Tore Core Config File Extensions Hex Json Stl Sys Utc Utf8 Xor Utilities</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
-    <PackageReleaseNotes>Radically changed, not compatible with previous versions.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added Json.Populate, changed Attr&lt;T&gt; to return T and some comment corrections.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>False</SignAssembly>
     <ApplicationIcon />
