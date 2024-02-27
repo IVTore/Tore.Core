@@ -11,6 +11,11 @@ Dependencies: <br/>
 net7.0<br/>
 Newtonsoft.Json 13+
 
+Changes in v8.0.2: 
+
+    StrLst.cs:
+        Corrected hasPair method name into HasPair.
+
 Changes in v8.0.1: 
 
     Minor corrections on documentation.

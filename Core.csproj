@@ -6,18 +6,18 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>İhsan Volkan Töre</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Copyright>2023 İhsan Volkan Töre</Copyright>
+    <Copyright>2024 İhsan Volkan Töre</Copyright>
     <Description>C# core utility library By İ. V. Töre.
 </Description>
     <PackageTags>Tore Core Config File Extensions Hex Json Stl Sys Utc Utf8 Xor Utilities</PackageTags>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/IVTore/Tore.Core</RepositoryUrl>
-    <PackageReleaseNotes>Added Json.Populate, changed Attr&lt;T&gt; to return T and some comment corrections.</PackageReleaseNotes>
+    <PackageReleaseNotes>Renamed StrLst hasPair(...) method to HasPair.</PackageReleaseNotes>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SignAssembly>False</SignAssembly>
     <ApplicationIcon />
     <Win32Resource />
-    <Version>8.0.1</Version>
+    <Version>8.0.2</Version>
     <PackageProjectUrl>https://github.com/IVTore/Tore.Core</PackageProjectUrl>
     <IncludeSymbols>True</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
