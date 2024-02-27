@@ -512,7 +512,7 @@ namespace Tore.Core {
         }
 
         /**———————————————————————————————————————————————————————————————————————————
-          FUNC: hasPair                                                     <summary>
+          FUNC: HasPair                                                     <summary>
           TASK:                                                             <br/>
                 Looks if a Key object pair exists from the beginning index. <para/>
           ARGS:                                                             <br/>
@@ -522,7 +522,7 @@ namespace Tore.Core {
           RETV:                                                             <br/>
                             : bool   : true if found, else false.           </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool hasPair(string aKey, object aObj, int fromIndex = 0) {
+        public bool HasPair(string aKey, object aObj, int fromIndex = 0) {
             return (IndexPair(aKey, aObj, fromIndex) > -1);
         }
 
@@ -952,7 +952,7 @@ namespace Tore.Core {
           FUNC: Contains                                                    <summary>
           TASK: IDictionary interface. Better use hasPair().                </summary>
         ————————————————————————————————————————————————————————————————————————————*/
-        public bool Contains(KeyValuePair<string, object> item) => hasPair(item.Key, item.Value);
+        public bool Contains(KeyValuePair<string, object> item) => HasPair(item.Key, item.Value);
         
         /**———————————————————————————————————————————————————————————————————————————
           PROP: IsReadOnly                                                  <summary>
