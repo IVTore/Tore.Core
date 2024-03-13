@@ -2,7 +2,9 @@
 Core utilities and extensions library for C# By İ. Volkan Töre.
 
 Please give a STAR (it's free!) if you find this library useful.
+
 I want to know if this library is used by real people.
+
 Nuget reports many downloads but probably they are bots.
 
 
