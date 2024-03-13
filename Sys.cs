@@ -6,10 +6,11 @@
 © Copyright 2023 İhsan Volkan Töre.
 
 Author              : IVT.  (İhsan Volkan Töre)
-Version             : 202310071044 (v8.0.1).
+Version             : 202403131321: (v8.0.3).
 License             : MIT.
 
 History             :
+202403131321: IVT   : Revision and upgrade to .NET 8 LTS.
 202310071044: IVT   : Generic Attr<T>() method modified to return T.
 202303191158: IVT   : 
     * Dbg(), isDebug etc. removed.
@@ -141,9 +142,11 @@ namespace Tore.Core {
             StrLst dta;
             MethodBase met;
 
+            tag ??= "E_NO_TAG";
+            inf ??= "";
             cex = e ?? new ToreCoreException(tag);      // If no exception make one.
             if (cex.HasInfo())                          // If exception already processed
-                return null;                            // return.
+                return cex;                             // return.
             dta = new StrLst(){                         // Collect data.
                 {"exc", cex.GetType().FullName},
                 {"msg", cex.Message},

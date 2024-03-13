@@ -8,8 +8,14 @@ Nuget package: [Tore.Core](https://www.nuget.org/packages/Tore.Core/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 Dependencies: <br/>
-net7.0<br/>
-Newtonsoft.Json 13+
+.NET 8 LTS.<br/>
+Newtonsoft.Json 13.0.3+
+
+Changes in v8.0.3:
+
+    Upgraded to .NET 8 LTS.
+    
+    Last .NET 7 version was v.8.0.2.
 
 Changes in v8.0.2: 
 

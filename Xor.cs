@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
 
 
 using static Tore.Core.Sys;
@@ -92,9 +88,10 @@ namespace Tore.Core {
         ————————————————————————————————————————————————————————————————————————————*/
         public static string Decrypt(string hex, string encKey, string xorKey, string strip = "-"){
             byte[] decBuf;
-            byte[] keyArr = PrepDualKey(encKey, xorKey, strip);
+            byte[] keyArr;
 
             Chk(hex, nameof(hex));
+            keyArr = PrepDualKey(encKey, xorKey, strip);
             decBuf = Hex.ToByteArray(hex);
             decBuf = CryptByteArrays(decBuf, keyArr);
             return Encoding.UTF8.GetString(decBuf);
@@ -120,8 +117,11 @@ namespace Tore.Core {
                                      string xorKey, 
                                      string strip = "-") {
             byte[] encBuf;
-            byte[] keyArr = PrepDualKey(encKey, xorKey, strip);
-            
+            byte[] keyArr;
+
+            Chk(data, nameof(data));
+            strip ??="";
+            keyArr = PrepDualKey(encKey, xorKey, strip);
             encBuf = Encoding.UTF8.GetBytes(data);
             encBuf = CryptByteArrays(encBuf, keyArr);
             return Encoding.UTF8.GetString(encBuf);
@@ -154,8 +154,10 @@ namespace Tore.Core {
                  file : string  : filename                                  </summary>
         ————————————————————————————————————————————————————————————————————————————*/
         public static bool IsCryptoFile(string file) {
-            char[] buf = new char[CF_HDR.Length];
+            char[] buf;
 
+            Chk(file, nameof(file));
+            buf = new char[CF_HDR.Length];
             using (StreamReader reader = new StreamReader(file, Encoding.UTF8))
                 reader.Read(buf, 0, buf.Length);
             return CF_HDR.Equals(buf.ToString());
